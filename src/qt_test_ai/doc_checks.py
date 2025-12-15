@@ -1,0 +1,96 @@
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+from .models import Finding
+from .utils import iter_files, read_text_best_effort
+
+
+_DOC_NAMES = (
+    "README.md",
+    "readme.md",
+    "README.txt",
+    "使用说明.md",
+    "用户手册.md",
+)
+
+
+def run_doc_checks(project_root: Path) -> tuple[list[Finding], dict]:
+    findings: list[Finding] = []
+    meta: dict = {}
+
+    # 找用户文档
+    doc_paths: list[Path] = []
+    for name in _DOC_NAMES:
+        p = project_root / name
+        if p.exists():
+            doc_paths.append(p)
+
+    # 也支持 docs/ 目录
+    docs_dir = project_root / "docs"
+    if docs_dir.exists() and docs_dir.is_dir():
+        doc_paths.extend(iter_files(docs_dir, ("**/*.md", "**/*.txt")))
+
+    doc_paths = sorted({p.resolve(): p for p in doc_paths}.values(), key=lambda x: str(x).lower())
+    meta["doc_files"] = [str(p) for p in doc_paths]
+
+    if not doc_paths:
+        findings.append(
+            Finding(
+                category="docs",
+                severity="error",
+                title="未发现用户文档（README/使用说明/用户手册）",
+                details="建议至少提供：安装/运行/主要功能/快捷键或菜单/常见问题/联系方式。",
+            )
+        )
+        return findings, meta
+
+    # 简单完整性检查
+    required_keywords = [
+        ("安装", "安装/环境"),
+        ("运行", "运行/启动"),
+        ("功能", "主要功能"),
+    ]
+
+    for p in doc_paths:
+        text = read_text_best_effort(p)
+        lower = text.lower()
+
+        for kw, desc in required_keywords:
+            if kw.lower() not in lower and kw not in text:
+                findings.append(
+                    Finding(
+                        category="docs",
+                        severity="warning",
+                        title=f"文档缺少：{desc}",
+                        file=str(p),
+                        details=f"未检测到关键字：{kw}",
+                    )
+                )
+
+        # 检查是否有截图/示例
+        if not re.search(r"!\[[^\]]*\]\([^\)]+\)", text) and "示例" not in text:
+            findings.append(
+                Finding(
+                    category="docs",
+                    severity="info",
+                    title="建议增加截图或操作示例",
+                    file=str(p),
+                )
+            )
+
+        # 超长行（可读性）
+        long_lines = [i for i, line in enumerate(text.splitlines(), start=1) if len(line) > 180]
+        if long_lines:
+            findings.append(
+                Finding(
+                    category="docs",
+                    severity="info",
+                    title="文档存在较长行（影响阅读）",
+                    file=str(p),
+                    details=f"行号示例：{', '.join(map(str, long_lines[:10]))}",
+                )
+            )
+
+    return findings, meta
