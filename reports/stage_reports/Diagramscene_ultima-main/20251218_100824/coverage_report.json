@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "lines": {
+      "total": 5468,
+      "covered": 72,
+      "percent": 1.32
+    },
+    "functions": {
+      "total": 422,
+      "covered": 0,
+      "percent": 0.0
+    },
+    "branches": {
+      "total": 0,
+      "covered": 0,
+      "percent": 0.0
+    }
+  }
+}

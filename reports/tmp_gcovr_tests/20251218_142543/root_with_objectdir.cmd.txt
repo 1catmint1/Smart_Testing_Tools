@@ -1,0 +1,1 @@
+gcovr -r C:\Users\lenovo\Desktop\Diagramscene_ultima-main --object-directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug --gcov-executable D:/Qt/Tools/mingw1310_64/bin/gcov.exe --print-summary --html-details -o coverage.html

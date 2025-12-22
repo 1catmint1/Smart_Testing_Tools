@@ -77,11 +77,29 @@ def chat_completion_text(cfg: LLMConfig, *, messages: list[dict[str, Any]]) -> s
         "temperature": 0.2,
     }
 
+    # Optional logging for debugging long-running LLM calls.
+    do_log = (os.getenv("QT_TEST_AI_LOG_REQUESTS") or "").strip() in {"1","true","yes"}
+    if do_log:
+        try:
+            import datetime
+            print(f"[LLM] request {datetime.datetime.now().isoformat()} url={url} model={cfg.model} messages={len(messages)}")
+        except Exception:
+            pass
+
     resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=cfg.timeout_s)
     if resp.status_code >= 400:
-        raise RuntimeError(f"LLM请求失败: url={url} HTTP {resp.status_code} {resp.text[:500]}")
+        err = f"LLM请求失败: url={url} HTTP {resp.status_code} {resp.text[:500]}"
+        if do_log:
+            print(f"[LLM] error: {err}")
+        raise RuntimeError(err)
 
     data = resp.json()
+    if do_log:
+        try:
+            import datetime
+            print(f"[LLM] response {datetime.datetime.now().isoformat()} keys={list(data.keys())}")
+        except Exception:
+            pass
     choices = data.get("choices") or []
     if not choices:
         raise RuntimeError("LLM返回缺少choices")

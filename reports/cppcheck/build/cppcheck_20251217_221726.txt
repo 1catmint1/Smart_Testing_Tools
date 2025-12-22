@@ -1,0 +1,34 @@
+C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_diagramscene.cpp:22:2: warning: #error "This file was generated using the moc from 6.10.1. It" [preprocessorErrorDirective]
+#error "This file was generated using the moc from 6.10.1. It"
+ ^
+C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_diagramtextitem.cpp:22:2: warning: #error "This file was generated using the moc from 6.10.1. It" [preprocessorErrorDirective]
+#error "This file was generated using the moc from 6.10.1. It"
+ ^
+C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_findreplacedialog.cpp:22:2: warning: #error "This file was generated using the moc from 6.10.1. It" [preprocessorErrorDirective]
+#error "This file was generated using the moc from 6.10.1. It"
+ ^
+C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_mainwindow.cpp:22:2: warning: #error "This file was generated using the moc from 6.10.1. It" [preprocessorErrorDirective]
+#error "This file was generated using the moc from 6.10.1. It"
+ ^
+C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\qrc_diagramscene.cpp:8758:31: warning: Unmatched '{'. Configuration: 'QT_INLINE_NAMESPACE'. [syntaxError]
+inline namespace QT_NAMESPACE {
+                              ^
+C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\qrc_diagramscene.cpp:8760:11: warning: syntax error [syntaxError]
+namespace QT_NAMESPACE {
+          ^
+
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_diagramscene.cpp ...
+1/5 files checked 1% done
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_diagramtextitem.cpp ...
+2/5 files checked 1% done
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_findreplacedialog.cpp ...
+3/5 files checked 2% done
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_mainwindow.cpp ...
+4/5 files checked 5% done
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\qrc_diagramscene.cpp ...
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\qrc_diagramscene.cpp: QT_INLINE_NAMESPACE...
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\qrc_diagramscene.cpp: QT_NAMESPACE...
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\qrc_diagramscene.cpp: _MSC_VER...
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\qrc_diagramscene.cpp: __APPLE__;__ELF__...
+Checking C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\qrc_diagramscene.cpp: __clang__...
+5/5 files checked 100% done

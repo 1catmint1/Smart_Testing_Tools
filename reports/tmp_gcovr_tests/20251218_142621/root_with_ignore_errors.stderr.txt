@@ -1,0 +1,361 @@
+(INFO) Reading coverage data...
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\arrow.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../arrow.h
+Cannot open source file ../../../arrow.cpp
+Cannot open source file ../../../diagramitem.h
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../arrow.h
+Cannot open source file ../../../arrow.cpp
+Cannot open source file ../../../diagramitem.h
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\deletecommand.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../deletecommand.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../deletecommand.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\diagramitem.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../diagramitem.h
+Cannot open source file ../../../diagramitem.cpp
+Cannot open source file ../../../arrow.h
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../diagramitem.h
+Cannot open source file ../../../diagramitem.cpp
+Cannot open source file ../../../arrow.h
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\diagramitemgroup.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../diagramitemgroup.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../diagramitemgroup.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\diagrampath.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../diagrampath.h
+Cannot open source file ../../../diagrampath.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../diagrampath.h
+Cannot open source file ../../../diagrampath.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\diagramscene.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../diagramscene.cpp
+Cannot open source file ../../../arrow.h
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../diagramscene.cpp
+Cannot open source file ../../../arrow.h
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\diagramtextitem.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../diagramtextitem.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../diagramtextitem.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\findreplacedialog.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../findreplacedialog.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../findreplacedialog.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\mainwindow.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../../mainwindow.cpp
+Cannot open source file ../../../diagramitem.h
+Cannot open source file ../../../mainwindow.h
+Cannot open source file ../../../arrow.h
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../../mainwindow.cpp
+Cannot open source file ../../../diagramitem.h
+Cannot open source file ../../../mainwindow.h
+Cannot open source file ../../../arrow.h
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\moc_diagramtextitem.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+debug\moc_diagramtextitem.cpp:source file is newer than notes file './moc_diagramtextitem.gcno'
+(the message is displayed only once per source file)
+Cannot open source file ../../../diagramtextitem.h
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/moc_diagramtextitem.cpp
+Cannot open source file ../../../diagramtextitem.h
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_arrow_connection_system.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../test_arrow_connection_system.cpp
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/internal/gtest-internal.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest-matchers.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-matchers.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-actions.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest-printers.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-spec-builders.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/internal/gmock-internal-utils.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest-message.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/internal/gtest-port.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest-assertion-result.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-nice-strict.h
+Cannot open source file ../../../diagramitem.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-cardinalities.h
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../test_arrow_connection_system.cpp
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/internal/gtest-internal.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest-matchers.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-matchers.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-actions.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest-printers.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-spec-builders.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/internal/gmock-internal-utils.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest-message.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/internal/gtest-port.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest-assertion-result.h
+Cannot open source file ../../../../googletest-main/googletest/include/gtest/gtest.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-nice-strict.h
+Cannot open source file ../../../diagramitem.h
+Cannot open source file ../../../../googletest-main/googlemock/include/gmock/gmock-cardinalities.h
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_arrow_straight_connection.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_arrow_straight_connection.moc
+Cannot open source file ../../test_arrow_straight_connection.cpp
+Cannot open source file ../../../diagramitem.h
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_arrow_straight_connection.moc
+Cannot open source file ../../test_arrow_straight_connection.cpp
+Cannot open source file ../../../diagramitem.h
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_component_signal_integrate.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_component_signal_integrate.moc
+Cannot open source file ../../test_component_signal_integrate.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_component_signal_integrate.moc
+Cannot open source file ../../test_component_signal_integrate.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_connectionline_style.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_connectionline_style.moc
+Cannot open source file ../../test_connectionline_style.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_connectionline_style.moc
+Cannot open source file ../../test_connectionline_style.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_dataflow_integrity.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_dataflow_integrity.moc
+Cannot open source file ../../test_dataflow_integrity.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_dataflow_integrity.moc
+Cannot open source file ../../test_dataflow_integrity.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_diagramitem_properties.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_diagramitem_properties.moc
+Cannot open source file ../../test_diagramitem_properties.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_diagramitem_properties.moc
+Cannot open source file ../../test_diagramitem_properties.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_diagramitem_transform.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_diagramitem_transform.moc
+Cannot open source file ../../test_diagramitem_transform.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_diagramitem_transform.moc
+Cannot open source file ../../test_diagramitem_transform.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_diagramitem_types_full.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_diagramitem_types_full.moc
+Cannot open source file ../../test_diagramitem_types_full.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_diagramitem_types_full.moc
+Cannot open source file ../../test_diagramitem_types_full.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_diagramitems_create.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_diagramitems_create.moc
+Cannot open source file ../../test_diagramitems_create.cpp
+Cannot open source file ../../../diagramitem.h
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_diagramitems_create.moc
+Cannot open source file ../../test_diagramitems_create.cpp
+Cannot open source file ../../../diagramitem.h
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_diagrampath_connection.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_diagrampath_connection.moc
+Cannot open source file ../../test_diagrampath_connection.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_diagrampath_connection.moc
+Cannot open source file ../../test_diagrampath_connection.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_diagrampath_path_dev.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_diagrampath_path_dev.moc
+Cannot open source file ../../test_diagrampath_path_dev.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_diagrampath_path_dev.moc
+Cannot open source file ../../test_diagrampath_path_dev.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_diagramtextitem_edit.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_diagramtextitem_edit.moc
+Cannot open source file ../../test_diagramtextitem_edit.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_diagramtextitem_edit.moc
+Cannot open source file ../../test_diagramtextitem_edit.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_file_io.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../test_file_io.cpp
+Cannot open source file debug/test_file_io.moc
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../test_file_io.cpp
+Cannot open source file debug/test_file_io.moc
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_findreplacedialog.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_findreplacedialog.moc
+Cannot open source file ../../test_findreplacedialog.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_findreplacedialog.moc
+Cannot open source file ../../test_findreplacedialog.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_main.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file ../../test_main.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file ../../test_main.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_performance_stress.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_performance_stress.moc
+Cannot open source file ../../test_performance_stress.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_performance_stress.moc
+Cannot open source file ../../test_performance_stress.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_performance_workflow.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_performance_workflow.moc
+Cannot open source file ../../test_performance_workflow.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_performance_workflow.moc
+Cannot open source file ../../test_performance_workflow.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_scene_management.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_scene_management.moc
+Cannot open source file ../../test_scene_management.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_scene_management.moc
+Cannot open source file ../../test_scene_management.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_shortcuts.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_shortcuts.moc
+Cannot open source file ../../test_shortcuts.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_shortcuts.moc
+Cannot open source file ../../test_shortcuts.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(ERROR) GCOV produced the following errors processing C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\test_undo_redo.gcda:
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug:
+Cannot open source file debug/test_undo_redo.moc
+Cannot open source file ../../test_undo_redo.cpp
+
+	In directory C:\Users\lenovo\Desktop\Diagramscene_ultima-main:
+Cannot open source file debug/test_undo_redo.moc
+Cannot open source file ../../test_undo_redo.cpp
+
+	(GCOVR could not infer a working directory that resolved it.)
+To ignore this error use option --gcov-ignore-errors=no_working_dir_found.
+(INFO) Writing coverage report...

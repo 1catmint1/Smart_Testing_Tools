@@ -1,0 +1,87 @@
+{
+  "exe_path": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main\\build\\Desktop_Qt_6_7_2_MinGW_64_bit-Debug\\debug\\diagramscene.exe",
+  "timestamp": "2025-12-17T22:31:56.760322",
+  "smoke_test": {
+    "exe": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main\\build\\Desktop_Qt_6_7_2_MinGW_64_bit-Debug\\debug\\diagramscene.exe",
+    "timeout_sec": 15,
+    "alive": true,
+    "cpu_samples": [
+      15.3,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "memory_samples": [
+      {
+        "rss_mb": 1.82,
+        "vms_mb": 0.45,
+        "percent": 0.01,
+        "elapsed_s": 0.2
+      },
+      {
+        "rss_mb": 1.82,
+        "vms_mb": 0.45,
+        "percent": 0.01,
+        "elapsed_s": 0.4
+      },
+      {
+        "rss_mb": 1.82,
+        "vms_mb": 0.45,
+        "percent": 0.01,
+        "elapsed_s": 0.61
+      },
+      {
+        "rss_mb": 1.82,
+        "vms_mb": 0.45,
+        "percent": 0.01,
+        "elapsed_s": 0.81
+      },
+      {
+        "rss_mb": 1.82,
+        "vms_mb": 0.45,
+        "percent": 0.01,
+        "elapsed_s": 1.01
+      }
+    ],
+    "returncode": null,
+    "startup_time_s": 0.0020895004272460938,
+    "memory_analysis": {
+      "initial_rss_mb": 1.82,
+      "final_rss_mb": 1.82,
+      "growth_mb": 0.0,
+      "growth_percent": 0.0
+    }
+  },
+  "ui_probe": {
+    "exe": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main\\build\\Desktop_Qt_6_7_2_MinGW_64_bit-Debug\\debug\\diagramscene.exe",
+    "timeout_sec": 15
+  },
+  "findings": [
+    {
+      "title": "已自动选择候选 exe",
+      "severity": "info",
+      "details": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main\\build\\Desktop_Qt_6_7_2_MinGW_64_bit-Debug\\debug\\diagramscene.exe"
+    },
+    {
+      "title": "进程启动成功",
+      "severity": "info",
+      "details": "pid=44368"
+    },
+    {
+      "title": "启动响应时间: 0.00秒",
+      "severity": "info",
+      "details": "从启动到进程就绪耗时 0.00 秒"
+    },
+    {
+      "title": "内存占用: 1.8 MB (RSS)",
+      "severity": "info",
+      "details": "初始: 1.8 MB → 最终: 1.8 MB"
+    },
+    {
+      "title": "UI 探测失败",
+      "severity": "warning",
+      "details": "No windows for that process could be found"
+    }
+  ]
+}
