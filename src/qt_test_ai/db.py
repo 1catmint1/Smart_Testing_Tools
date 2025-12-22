@@ -21,24 +21,50 @@ def open_db(db_path: Path) -> sqlite3.Connection:
             project_root TEXT NOT NULL,
             exe_path TEXT,
             meta_json TEXT NOT NULL,
-            findings_json TEXT NOT NULL
+            findings_json TEXT NOT NULL,
+            total_findings INTEGER DEFAULT 0,
+            error_count INTEGER DEFAULT 0,
+            warning_count INTEGER DEFAULT 0
         );
         """
     )
+    
+    # Auto-migration: check if columns exist, if not add them
+    try:
+        conn.execute("SELECT total_findings FROM test_runs LIMIT 1")
+    except sqlite3.OperationalError:
+        conn.execute("ALTER TABLE test_runs ADD COLUMN total_findings INTEGER DEFAULT 0")
+        conn.execute("ALTER TABLE test_runs ADD COLUMN error_count INTEGER DEFAULT 0")
+        conn.execute("ALTER TABLE test_runs ADD COLUMN warning_count INTEGER DEFAULT 0")
+        
     return conn
 
 
 def save_run(conn: sqlite3.Connection, run: TestRun) -> int:
     findings_json = json.dumps([asdict(f) for f in run.findings], ensure_ascii=False)
     meta_json = json.dumps(run.meta, ensure_ascii=False)
+    
+    # Calculate stats
+    total = len(run.findings)
+    err = sum(1 for f in run.findings if f.severity == "error")
+    warn = sum(1 for f in run.findings if f.severity == "warning")
+    
     cur = conn.execute(
-        "INSERT INTO test_runs(created_at, project_root, exe_path, meta_json, findings_json) VALUES(?,?,?,?,?)",
+        """
+        INSERT INTO test_runs(
+            created_at, project_root, exe_path, meta_json, findings_json,
+            total_findings, error_count, warning_count
+        ) VALUES(?,?,?,?,?,?,?,?)
+        """,
         (
             run.created_at.isoformat(timespec="seconds"),
             run.project_root,
             run.exe_path,
             meta_json,
             findings_json,
+            total,
+            err,
+            warn
         ),
     )
     conn.commit()
@@ -74,3 +100,10 @@ def load_run(conn: sqlite3.Connection, run_id: int) -> TestRun:
         findings=findings,
         meta=meta,
     )
+
+
+def delete_run(conn: sqlite3.Connection, run_id: int) -> bool:
+    """Delete a test run by ID. Returns True if deleted, False if not found."""
+    cur = conn.execute("DELETE FROM test_runs WHERE id=?", (run_id,))
+    conn.commit()
+    return cur.rowcount > 0
