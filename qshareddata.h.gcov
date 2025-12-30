@@ -1,0 +1,321 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qshareddata.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QSHAREDDATA_H
+        -:    5:#define QSHAREDDATA_H
+        -:    6:
+        -:    7:#include <QtCore/qglobal.h>
+        -:    8:#include <QtCore/qatomic.h>
+        -:    9:#include <QtCore/qcompare.h>
+        -:   10:#include <QtCore/qhashfunctions.h>
+        -:   11:
+        -:   12:
+        -:   13:QT_BEGIN_NAMESPACE
+        -:   14:
+        -:   15:
+        -:   16:template <class T> class QSharedDataPointer;
+        -:   17:
+        -:   18:class QSharedData
+        -:   19:{
+        -:   20:public:
+        -:   21:    mutable QAtomicInt ref;
+        -:   22:
+    #####:   23:    QSharedData() noexcept : ref(0) { }
+    #####:   24:    QSharedData(const QSharedData &) noexcept : ref(0) { }
+        -:   25:
+        -:   26:    // using the assignment operator would lead to corruption in the ref-counting
+        -:   27:    QSharedData &operator=(const QSharedData &) = delete;
+        -:   28:    ~QSharedData() = default;
+        -:   29:};
+        -:   30:
+        -:   31:struct QAdoptSharedDataTag { explicit constexpr QAdoptSharedDataTag() = default; };
+        -:   32:
+        -:   33:template <typename T>
+        -:   34:class QSharedDataPointer
+        -:   35:{
+        -:   36:public:
+        -:   37:    typedef T Type;
+        -:   38:    typedef T *pointer;
+        -:   39:
+        -:   40:    void detach() { if (d && d->ref.loadRelaxed() != 1) detach_helper(); }
+        -:   41:    T &operator*() { detach(); return *(d.get()); }
+        -:   42:    const T &operator*() const { return *(d.get()); }
+        -:   43:    T *operator->() { detach(); return d.get(); }
+        -:   44:    const T *operator->() const noexcept { return d.get(); }
+        -:   45:    operator T *() { detach(); return d.get(); }
+        -:   46:    operator const T *() const noexcept { return d.get(); }
+        -:   47:    T *data() { detach(); return d.get(); }
+        -:   48:    T *get() { detach(); return d.get(); }
+        -:   49:    const T *data() const noexcept { return d.get(); }
+        -:   50:    const T *get() const noexcept { return d.get(); }
+        -:   51:    const T *constData() const noexcept { return d.get(); }
+        -:   52:    T *take() noexcept { return std::exchange(d, nullptr).get(); }
+        -:   53:
+        -:   54:    Q_NODISCARD_CTOR
+        -:   55:    QSharedDataPointer() noexcept : d(nullptr) { }
+        -:   56:    ~QSharedDataPointer() { if (d && !d->ref.deref()) delete d.get(); }
+        -:   57:
+        -:   58:    Q_NODISCARD_CTOR
+        -:   59:    explicit QSharedDataPointer(T *data) noexcept : d(data)
+        -:   60:    { if (d) d->ref.ref(); }
+        -:   61:    Q_NODISCARD_CTOR
+        -:   62:    QSharedDataPointer(T *data, QAdoptSharedDataTag) noexcept : d(data)
+        -:   63:    {}
+        -:   64:    Q_NODISCARD_CTOR
+        -:   65:    QSharedDataPointer(const QSharedDataPointer &o) noexcept : d(o.d)
+        -:   66:    { if (d) d->ref.ref(); }
+        -:   67:
+        -:   68:    void reset(T *ptr = nullptr) noexcept
+        -:   69:    {
+        -:   70:        if (ptr != d.get()) {
+        -:   71:            if (ptr)
+        -:   72:                ptr->ref.ref();
+        -:   73:            T *old = std::exchange(d, Qt::totally_ordered_wrapper(ptr)).get();
+        -:   74:            if (old && !old->ref.deref())
+        -:   75:                delete old;
+        -:   76:        }
+        -:   77:    }
+        -:   78:
+        -:   79:    QSharedDataPointer &operator=(const QSharedDataPointer &o) noexcept
+        -:   80:    {
+        -:   81:        reset(o.d.get());
+        -:   82:        return *this;
+        -:   83:    }
+        -:   84:    inline QSharedDataPointer &operator=(T *o) noexcept
+        -:   85:    {
+        -:   86:        reset(o);
+        -:   87:        return *this;
+        -:   88:    }
+        -:   89:    Q_NODISCARD_CTOR
+        -:   90:    QSharedDataPointer(QSharedDataPointer &&o) noexcept : d(std::exchange(o.d, nullptr)) {}
+        -:   91:    QT_MOVE_ASSIGNMENT_OPERATOR_IMPL_VIA_MOVE_AND_SWAP(QSharedDataPointer)
+        -:   92:
+        -:   93:    operator bool () const noexcept { return d != nullptr; }
+        -:   94:    bool operator!() const noexcept { return d == nullptr; }
+        -:   95:
+        -:   96:    void swap(QSharedDataPointer &other) noexcept
+        -:   97:    { qt_ptr_swap(d, other.d); }
+        -:   98:
+        -:   99:protected:
+        -:  100:    T *clone();
+        -:  101:
+        -:  102:private:
+        -:  103:    friend bool comparesEqual(const QSharedDataPointer &lhs, const QSharedDataPointer &rhs) noexcept
+        -:  104:    { return lhs.d == rhs.d; }
+        -:  105:    friend Qt::strong_ordering
+        -:  106:    compareThreeWay(const QSharedDataPointer &lhs, const QSharedDataPointer &rhs) noexcept
+        -:  107:    { return Qt::compareThreeWay(lhs.d, rhs.d); }
+        -:  108:    Q_DECLARE_STRONGLY_ORDERED(QSharedDataPointer)
+        -:  109:
+        -:  110:    friend bool comparesEqual(const QSharedDataPointer &lhs, const T *rhs) noexcept
+        -:  111:    { return lhs.d == rhs; }
+        -:  112:    friend Qt::strong_ordering
+        -:  113:    compareThreeWay(const QSharedDataPointer &lhs, const T *rhs) noexcept
+        -:  114:    { return Qt::compareThreeWay(lhs.d, rhs); }
+        -:  115:    Q_DECLARE_STRONGLY_ORDERED(QSharedDataPointer, T*)
+        -:  116:
+        -:  117:    friend bool comparesEqual(const QSharedDataPointer &lhs, std::nullptr_t) noexcept
+        -:  118:    { return lhs.d == nullptr; }
+        -:  119:    friend Qt::strong_ordering
+        -:  120:    compareThreeWay(const QSharedDataPointer &lhs, std::nullptr_t) noexcept
+        -:  121:    { return Qt::compareThreeWay(lhs.d, nullptr); }
+        -:  122:    Q_DECLARE_STRONGLY_ORDERED(QSharedDataPointer, std::nullptr_t)
+        -:  123:
+        -:  124:    void detach_helper();
+        -:  125:
+        -:  126:    Qt::totally_ordered_wrapper<T *> d;
+        -:  127:};
+        -:  128:
+        -:  129:template <typename T>
+        -:  130:class QExplicitlySharedDataPointer
+        -:  131:{
+        -:  132:public:
+        -:  133:    typedef T Type;
+        -:  134:    typedef T *pointer;
+        -:  135:
+        -:  136:    T &operator*() const { return *(d.get()); }
+        -:  137:    T *operator->() noexcept { return d.get(); }
+        -:  138:    T *operator->() const noexcept { return d.get(); }
+        -:  139:    explicit operator T *() { return d.get(); }
+        -:  140:    explicit operator const T *() const noexcept { return d.get(); }
+        -:  141:    T *data() const noexcept { return d.get(); }
+        -:  142:    T *get() const noexcept { return d.get(); }
+        -:  143:    const T *constData() const noexcept { return d.get(); }
+        -:  144:    T *take() noexcept { return std::exchange(d, nullptr).get(); }
+        -:  145:
+        -:  146:    void detach() { if (d && d->ref.loadRelaxed() != 1) detach_helper(); }
+        -:  147:
+        -:  148:    Q_NODISCARD_CTOR
+        -:  149:    QExplicitlySharedDataPointer() noexcept : d(nullptr) { }
+        -:  150:    ~QExplicitlySharedDataPointer() { if (d && !d->ref.deref()) delete d.get(); }
+        -:  151:
+        -:  152:    Q_NODISCARD_CTOR
+        -:  153:    explicit QExplicitlySharedDataPointer(T *data) noexcept : d(data)
+        -:  154:    { if (d) d->ref.ref(); }
+        -:  155:    Q_NODISCARD_CTOR
+        -:  156:    QExplicitlySharedDataPointer(T *data, QAdoptSharedDataTag) noexcept : d(data)
+        -:  157:    {}
+        -:  158:    Q_NODISCARD_CTOR
+        -:  159:    QExplicitlySharedDataPointer(const QExplicitlySharedDataPointer &o) noexcept : d(o.d)
+        -:  160:    { if (d) d->ref.ref(); }
+        -:  161:
+        -:  162:    template<typename X>
+        -:  163:    Q_NODISCARD_CTOR
+        -:  164:    QExplicitlySharedDataPointer(const QExplicitlySharedDataPointer<X> &o) noexcept
+        -:  165:#ifdef QT_ENABLE_QEXPLICITLYSHAREDDATAPOINTER_STATICCAST
+        -:  166:#error This macro has been removed in Qt 6.9.
+        -:  167:#endif
+        -:  168:        : d(o.data())
+        -:  169:    { if (d) d->ref.ref(); }
+        -:  170:
+        -:  171:    void reset(T *ptr = nullptr) noexcept
+        -:  172:    {
+        -:  173:        if (ptr != d) {
+        -:  174:            if (ptr)
+        -:  175:                ptr->ref.ref();
+        -:  176:            T *old = std::exchange(d, Qt::totally_ordered_wrapper(ptr)).get();
+        -:  177:            if (old && !old->ref.deref())
+        -:  178:                delete old;
+        -:  179:        }
+        -:  180:    }
+        -:  181:
+        -:  182:    QExplicitlySharedDataPointer &operator=(const QExplicitlySharedDataPointer &o) noexcept
+        -:  183:    {
+        -:  184:        reset(o.d.get());
+        -:  185:        return *this;
+        -:  186:    }
+        -:  187:    QExplicitlySharedDataPointer &operator=(T *o) noexcept
+        -:  188:    {
+        -:  189:        reset(o);
+        -:  190:        return *this;
+        -:  191:    }
+        -:  192:    Q_NODISCARD_CTOR
+        -:  193:    QExplicitlySharedDataPointer(QExplicitlySharedDataPointer &&o) noexcept : d(std::exchange(o.d, nullptr)) {}
+        -:  194:    QT_MOVE_ASSIGNMENT_OPERATOR_IMPL_VIA_MOVE_AND_SWAP(QExplicitlySharedDataPointer)
+        -:  195:
+        -:  196:    operator bool () const noexcept { return d != nullptr; }
+        -:  197:    bool operator!() const noexcept { return d == nullptr; }
+        -:  198:
+        -:  199:    void swap(QExplicitlySharedDataPointer &other) noexcept
+        -:  200:    { qt_ptr_swap(d, other.d); }
+        -:  201:
+        -:  202:protected:
+        -:  203:    T *clone();
+        -:  204:
+        -:  205:private:
+        -:  206:    friend bool comparesEqual(const QExplicitlySharedDataPointer &lhs,
+        -:  207:                              const QExplicitlySharedDataPointer &rhs) noexcept
+        -:  208:    { return lhs.d == rhs.d; }
+        -:  209:    friend Qt::strong_ordering
+        -:  210:    compareThreeWay(const QExplicitlySharedDataPointer &lhs,
+        -:  211:                    const QExplicitlySharedDataPointer &rhs) noexcept
+        -:  212:    { return Qt::compareThreeWay(lhs.d, rhs.d); }
+        -:  213:    Q_DECLARE_STRONGLY_ORDERED(QExplicitlySharedDataPointer)
+        -:  214:
+        -:  215:    friend bool comparesEqual(const QExplicitlySharedDataPointer &lhs, const T *rhs) noexcept
+        -:  216:    { return lhs.d == rhs; }
+        -:  217:    friend Qt::strong_ordering
+        -:  218:    compareThreeWay(const QExplicitlySharedDataPointer &lhs, const T *rhs) noexcept
+        -:  219:    { return Qt::compareThreeWay(lhs.d, rhs); }
+        -:  220:    Q_DECLARE_STRONGLY_ORDERED(QExplicitlySharedDataPointer, const T*)
+        -:  221:
+        -:  222:    friend bool comparesEqual(const QExplicitlySharedDataPointer &lhs, std::nullptr_t) noexcept
+        -:  223:    { return lhs.d == nullptr; }
+        -:  224:    friend Qt::strong_ordering
+        -:  225:    compareThreeWay(const QExplicitlySharedDataPointer &lhs, std::nullptr_t) noexcept
+        -:  226:    { return Qt::compareThreeWay(lhs.d, nullptr); }
+        -:  227:    Q_DECLARE_STRONGLY_ORDERED(QExplicitlySharedDataPointer, std::nullptr_t)
+        -:  228:
+        -:  229:    void detach_helper();
+        -:  230:
+        -:  231:    Qt::totally_ordered_wrapper<T *> d;
+        -:  232:};
+        -:  233:
+        -:  234:// Declared here and as Q_OUTOFLINE_TEMPLATE to work-around MSVC bug causing missing symbols at link time.
+        -:  235:template <typename T>
+        -:  236:Q_INLINE_TEMPLATE T *QSharedDataPointer<T>::clone()
+        -:  237:{
+        -:  238:    return new T(*d);
+        -:  239:}
+        -:  240:
+        -:  241:template <typename T>
+        -:  242:Q_OUTOFLINE_TEMPLATE void QSharedDataPointer<T>::detach_helper()
+        -:  243:{
+        -:  244:    T *x = clone();
+        -:  245:    x->ref.ref();
+        -:  246:    if (!d.get()->ref.deref())
+        -:  247:        delete d.get();
+        -:  248:    d.reset(x);
+        -:  249:}
+        -:  250:
+        -:  251:template <typename T>
+        -:  252:Q_INLINE_TEMPLATE T *QExplicitlySharedDataPointer<T>::clone()
+        -:  253:{
+        -:  254:    return new T(*d.get());
+        -:  255:}
+        -:  256:
+        -:  257:template <typename T>
+        -:  258:Q_OUTOFLINE_TEMPLATE void QExplicitlySharedDataPointer<T>::detach_helper()
+        -:  259:{
+        -:  260:    T *x = clone();
+        -:  261:    x->ref.ref();
+        -:  262:    if (!d->ref.deref())
+        -:  263:        delete d.get();
+        -:  264:    d.reset(x);
+        -:  265:}
+        -:  266:
+        -:  267:template <typename T>
+        -:  268:void swap(QSharedDataPointer<T> &p1, QSharedDataPointer<T> &p2) noexcept
+        -:  269:{ p1.swap(p2); }
+        -:  270:
+        -:  271:template <typename T>
+        -:  272:void swap(QExplicitlySharedDataPointer<T> &p1, QExplicitlySharedDataPointer<T> &p2) noexcept
+        -:  273:{ p1.swap(p2); }
+        -:  274:
+        -:  275:template <typename T>
+        -:  276:size_t qHash(const QSharedDataPointer<T> &ptr, size_t seed = 0) noexcept
+        -:  277:{
+        -:  278:    return qHash(ptr.data(), seed);
+        -:  279:}
+        -:  280:template <typename T>
+        -:  281:size_t qHash(const QExplicitlySharedDataPointer<T> &ptr, size_t seed = 0) noexcept
+        -:  282:{
+        -:  283:    return qHash(ptr.data(), seed);
+        -:  284:}
+        -:  285:
+        -:  286:template<typename T> Q_DECLARE_TYPEINFO_BODY(QSharedDataPointer<T>, Q_RELOCATABLE_TYPE);
+        -:  287:template<typename T> Q_DECLARE_TYPEINFO_BODY(QExplicitlySharedDataPointer<T>, Q_RELOCATABLE_TYPE);
+        -:  288:
+        -:  289:#define QT_DECLARE_QSDP_SPECIALIZATION_DTOR(Class) \
+        -:  290:    template<> QSharedDataPointer<Class>::~QSharedDataPointer();
+        -:  291:
+        -:  292:#define QT_DECLARE_QSDP_SPECIALIZATION_DTOR_WITH_EXPORT(Class, ExportMacro) \
+        -:  293:    template<> ExportMacro QSharedDataPointer<Class>::~QSharedDataPointer();
+        -:  294:
+        -:  295:#define QT_DEFINE_QSDP_SPECIALIZATION_DTOR(Class) \
+        -:  296:    template<> QSharedDataPointer<Class>::~QSharedDataPointer() \
+        -:  297:    { \
+        -:  298:        if (d && !d->ref.deref()) \
+        -:  299:            delete d.get(); \
+        -:  300:    }
+        -:  301:
+        -:  302:#define QT_DECLARE_QESDP_SPECIALIZATION_DTOR(Class) \
+        -:  303:    template<> QExplicitlySharedDataPointer<Class>::~QExplicitlySharedDataPointer();
+        -:  304:
+        -:  305:#define QT_DECLARE_QESDP_SPECIALIZATION_DTOR_WITH_EXPORT(Class, ExportMacro) \
+        -:  306:    template<> ExportMacro QExplicitlySharedDataPointer<Class>::~QExplicitlySharedDataPointer();
+        -:  307:
+        -:  308:#define QT_DEFINE_QESDP_SPECIALIZATION_DTOR(Class) \
+        -:  309:    template<> QExplicitlySharedDataPointer<Class>::~QExplicitlySharedDataPointer() \
+        -:  310:    { \
+        -:  311:        if (d && !d->ref.deref()) \
+        -:  312:            delete d.get(); \
+        -:  313:    }
+        -:  314:
+        -:  315:QT_END_NAMESPACE
+        -:  316:
+        -:  317:#endif // QSHAREDDATA_H

@@ -1,0 +1,7 @@
+[stage] testgen
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-main
+[time] 20251223_172739
+
+== findings ==
+- testgen | warning | 生成文件失败: tests/generated/test_diagramscene.cpp
+- testgen | info | 已生成 QtTest：24 个文件，共约 134 个用例

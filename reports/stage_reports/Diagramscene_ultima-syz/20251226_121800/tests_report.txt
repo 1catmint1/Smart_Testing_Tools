@@ -1,0 +1,52 @@
+[stage] tests
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[time] 20251226_121800
+[meta] cmd: cmd /c "set PATH=D:\Qt\6.10.1\mingw_64\bin;D:\Qt\Tools\mingw1310_64\bin;%PATH% && cd /d C:\Users\lenovo\Desktop\Diagramscene_ultima-syz && cd tests\generated && qmake tests.pro && mingw32-make clean && mingw32-make -f Makefile.Debug && debug\tests.exe && move debug\*.gc* ."
+[meta] cwd: C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[meta] returncode: 2
+[meta] timed_out: False
+[meta] timeout_s: 600.0
+
+== findings ==
+- tests | error | 测试命令执行失败
+
+== stdout (truncated) ==
+mingw32-make -f Makefile.Release clean
+mingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+del moc\moc_predefs.h
+del moc\moc_diagramscene.cpp moc\moc_diagramtextitem.cpp moc\moc_findreplacedialog.cpp moc\moc_mainwindow.cpp
+del moc\test_diagrampath.moc
+del obj\test_diagrampath.o obj\arrow.o obj\diagramitem.o obj\diagramitemgroup.o obj\diagrampath.o obj\diagramscene.o obj\diagramtextitem.o obj\findreplacedialog.o obj\mainwindow.o obj\moc_diagramscene.o obj\moc_diagramtextitem.o obj\moc_findreplacedialog.o obj\moc_mainwindow.o
+mingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+mingw32-make -f Makefile.Debug clean
+mingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+del moc\moc_predefs.h
+del moc\moc_diagramscene.cpp moc\moc_diagramtextitem.cpp moc\moc_findreplacedialog.cpp moc\moc_mainwindow.cpp
+del moc\test_diagrampath.moc
+del obj\test_diagrampath.o obj\arrow.o obj\diagramitem.o obj\diagramitemgroup.o obj\diagrampath.o obj\diagramscene.o obj\diagramtextitem.o obj\findreplacedialog.o obj\mainwindow.o obj\moc_diagramscene.o obj\moc_diagramtextitem.o obj\moc_findreplacedialog.o obj\moc_mainwindow.o
+mingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+g++ -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -dM -E -o moc\moc_predefs.h D:\Qt\6.10.1\mingw_64\mkspecs\features\data\dummy.cpp
+D:\Qt\6.10.1\mingw_64\bin\moc.exe -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR="\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\"" --include C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/moc/moc_predefs.h -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++ -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -ID:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include test_diagrampath.cpp -o moc\test_diagrampath.moc
+g++ -c -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR="\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\"" -I. -I../../../Diagramscene_ultima-syz -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -Imoc -I/include -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++  -o obj\test_diagrampath.o test_diagrampath.cpp
+
+== stderr (truncated) ==
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\moc_predefs.h
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\moc_diagramscene.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\test_diagrampath.moc
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\obj\test_diagrampath.o
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\moc_predefs.h
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\moc_diagramscene.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\test_diagrampath.moc
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\obj\test_diagrampath.o
+test_diagrampath.cpp: In member function 'void TestDiagramPath::testQuadFunction()':
+test_diagrampath.cpp:20:69: error: 'Top' is not a member of 'DiagramItem::TransformState'
+   20 |     DiagramPath path(nullptr, nullptr, DiagramItem::TransformState::Top, DiagramItem::TransformState::Bottom, nullptr);
+      |                                                                     ^~~
+test_diagrampath.cpp:20:103: error: 'Bottom' is not a member of 'DiagramItem::TransformState'
+   20 |     DiagramPath path(nullptr, nullptr, DiagramItem::TransformState::Top, DiagramItem::TransformState::Bottom, nullptr);
+      |                                                                                                       ^~~~~~
+test_diagrampath.cpp: In member function 'void TestDiagramPath::testConstructorState()':
+test_diagrampath.cpp:43:18: warning: unused variable 'path' [-Wunused-variable]
+   43 |     DiagramPath* path = nullptr;
+      |                  ^~~~
+mingw32-make: *** [Makefile.Debug:1908: obj/test_diagrampath.o] Error 1

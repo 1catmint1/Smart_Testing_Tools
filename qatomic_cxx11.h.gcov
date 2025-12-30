@@ -1,0 +1,469 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qatomic_cxx11.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2011 Thiago Macieira <thiago@kde.org>
+        -:    2:// Copyright (C) 2016 Intel Corporation.
+        -:    3:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    4:// Qt-Security score:significant reason:default
+        -:    5:
+        -:    6:#ifndef QATOMIC_CXX11_H
+        -:    7:#define QATOMIC_CXX11_H
+        -:    8:
+        -:    9:#include <QtCore/qgenericatomic.h>
+        -:   10:#include <QtCore/qyieldcpu.h>
+        -:   11:#include <atomic>
+        -:   12:
+        -:   13:QT_BEGIN_NAMESPACE
+        -:   14:
+        -:   15:#if 0
+        -:   16:// silence syncqt warnings
+        -:   17:QT_END_NAMESPACE
+        -:   18:#pragma qt_sync_skip_header_check
+        -:   19:#pragma qt_sync_stop_processing
+        -:   20:#endif
+        -:   21:
+        -:   22:/* Attempt to detect whether the atomic operations exist in hardware
+        -:   23: * or whether they are emulated by way of a lock.
+        -:   24: *
+        -:   25: * C++11 29.4 [atomics.lockfree] p1 says
+        -:   26: *
+        -:   27: *  The ATOMIC_..._LOCK_FREE macros indicate the lock-free property of the
+        -:   28: *  corresponding atomic types, with the signed and unsigned variants grouped
+        -:   29: *  together. The properties also apply to the corresponding (partial)
+        -:   30: *  specializations of the atomic template. A value of 0 indicates that the
+        -:   31: *  types are never lock-free. A value of 1 indicates that the types are
+        -:   32: *  sometimes lock-free. A value of 2 indicates that the types are always
+        -:   33: *  lock-free.
+        -:   34: *
+        -:   35: * We have a problem when the value is 1: we'd need to check at runtime, but
+        -:   36: * QAtomicInteger requires a constexpr answer (defect introduced in Qt 5.0). So
+        -:   37: * we'll err in the side of caution and say it isn't.
+        -:   38: */
+        -:   39:template <int N> struct QAtomicTraits
+        -:   40:{ static inline bool isLockFree(); };
+        -:   41:
+        -:   42:#define Q_ATOMIC_INT32_IS_SUPPORTED
+        -:   43:#if ATOMIC_INT_LOCK_FREE == 2
+        -:   44:#  define Q_ATOMIC_INT_REFERENCE_COUNTING_IS_ALWAYS_NATIVE
+        -:   45:#  define Q_ATOMIC_INT_TEST_AND_SET_IS_ALWAYS_NATIVE
+        -:   46:#  define Q_ATOMIC_INT_FETCH_AND_STORE_IS_ALWAYS_NATIVE
+        -:   47:#  define Q_ATOMIC_INT_FETCH_AND_ADD_IS_ALWAYS_NATIVE
+        -:   48:#  define Q_ATOMIC_INT32_REFERENCE_COUNTING_IS_ALWAYS_NATIVE
+        -:   49:#  define Q_ATOMIC_INT32_TEST_AND_SET_IS_ALWAYS_NATIVE
+        -:   50:#  define Q_ATOMIC_INT32_FETCH_AND_STORE_IS_ALWAYS_NATIVE
+        -:   51:#  define Q_ATOMIC_INT32_FETCH_AND_ADD_IS_ALWAYS_NATIVE
+        -:   52:
+        -:   53:template <> inline bool QAtomicTraits<4>::isLockFree()
+        -:   54:{ return true; }
+        -:   55:#elif ATOMIC_INT_LOCK_FREE == 1
+        -:   56:#  define Q_ATOMIC_INT_REFERENCE_COUNTING_IS_SOMETIMES_NATIVE
+        -:   57:#  define Q_ATOMIC_INT_TEST_AND_SET_IS_SOMETIMES_NATIVE
+        -:   58:#  define Q_ATOMIC_INT_FETCH_AND_STORE_IS_SOMETIMES_NATIVE
+        -:   59:#  define Q_ATOMIC_INT_FETCH_AND_ADD_IS_SOMETIMES_NATIVE
+        -:   60:#  define Q_ATOMIC_INT32_REFERENCE_COUNTING_IS_SOMETIMES_NATIVE
+        -:   61:#  define Q_ATOMIC_INT32_TEST_AND_SET_IS_SOMETIMES_NATIVE
+        -:   62:#  define Q_ATOMIC_INT32_FETCH_AND_STORE_IS_SOMETIMES_NATIVE
+        -:   63:#  define Q_ATOMIC_INT32_FETCH_AND_ADD_IS_SOMETIMES_NATIVE
+        -:   64:
+        -:   65:template <> inline bool QAtomicTraits<4>::isLockFree()
+        -:   66:{ return false; }
+        -:   67:#else
+        -:   68:#  define Q_ATOMIC_INT_REFERENCE_COUNTING_IS_NEVER_NATIVE
+        -:   69:#  define Q_ATOMIC_INT_TEST_AND_SET_IS_NEVER_NATIVE
+        -:   70:#  define Q_ATOMIC_INT_FETCH_AND_STORE_IS_NEVER_NATIVE
+        -:   71:#  define Q_ATOMIC_INT_FETCH_AND_ADD_IS_NEVER_NATIVE
+        -:   72:#  define Q_ATOMIC_INT32_REFERENCE_COUNTING_IS_NEVER_NATIVE
+        -:   73:#  define Q_ATOMIC_INT32_TEST_AND_SET_IS_NEVER_NATIVE
+        -:   74:#  define Q_ATOMIC_INT32_FETCH_AND_STORE_IS_NEVER_NATIVE
+        -:   75:#  define Q_ATOMIC_INT32_FETCH_AND_ADD_IS_NEVER_NATIVE
+        -:   76:
+        -:   77:template <> inline bool QAtomicTraits<4>::isLockFree()
+        -:   78:{ return false; }
+        -:   79:#endif
+        -:   80:
+        -:   81:#if ATOMIC_POINTER_LOCK_FREE == 2
+        -:   82:#  define Q_ATOMIC_POINTER_REFERENCE_COUNTING_IS_ALWAYS_NATIVE
+        -:   83:#  define Q_ATOMIC_POINTER_TEST_AND_SET_IS_ALWAYS_NATIVE
+        -:   84:#  define Q_ATOMIC_POINTER_FETCH_AND_STORE_IS_ALWAYS_NATIVE
+        -:   85:#  define Q_ATOMIC_POINTER_FETCH_AND_ADD_IS_ALWAYS_NATIVE
+        -:   86:#elif ATOMIC_POINTER_LOCK_FREE == 1
+        -:   87:#  define Q_ATOMIC_POINTER_REFERENCE_COUNTING_IS_SOMETIMES_NATIVE
+        -:   88:#  define Q_ATOMIC_POINTER_TEST_AND_SET_IS_SOMETIMES_NATIVE
+        -:   89:#  define Q_ATOMIC_POINTER_FETCH_AND_STORE_IS_SOMETIMES_NATIVE
+        -:   90:#  define Q_ATOMIC_POINTER_FETCH_AND_ADD_IS_SOMETIMES_NATIVE
+        -:   91:#else
+        -:   92:#  define Q_ATOMIC_POINTER_REFERENCE_COUNTING_IS_NEVER_NATIVE
+        -:   93:#  define Q_ATOMIC_POINTER_TEST_AND_SET_IS_NEVER_NATIVE
+        -:   94:#  define Q_ATOMIC_POINTER_FETCH_AND_STORE_IS_NEVER_NATIVE
+        -:   95:#  define Q_ATOMIC_POINTER_FETCH_AND_ADD_IS_NEVER_NATIVE
+        -:   96:#endif
+        -:   97:
+        -:   98:template<> struct QAtomicOpsSupport<1> { enum { IsSupported = 1 }; };
+        -:   99:#define Q_ATOMIC_INT8_IS_SUPPORTED
+        -:  100:#if ATOMIC_CHAR_LOCK_FREE == 2
+        -:  101:#  define Q_ATOMIC_INT8_REFERENCE_COUNTING_IS_ALWAYS_NATIVE
+        -:  102:#  define Q_ATOMIC_INT8_TEST_AND_SET_IS_ALWAYS_NATIVE
+        -:  103:#  define Q_ATOMIC_INT8_FETCH_AND_STORE_IS_ALWAYS_NATIVE
+        -:  104:#  define Q_ATOMIC_INT8_FETCH_AND_ADD_IS_ALWAYS_NATIVE
+        -:  105:
+        -:  106:template <> inline bool QAtomicTraits<1>::isLockFree()
+        -:  107:{ return true; }
+        -:  108:#elif ATOMIC_CHAR_LOCK_FREE == 1
+        -:  109:#  define Q_ATOMIC_INT8_REFERENCE_COUNTING_IS_SOMETIMES_NATIVE
+        -:  110:#  define Q_ATOMIC_INT8_TEST_AND_SET_IS_SOMETIMES_NATIVE
+        -:  111:#  define Q_ATOMIC_INT8_FETCH_AND_STORE_IS_SOMETIMES_NATIVE
+        -:  112:#  define Q_ATOMIC_INT8_FETCH_AND_ADD_IS_SOMETIMES_NATIVE
+        -:  113:
+        -:  114:template <> inline bool QAtomicTraits<1>::isLockFree()
+        -:  115:{ return false; }
+        -:  116:#else
+        -:  117:#  define Q_ATOMIC_INT8_REFERENCE_COUNTING_IS_NEVER_NATIVE
+        -:  118:#  define Q_ATOMIC_INT8_TEST_AND_SET_IS_NEVER_NATIVE
+        -:  119:#  define Q_ATOMIC_INT8_FETCH_AND_STORE_IS_NEVER_NATIVE
+        -:  120:#  define Q_ATOMIC_INT8_FETCH_AND_ADD_IS_NEVER_NATIVE
+        -:  121:
+        -:  122:template <> bool QAtomicTraits<1>::isLockFree()
+        -:  123:{ return false; }
+        -:  124:#endif
+        -:  125:
+        -:  126:template<> struct QAtomicOpsSupport<2> { enum { IsSupported = 1 }; };
+        -:  127:#define Q_ATOMIC_INT16_IS_SUPPORTED
+        -:  128:#if ATOMIC_SHORT_LOCK_FREE == 2
+        -:  129:#  define Q_ATOMIC_INT16_REFERENCE_COUNTING_IS_ALWAYS_NATIVE
+        -:  130:#  define Q_ATOMIC_INT16_TEST_AND_SET_IS_ALWAYS_NATIVE
+        -:  131:#  define Q_ATOMIC_INT16_FETCH_AND_STORE_IS_ALWAYS_NATIVE
+        -:  132:#  define Q_ATOMIC_INT16_FETCH_AND_ADD_IS_ALWAYS_NATIVE
+        -:  133:
+        -:  134:template <> inline bool QAtomicTraits<2>::isLockFree()
+        -:  135:{ return false; }
+        -:  136:#elif ATOMIC_SHORT_LOCK_FREE == 1
+        -:  137:#  define Q_ATOMIC_INT16_REFERENCE_COUNTING_IS_SOMETIMES_NATIVE
+        -:  138:#  define Q_ATOMIC_INT16_TEST_AND_SET_IS_SOMETIMES_NATIVE
+        -:  139:#  define Q_ATOMIC_INT16_FETCH_AND_STORE_IS_SOMETIMES_NATIVE
+        -:  140:#  define Q_ATOMIC_INT16_FETCH_AND_ADD_IS_SOMETIMES_NATIVE
+        -:  141:
+        -:  142:template <> inline bool QAtomicTraits<2>::isLockFree()
+        -:  143:{ return false; }
+        -:  144:#else
+        -:  145:#  define Q_ATOMIC_INT16_REFERENCE_COUNTING_IS_NEVER_NATIVE
+        -:  146:#  define Q_ATOMIC_INT16_TEST_AND_SET_IS_NEVER_NATIVE
+        -:  147:#  define Q_ATOMIC_INT16_FETCH_AND_STORE_IS_NEVER_NATIVE
+        -:  148:#  define Q_ATOMIC_INT16_FETCH_AND_ADD_IS_NEVER_NATIVE
+        -:  149:
+        -:  150:template <> inline bool QAtomicTraits<2>::isLockFree()
+        -:  151:{ return false; }
+        -:  152:#endif
+        -:  153:
+        -:  154:#if !defined(QT_BOOTSTRAPPED) && QT_CONFIG(std_atomic64)
+        -:  155:template<> struct QAtomicOpsSupport<8> { enum { IsSupported = 1 }; };
+        -:  156:#  define Q_ATOMIC_INT64_IS_SUPPORTED
+        -:  157:#  if ATOMIC_LLONG_LOCK_FREE == 2
+        -:  158:#    define Q_ATOMIC_INT64_REFERENCE_COUNTING_IS_ALWAYS_NATIVE
+        -:  159:#    define Q_ATOMIC_INT64_TEST_AND_SET_IS_ALWAYS_NATIVE
+        -:  160:#    define Q_ATOMIC_INT64_FETCH_AND_STORE_IS_ALWAYS_NATIVE
+        -:  161:#    define Q_ATOMIC_INT64_FETCH_AND_ADD_IS_ALWAYS_NATIVE
+        -:  162:
+        -:  163:template <> inline bool QAtomicTraits<8>::isLockFree()
+        -:  164:{ return true; }
+        -:  165:#  elif ATOMIC_LLONG_LOCK_FREE == 1
+        -:  166:#    define Q_ATOMIC_INT64_REFERENCE_COUNTING_IS_SOMETIMES_NATIVE
+        -:  167:#    define Q_ATOMIC_INT64_TEST_AND_SET_IS_SOMETIMES_NATIVE
+        -:  168:#    define Q_ATOMIC_INT64_FETCH_AND_STORE_IS_SOMETIMES_NATIVE
+        -:  169:#    define Q_ATOMIC_INT64_FETCH_AND_ADD_IS_SOMETIMES_NATIVE
+        -:  170:
+        -:  171:template <> inline bool QAtomicTraits<8>::isLockFree()
+        -:  172:{ return false; }
+        -:  173:#  else
+        -:  174:#    define Q_ATOMIC_INT64_REFERENCE_COUNTING_IS_NEVER_NATIVE
+        -:  175:#    define Q_ATOMIC_INT64_TEST_AND_SET_IS_NEVER_NATIVE
+        -:  176:#    define Q_ATOMIC_INT64_FETCH_AND_STORE_IS_NEVER_NATIVE
+        -:  177:#    define Q_ATOMIC_INT64_FETCH_AND_ADD_IS_NEVER_NATIVE
+        -:  178:
+        -:  179:template <> inline bool QAtomicTraits<8>::isLockFree()
+        -:  180:{ return false; }
+        -:  181:#  endif
+        -:  182:#endif
+        -:  183:
+        -:  184:template <typename X> struct QAtomicOps
+        -:  185:{
+        -:  186:    typedef std::atomic<X> Type;
+        -:  187:
+        -:  188:    template <typename T> static inline
+        -:  189:    T load(const std::atomic<T> &_q_value) noexcept
+        -:  190:    {
+        -:  191:        return _q_value.load(std::memory_order_relaxed);
+        -:  192:    }
+        -:  193:
+        -:  194:    template <typename T> static inline
+        -:  195:    T load(const volatile std::atomic<T> &_q_value) noexcept
+        -:  196:    {
+        -:  197:        return _q_value.load(std::memory_order_relaxed);
+        -:  198:    }
+        -:  199:
+        -:  200:    template <typename T> static inline
+    #####:  201:    T loadRelaxed(const std::atomic<T> &_q_value) noexcept
+        -:  202:    {
+    #####:  203:        return _q_value.load(std::memory_order_relaxed);
+        -:  204:    }
+        -:  205:
+        -:  206:    template <typename T> static inline
+        -:  207:    T loadRelaxed(const volatile std::atomic<T> &_q_value) noexcept
+        -:  208:    {
+        -:  209:        return _q_value.load(std::memory_order_relaxed);
+        -:  210:    }
+        -:  211:
+        -:  212:    template <typename T> static inline
+    #####:  213:    T loadAcquire(const std::atomic<T> &_q_value) noexcept
+        -:  214:    {
+    #####:  215:        return _q_value.load(std::memory_order_acquire);
+        -:  216:    }
+        -:  217:
+        -:  218:    template <typename T> static inline
+        -:  219:    T loadAcquire(const volatile std::atomic<T> &_q_value) noexcept
+        -:  220:    {
+        -:  221:        return _q_value.load(std::memory_order_acquire);
+        -:  222:    }
+        -:  223:
+        -:  224:    template <typename T> static inline
+        -:  225:    void store(std::atomic<T> &_q_value, T newValue) noexcept
+        -:  226:    {
+        -:  227:        _q_value.store(newValue, std::memory_order_relaxed);
+        -:  228:    }
+        -:  229:
+        -:  230:    template <typename T> static inline
+        -:  231:    void storeRelaxed(std::atomic<T> &_q_value, T newValue) noexcept
+        -:  232:    {
+        -:  233:        _q_value.store(newValue, std::memory_order_relaxed);
+        -:  234:    }
+        -:  235:
+        -:  236:    template <typename T> static inline
+    #####:  237:    void storeRelease(std::atomic<T> &_q_value, T newValue) noexcept
+        -:  238:    {
+    #####:  239:        _q_value.store(newValue, std::memory_order_release);
+    #####:  240:    }
+        -:  241:
+        -:  242:    static inline bool isReferenceCountingNative() noexcept { return isTestAndSetNative(); }
+        -:  243:    static inline constexpr bool isReferenceCountingWaitFree() noexcept { return false; }
+        -:  244:    template <typename T>
+    #####:  245:    static inline bool ref(std::atomic<T> &_q_value)
+        -:  246:    {
+        -:  247:        /* Conceptually, we want to
+        -:  248:         *    return ++_q_value != 0;
+        -:  249:         * However, that would be sequentially consistent, and thus stronger
+        -:  250:         * than what we need. Based on
+        -:  251:         * http://eel.is/c++draft/atomics.types.memop#6, we know that
+        -:  252:         * pre-increment is equivalent to fetch_add(1) + 1. Unlike
+        -:  253:         * pre-increment, fetch_add takes a memory order argument, so we can get
+        -:  254:         * the desired acquire-release semantics.
+        -:  255:         * One last gotcha is that fetch_add(1) + 1 would need to be converted
+        -:  256:         * back to T, because it's susceptible to integer promotion. To sidestep
+        -:  257:         * this issue and to avoid UB on signed overflow, we rewrite the
+        -:  258:         * expression to:
+        -:  259:         */
+    #####:  260:        return _q_value.fetch_add(1, std::memory_order_acq_rel) != T(-1);
+        -:  261:    }
+        -:  262:
+        -:  263:    template <typename T>
+    #####:  264:    static inline bool deref(std::atomic<T> &_q_value) noexcept
+        -:  265:    {
+        -:  266:        // compare with ref
+    #####:  267:        return _q_value.fetch_sub(1, std::memory_order_acq_rel) != T(1);
+        -:  268:    }
+        -:  269:
+        -:  270:    static inline bool isTestAndSetNative() noexcept
+        -:  271:    { return QAtomicTraits<sizeof(X)>::isLockFree(); }
+        -:  272:    static inline constexpr bool isTestAndSetWaitFree() noexcept { return false; }
+        -:  273:
+        -:  274:    template <typename T>
+        -:  275:    static bool testAndSetRelaxed(std::atomic<T> &_q_value, T expectedValue, T newValue, T *currentValue = nullptr) noexcept
+        -:  276:    {
+        -:  277:        bool tmp = _q_value.compare_exchange_strong(expectedValue, newValue, std::memory_order_relaxed, std::memory_order_relaxed);
+        -:  278:        if (currentValue)
+        -:  279:            *currentValue = expectedValue;
+        -:  280:        return tmp;
+        -:  281:    }
+        -:  282:
+        -:  283:    template <typename T>
+        -:  284:    static bool testAndSetAcquire(std::atomic<T> &_q_value, T expectedValue, T newValue, T *currentValue = nullptr) noexcept
+        -:  285:    {
+        -:  286:        bool tmp = _q_value.compare_exchange_strong(expectedValue, newValue, std::memory_order_acquire, std::memory_order_acquire);
+        -:  287:        if (currentValue)
+        -:  288:            *currentValue = expectedValue;
+        -:  289:        return tmp;
+        -:  290:    }
+        -:  291:
+        -:  292:    template <typename T>
+        -:  293:    static bool testAndSetRelease(std::atomic<T> &_q_value, T expectedValue, T newValue, T *currentValue = nullptr) noexcept
+        -:  294:    {
+        -:  295:        bool tmp = _q_value.compare_exchange_strong(expectedValue, newValue, std::memory_order_release, std::memory_order_relaxed);
+        -:  296:        if (currentValue)
+        -:  297:            *currentValue = expectedValue;
+        -:  298:        return tmp;
+        -:  299:    }
+        -:  300:
+        -:  301:    template <typename T>
+        -:  302:    static bool testAndSetOrdered(std::atomic<T> &_q_value, T expectedValue, T newValue, T *currentValue = nullptr) noexcept
+        -:  303:    {
+        -:  304:        bool tmp = _q_value.compare_exchange_strong(expectedValue, newValue, std::memory_order_acq_rel, std::memory_order_acquire);
+        -:  305:        if (currentValue)
+        -:  306:            *currentValue = expectedValue;
+        -:  307:        return tmp;
+        -:  308:    }
+        -:  309:
+        -:  310:    static inline bool isFetchAndStoreNative() noexcept { return isTestAndSetNative(); }
+        -:  311:    static inline constexpr bool isFetchAndStoreWaitFree() noexcept { return false; }
+        -:  312:
+        -:  313:    template <typename T>
+        -:  314:    static T fetchAndStoreRelaxed(std::atomic<T> &_q_value, T newValue) noexcept
+        -:  315:    {
+        -:  316:        return _q_value.exchange(newValue, std::memory_order_relaxed);
+        -:  317:    }
+        -:  318:
+        -:  319:    template <typename T>
+        -:  320:    static T fetchAndStoreAcquire(std::atomic<T> &_q_value, T newValue) noexcept
+        -:  321:    {
+        -:  322:        return _q_value.exchange(newValue, std::memory_order_acquire);
+        -:  323:    }
+        -:  324:
+        -:  325:    template <typename T>
+        -:  326:    static T fetchAndStoreRelease(std::atomic<T> &_q_value, T newValue) noexcept
+        -:  327:    {
+        -:  328:        return _q_value.exchange(newValue, std::memory_order_release);
+        -:  329:    }
+        -:  330:
+        -:  331:    template <typename T>
+        -:  332:    static T fetchAndStoreOrdered(std::atomic<T> &_q_value, T newValue) noexcept
+        -:  333:    {
+        -:  334:        return _q_value.exchange(newValue, std::memory_order_acq_rel);
+        -:  335:    }
+        -:  336:
+        -:  337:    static inline bool isFetchAndAddNative() noexcept { return isTestAndSetNative(); }
+        -:  338:    static inline constexpr bool isFetchAndAddWaitFree() noexcept { return false; }
+        -:  339:
+        -:  340:    template <typename T> static inline
+        -:  341:    T fetchAndAddRelaxed(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  342:    {
+        -:  343:        return _q_value.fetch_add(valueToAdd, std::memory_order_relaxed);
+        -:  344:    }
+        -:  345:
+        -:  346:    template <typename T> static inline
+        -:  347:    T fetchAndAddAcquire(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  348:    {
+        -:  349:        return _q_value.fetch_add(valueToAdd, std::memory_order_acquire);
+        -:  350:    }
+        -:  351:
+        -:  352:    template <typename T> static inline
+        -:  353:    T fetchAndAddRelease(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  354:    {
+        -:  355:        return _q_value.fetch_add(valueToAdd, std::memory_order_release);
+        -:  356:    }
+        -:  357:
+        -:  358:    template <typename T> static inline
+        -:  359:    T fetchAndAddOrdered(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  360:    {
+        -:  361:        return _q_value.fetch_add(valueToAdd, std::memory_order_acq_rel);
+        -:  362:    }
+        -:  363:
+        -:  364:    template <typename T> static inline
+        -:  365:    T fetchAndSubRelaxed(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  366:    {
+        -:  367:        return _q_value.fetch_sub(valueToAdd, std::memory_order_relaxed);
+        -:  368:    }
+        -:  369:
+        -:  370:    template <typename T> static inline
+        -:  371:    T fetchAndSubAcquire(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  372:    {
+        -:  373:        return _q_value.fetch_sub(valueToAdd, std::memory_order_acquire);
+        -:  374:    }
+        -:  375:
+        -:  376:    template <typename T> static inline
+        -:  377:    T fetchAndSubRelease(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  378:    {
+        -:  379:        return _q_value.fetch_sub(valueToAdd, std::memory_order_release);
+        -:  380:    }
+        -:  381:
+        -:  382:    template <typename T> static inline
+        -:  383:    T fetchAndSubOrdered(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  384:    {
+        -:  385:        return _q_value.fetch_sub(valueToAdd, std::memory_order_acq_rel);
+        -:  386:    }
+        -:  387:
+        -:  388:    template <typename T> static inline
+        -:  389:    T fetchAndAndRelaxed(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  390:    {
+        -:  391:        return _q_value.fetch_and(valueToAdd, std::memory_order_relaxed);
+        -:  392:    }
+        -:  393:
+        -:  394:    template <typename T> static inline
+        -:  395:    T fetchAndAndAcquire(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  396:    {
+        -:  397:        return _q_value.fetch_and(valueToAdd, std::memory_order_acquire);
+        -:  398:    }
+        -:  399:
+        -:  400:    template <typename T> static inline
+        -:  401:    T fetchAndAndRelease(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  402:    {
+        -:  403:        return _q_value.fetch_and(valueToAdd, std::memory_order_release);
+        -:  404:    }
+        -:  405:
+        -:  406:    template <typename T> static inline
+        -:  407:    T fetchAndAndOrdered(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  408:    {
+        -:  409:        return _q_value.fetch_and(valueToAdd, std::memory_order_acq_rel);
+        -:  410:    }
+        -:  411:
+        -:  412:    template <typename T> static inline
+        -:  413:    T fetchAndOrRelaxed(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  414:    {
+        -:  415:        return _q_value.fetch_or(valueToAdd, std::memory_order_relaxed);
+        -:  416:    }
+        -:  417:
+        -:  418:    template <typename T> static inline
+        -:  419:    T fetchAndOrAcquire(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  420:    {
+        -:  421:        return _q_value.fetch_or(valueToAdd, std::memory_order_acquire);
+        -:  422:    }
+        -:  423:
+        -:  424:    template <typename T> static inline
+        -:  425:    T fetchAndOrRelease(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  426:    {
+        -:  427:        return _q_value.fetch_or(valueToAdd, std::memory_order_release);
+        -:  428:    }
+        -:  429:
+        -:  430:    template <typename T> static inline
+        -:  431:    T fetchAndOrOrdered(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  432:    {
+        -:  433:        return _q_value.fetch_or(valueToAdd, std::memory_order_acq_rel);
+        -:  434:    }
+        -:  435:
+        -:  436:    template <typename T> static inline
+        -:  437:    T fetchAndXorRelaxed(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  438:    {
+        -:  439:        return _q_value.fetch_xor(valueToAdd, std::memory_order_relaxed);
+        -:  440:    }
+        -:  441:
+        -:  442:    template <typename T> static inline
+        -:  443:    T fetchAndXorAcquire(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  444:    {
+        -:  445:        return _q_value.fetch_xor(valueToAdd, std::memory_order_acquire);
+        -:  446:    }
+        -:  447:
+        -:  448:    template <typename T> static inline
+        -:  449:    T fetchAndXorRelease(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  450:    {
+        -:  451:        return _q_value.fetch_xor(valueToAdd, std::memory_order_release);
+        -:  452:    }
+        -:  453:
+        -:  454:    template <typename T> static inline
+        -:  455:    T fetchAndXorOrdered(std::atomic<T> &_q_value, typename QAtomicAdditiveType<T>::AdditiveT valueToAdd) noexcept
+        -:  456:    {
+        -:  457:        return _q_value.fetch_xor(valueToAdd, std::memory_order_acq_rel);
+        -:  458:    }
+        -:  459:};
+        -:  460:
+        -:  461:#  define Q_BASIC_ATOMIC_INITIALIZER(a)     { a }
+        -:  462:
+        -:  463:QT_END_NAMESPACE
+        -:  464:
+        -:  465:#endif // QATOMIC_CXX0X_H

@@ -1,0 +1,10 @@
+arrow.cpp	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_arrow_generated.cpp
+arrow.h	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_arrow_generated.cpp
+deletecommand.cpp	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_deletecommand_generated.cpp
+diagramitem.cpp	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_diagramitem_generated.cpp
+diagramitem.h	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_diagramitem_generated.cpp
+diagramitemgroup.cpp	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_diagramitemgroup_generated.cpp
+diagrampath.cpp	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_diagrampath_generated.cpp
+diagrampath.h	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_diagrampath_generated.cpp
+diagramscene.cpp	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_diagramscene_generated.cpp
+diagramtextitem.cpp	0.0%	reports\stage_reports\Diagramscene_ultima-main\20251223_133932\generated_tests\test_diagramtextitem_generated.cpp

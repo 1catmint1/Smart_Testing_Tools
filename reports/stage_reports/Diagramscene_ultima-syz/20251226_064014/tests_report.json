@@ -1,0 +1,26 @@
+{
+  "stage": "tests",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_064014",
+  "meta": {
+    "cmd": "cmd /c \"set PATH=D:\\Qt\\6.10.1\\mingw_64\\bin;D:\\Qt\\Tools\\mingw1310_64\\bin;%PATH% && cd /d C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz && cd tests\\generated && qmake tests.pro && mingw32-make clean && mingw32-make -f Makefile.Debug && debug\\tests.exe && move debug\\*.gc* .\"",
+    "cwd": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "timeout_s": 600.0,
+    "returncode": 2,
+    "stdout": "mingw32-make -f Makefile.Release clean\nmingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'\ndel moc\\moc_predefs.h\ndel moc\\moc_diagramscene.cpp moc\\moc_diagramtextitem.cpp moc\\moc_findreplacedialog.cpp moc\\moc_mainwindow.cpp\ndel obj\\test_arrow.o obj\\arrow.o obj\\diagramitem.o obj\\diagramitemgroup.o obj\\diagrampath.o obj\\diagramscene.o obj\\diagramtextitem.o obj\\findreplacedialog.o obj\\mainwindow.o obj\\moc_diagramscene.o obj\\moc_diagramtextitem.o obj\\moc_findreplacedialog.o obj\\moc_mainwindow.o\nmingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'\nmingw32-make -f Makefile.Debug clean\nmingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'\ndel moc\\moc_predefs.h\ndel moc\\moc_diagramscene.cpp moc\\moc_diagramtextitem.cpp moc\\moc_findreplacedialog.cpp moc\\moc_mainwindow.cpp\ndel obj\\test_arrow.o obj\\arrow.o obj\\diagramitem.o obj\\diagramitemgroup.o obj\\diagrampath.o obj\\diagramscene.o obj\\diagramtextitem.o obj\\findreplacedialog.o obj\\mainwindow.o obj\\moc_diagramscene.o obj\\moc_diagramtextitem.o obj\\moc_findreplacedialog.o obj\\moc_mainwindow.o\nmingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'\n",
+    "stderr": "WARNING: Failure to find: C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/generated/test_arrow.cpp\nWARNING: Failure to find: C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/generated/test_arrow.cpp\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\moc\\moc_diagramscene.cpp\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\obj\\test_arrow.o\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\moc\\moc_predefs.h\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\moc\\moc_diagramscene.cpp\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\obj\\test_arrow.o\nmingw32-make: *** No rule to make target 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/generated/test_arrow.cpp', needed by 'obj/test_arrow.o'.  Stop.\n",
+    "timed_out": false
+  },
+  "findings": [
+    {
+      "category": "tests",
+      "severity": "error",
+      "title": "测试命令执行失败",
+      "details": "mingw32-make -f Makefile.Release clean\nmingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'\ndel moc\\moc_predefs.h\ndel moc\\moc_diagramscene.cpp moc\\moc_diagramtextitem.cpp moc\\moc_findreplacedialog.cpp moc\\moc_mainwindow.cpp\ndel obj\\test_arrow.o obj\\arrow.o obj\\diagramitem.o obj\\diagramitemgroup.o obj\\diagrampath.o obj\\diagramscene.o obj\\diagramtextitem.o obj\\findreplacedialog.o obj\\mainwindow.o obj\\moc_diagramscene.o obj\\moc_diagramtextitem.o obj\\moc_findreplacedialog.o obj\\moc_mainwindow.o\nmingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'\nmingw32-make -f Makefile.Debug clean\nmingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'\ndel moc\\moc_predefs.h\ndel moc\\moc_diagramscene.cpp moc\\moc_diagramtextitem.cpp moc\\moc_findreplacedialog.cpp moc\\moc_mainwindow.cpp\ndel obj\\test_arrow.o obj\\arrow.o obj\\diagramitem.o obj\\diagramitemgroup.o obj\\diagrampath.o obj\\diagramscene.o obj\\diagramtextitem.o obj\\findreplacedialog.o obj\\mainwindow.o obj\\moc_diagramscene.o obj\\moc_diagramtextitem.o obj\\moc_findreplacedialog.o obj\\moc_mainwindow.o\nmingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'\n\nWARNING: Failure to find: C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/generated/test_arrow.cpp\nWARNING: Failure to find: C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/generated/test_arrow.cpp\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\moc\\moc_diagramscene.cpp\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\obj\\test_arrow.o\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\moc\\moc_predefs.h\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\moc\\moc_diagramscene.cpp\n找不到 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\generated\\obj\\test_arrow.o\nmingw32-make: *** No rule to make target 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/generated/test_arrow.cpp', needed by 'obj/test_arrow.o'.  Stop.\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

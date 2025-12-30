@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_061237",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\arrow.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_arrow.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_arrow.cpp",
+          "content": "#include <QtTest>\n#include <QStyleOptionGraphicsItem>\n#include <QPainter>\n#include \"../../arrow.h\"\n#include \"../../diagramitem.h\"\n\nclass TestArrow : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void testConstructor();\n    void testBoundingRect();\n    void testUpdatePosition();\n    void testPaintDoesNotCrash();\n};\n\nvoid TestArrow::testConstructor()\n{\n    // 由于 DiagramItem 构造可能需要场景，我们创建一个简单的测试来验证 Arrow 对象能被构造。\n    // 这是一个冒烟测试。在实际项目中，需要确保 DiagramItem 可以被正确模拟或构造。\n    DiagramItem startItem(DiagramItem::Step);\n    DiagramItem endItem(DiagramItem::Step);\n    Arrow arrow(&startItem, &endItem);\n    QVERIFY(arrow.myStartItem == &startItem);\n    QVERIFY(arrow.myEndItem == &endItem);\n    QVERIFY(arrow.isSelectable());\n}\n\nvoid TestArrow::testBoundingRect()\n{\n    DiagramItem startItem(DiagramItem::Step);\n    DiagramItem endItem(DiagramItem::Step);\n    startItem.setPos(0, 0);\n    endItem.setPos(100, 100);\n    Arrow arrow(&startItem, &endItem);\n    arrow.updatePosition(); // 确保线被更新\n    QRectF rect = arrow.boundingRect();\n    QVERIFY(rect.isValid());\n    // 边界矩形应包含线，并有一些额外的边距\n    QVERIFY(rect.contains(arrow.line().p1()));\n    QVERIFY(rect.contains(arrow.line().p2()));\n}\n\nvoid TestArrow::testUpdatePosition()\n{\n    DiagramItem startItem(DiagramItem::Step);\n    DiagramItem endItem(DiagramItem::Step);\n    startItem.setPos(10, 20);\n    endItem.setPos(30, 40);\n    Arrow arrow(&startItem, &endItem);\n    // 初始线可能为默认值 (0,0 -> 0,0)，调用 updatePosition 后应更新\n    arrow.updatePosition();\n    QLineF line = arrow.line();\n    // 注意：mapFromItem 转换可能导致点不为精确的 (10,20) 和 (30,40)，但方向应一致\n    // 我们检查线长度是否大致正确\n    qreal expectedLength = QLineF(startItem.pos(), endItem.pos()).length();\n    qreal actualLength = line.length();\n    QVERIFY(qAbs(actualLength - expectedLength) < 1.0);\n}\n\nvoid TestArrow::testPaintDoesNotCrash()\n{\n    // 此测试旨在确保 paint 函数不会在简单场景下崩溃。\n    // 我们创建一个 QImage 和 QPainter 来模拟绘制。\n    DiagramItem startItem(DiagramItem::Step);\n    DiagramItem endItem(DiagramItem::Step);\n    startItem.setPos(0, 0);\n    endItem.setPos(50, 0); // 放在不碰撞的位置\n    Arrow arrow(&startItem, &endItem);\n    arrow.updatePosition();\n    QImage image(100, 100, QImage::Format_ARGB32);\n    image.fill(Qt::white);\n    QPainter painter(&image);\n    QStyleOptionGraphicsItem option;\n    arrow.paint(&painter, &option, nullptr);\n    // 如果没有崩溃，测试通过\n    QVERIFY(true);\n}\n\nQTEST_MAIN(TestArrow)\n#include \"test_arrow.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = tests\nCONFIG += console testcase\nQT += testlib svg\n\n# 假设项目根目录为 Diagramscene_ultima-syz\n# 包含被测源文件和头文件\ninclude(../../diagramscene_ultima-syz.pri)\n\n# 如果不存在 .pri 文件，则直接添加文件\n# 注意：这里需要根据实际项目结构调整路径\nSOURCES += \\\n    test_arrow.cpp \\\n    ../../arrow.cpp\n\nHEADERS += \\\n    ../../arrow.h \\\n    ../../diagramitem.h\n\n# 测试输出目录\nDESTDIR = $$OUT_PWD/bin\nOBJECTS_DIR = $$OUT_PWD/obj\nMOC_DIR = $$OUT_PWD/moc\nRCC_DIR = $$OUT_PWD/rcc\nUI_DIR = $$OUT_PWD/ui\nQMAKE_CXXFLAGS += --coverage\nQMAKE_LFLAGS += --coverage"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 4
+      }
+    },
+    "applied": [
+      "tests/generated/test_arrow.cpp (4 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 4
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 4 个用例",
+      "details": "生成文件明细：\ntests/generated/test_arrow.cpp (4 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

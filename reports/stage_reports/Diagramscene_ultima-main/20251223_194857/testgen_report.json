@@ -1,0 +1,76 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main",
+  "created_at": "20251223_194857",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_diagramitem.cpp",
+        "tests/generated/test_deletecommand.cpp",
+        "tests/generated/tests.pro",
+        "tests/generated/test_diagramitem.cpp",
+        "tests/generated/test_deletecommand.cpp",
+        "tests/generated/test_diagrampath.cpp",
+        "tests/generated/test_findreplacedialog.cpp"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_diagramitem.cpp",
+          "content": "#include <QtTest>\n#include <QGraphicsScene>\n#include <QMenu>\n#include <QPainter>\n#include <QGraphicsView>\n#include \"../diagramitem.h\"\n#include \"../diagramtextitem.h\"\n\nclass TestDiagramItem : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testConstructor();\n    void testBoundingRect();\n    void testSetBrush();\n    void testSetFixedSize();\n    void testDiagramTypes();\n    void testTextItemAssociation();\n    void testFlagsAndProperties();\n\nprivate:\n    QGraphicsScene *scene;\n    QMenu *dummyMenu;\n};\n\nvoid TestDiagramItem::initTestCase()\n{\n    scene = new QGraphicsScene();\n    dummyMenu = new QMenu();\n}\n\nvoid TestDiagramItem::cleanupTestCase()\n{\n    delete scene;\n    delete dummyMenu;\n}\n\nvoid TestDiagramItem::testConstructor()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QVERIFY(item.myDiagramType == DiagramItem::Step);\n    QVERIFY(item.myContextMenu == dummyMenu);\n    QVERIFY(item.textItem != nullptr);\n    QCOMPARE(item.textItem->toPlainText(), QString(\"请输入\"));\n}\n\nvoid TestDiagramItem::testBoundingRect()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QRectF rect = item.boundingRect();\n    QVERIFY(rect.isValid());\n    QVERIFY(rect.width() > 0);\n    QVERIFY(rect.height() > 0);\n}\n\nvoid TestDiagramItem::testSetBrush()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QColor newColor(Qt::red);\n    item.setBrush(newColor);\n    QCOMPARE(item.m_color, newColor);\n}\n\nvoid TestDiagramItem::testSetFixedSize()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QSizeF newSize(200, 150);\n    item.setFixedSize(newSize);\n    QCOMPARE(item.m_grapSize, newSize);\n}\n\nvoid TestDiagramItem::testDiagramTypes()\n{\n    QList<DiagramItem::DiagramType> types = {\n        DiagramItem::StartEnd,\n        DiagramItem::Conditional,\n        DiagramItem::Step,\n        DiagramItem::circular,\n        DiagramItem::Document,\n        DiagramItem::PredefinedProcess,\n        DiagramItem::StoredData\n    };\n    \n    for (auto type : types) {\n        DiagramItem item(type, dummyMenu);\n        QVERIFY(item.myDiagramType == type);\n        QVERIFY(item.boundingRect().isValid());\n    }\n}\n\nvoid TestDiagramItem::testTextItemAssociation()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QVERIFY(item.textItem != nullptr);\n    QVERIFY(item.textItem->parentItem() == &item);\n    QVERIFY(item.textItem->textInteractionFlags() & Qt::TextEditorInteraction);\n}\n\nvoid TestDiagramItem::testFlagsAndProperties()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QVERIFY(item.flags() & QGraphicsItem::ItemIsMovable);\n    QVERIFY(item.flags() & QGraphicsItem::ItemIsSelectable);\n    QVERIFY(item.flags() & QGraphicsItem::ItemSendsGeometryChanges);\n    QVERIFY(item.flags() & QGraphicsItem::ItemIsFocusable);\n    QVERIFY(item.acceptHoverEvents());\n}\n\nQTEST_MAIN(TestDiagramItem)\n#include \"test_diagramitem.moc\""
+        },
+        {
+          "path": "tests/generated/test_deletecommand.cpp",
+          "content": "#include <QtTest>\n#include <QGraphicsScene>\n#include <QGraphicsRectItem>\n#include \"deletecommand.h\"\n\nclass TestDeleteCommand : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testConstructor();\n    void testRedo();\n    void testUndo();\n    void testRedoUndoSequence();\n\nprivate:\n    QGraphicsScene *scene;\n    QGraphicsRectItem *item;\n    DeleteCommand *command;\n};\n\nvoid TestDeleteCommand::initTestCase()\n{\n    scene = new QGraphicsScene();\n    item = new QGraphicsRectItem(0, 0, 100, 50);\n    scene->addItem(item);\n    QVERIFY(scene->items().contains(item));\n}\n\nvoid TestDeleteCommand::cleanupTestCase()\n{\n    delete command;\n    delete scene;\n}\n\nvoid TestDeleteCommand::testConstructor()\n{\n    command = new DeleteCommand(item, scene);\n    QVERIFY(command != nullptr);\n    QCOMPARE(command->scene(), scene);\n    QCOMPARE(command->item(), item);\n}\n\nvoid TestDeleteCommand::testRedo()\n{\n    command = new DeleteCommand(item, scene);\n    QVERIFY(scene->items().contains(item));\n    command->redo();\n    QVERIFY(!scene->items().contains(item));\n}\n\nvoid TestDeleteCommand::testUndo()\n{\n    command = new DeleteCommand(item, scene);\n    command->redo();\n    QVERIFY(!scene->items().contains(item));\n    command->undo();\n    QVERIFY(scene->items().contains(item));\n    QCOMPARE(item->pos(), QPointF(0, 0));\n}\n\nvoid TestDeleteCommand::testRedoUndoSequence()\n{\n    command = new DeleteCommand(item, scene);\n    QVERIFY(scene->items().contains(item));\n    command->redo();\n    QVERIFY(!scene->items().contains(item));\n    command->undo();\n    QVERIFY(scene->items().contains(item));\n    command->redo();\n    QVERIFY(!scene->items().contains(item));\n}\n\nQTEST_MAIN(TestDeleteCommand)\n#include \"test_deletecommand.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "QT += testlib widgets\nTEMPLATE = app\nTARGET = tests\nCONFIG += console\nCONFIG -= app_bundle\nCONFIG += c++17\n\nSOURCES += \\\n    test_diagramitem.cpp \\\n    test_deletecommand.cpp \\\n    test_diagrampath.cpp \\\n    test_findreplacedialog.cpp\n\nHEADERS += \\\n    # 测试头文件（如果需要）\n\nINCLUDEPATH += ..\n\n# 包含被测源文件\nSOURCES += \\\n    ../diagramitem.cpp \\\n    ../deletecommand.cpp \\\n    ../diagrampath.cpp \\\n    ../findreplacedialog.cpp \\\n    ../arrow.cpp \\\n    ../diagramtextitem.cpp\n\n# 包含被测头文件\nHEADERS += \\\n    ../diagramitem.h \\\n    ../deletecommand.h \\\n    ../diagrampath.h \\\n    ../findreplacedialog.h \\\n    ../arrow.h \\\n    ../diagramtextitem.h\n\n# 注意：diagramscene.cpp 和 mainwindow.cpp 可能依赖更多 UI 组件，\n# 在纯单元测试中可能不直接包含。\n# 如果测试需要它们，请手动添加。"
+        },
+        {
+          "path": "tests/generated/test_diagramitem.cpp",
+          "content": "#include <QtTest>\n#include <QGraphicsScene>\n#include <QMenu>\n#include \"../diagramitem.h\"\n\nclass TestDiagramItem : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testConstructor();\n    void testBoundingRect();\n    void testSetBrush();\n    void testSetFixedSize();\n    void testRotationAngle();\n\nprivate:\n    QGraphicsScene *scene;\n    QMenu *dummyMenu;\n};\n\nvoid TestDiagramItem::initTestCase()\n{\n    scene = new QGraphicsScene();\n    dummyMenu = new QMenu();\n}\n\nvoid TestDiagramItem::cleanupTestCase()\n{\n    delete scene;\n    delete dummyMenu;\n}\n\nvoid TestDiagramItem::testConstructor()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QVERIFY(item.diagramType() == DiagramItem::Step);\n    QVERIFY(item.parentItem() == nullptr);\n    // 检查标志是否设置\n    QVERIFY(item.flags() & QGraphicsItem::ItemIsSelectable);\n    QVERIFY(item.flags() & QGraphicsItem::ItemIsMovable);\n}\n\nvoid TestDiagramItem::testBoundingRect()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QRectF rect = item.boundingRect();\n    QVERIFY(rect.isValid());\n    // 初始大小应为 m_grapSize (150,100) 加上边框扩展\n    QVERIFY(rect.width() > 150);\n    QVERIFY(rect.height() > 100);\n}\n\nvoid TestDiagramItem::testSetBrush()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QColor newColor(Qt::red);\n    item.setBrush(newColor);\n    // 无法直接验证内部颜色，但可以调用而不崩溃\n    QVERIFY(true);\n}\n\nvoid TestDiagramItem::testSetFixedSize()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    QSizeF newSize(200, 150);\n    item.setFixedSize(newSize);\n    QRectF rect = item.boundingRect();\n    // 大小应大致反映新尺寸（考虑旋转和边框）\n    QVERIFY(rect.width() > 200);\n    QVERIFY(rect.height() > 150);\n}\n\nvoid TestDiagramItem::testRotationAngle()\n{\n    DiagramItem item(DiagramItem::Step, dummyMenu);\n    // 初始角度应为0\n    QCOMPARE(item.rotationAngle(), 0.0);\n    item.setRotationAngle(45.0);\n    QCOMPARE(item.rotationAngle(), 45.0);\n}\n\nQTEST_MAIN(TestDiagramItem)\n#include \"test_diagramitem.moc\""
+        },
+        {
+          "path": "tests/generated/test_deletecommand.cpp",
+          "content": "#include <QtTest>\n#include <QGraphicsScene>\n#include <QGraphicsRectItem>\n#include \"../deletecommand.h\"\n\nclass TestDeleteCommand : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testUndoRedo();\n\nprivate:\n    QGraphicsScene *scene;\n    QGraphicsItem *testItem;\n};\n\nvoid TestDeleteCommand::initTestCase()\n{\n    scene = new QGraphicsScene();\n    testItem = new QGraphicsRectItem(0, 0, 100, 100);\n    scene->addItem(testItem);\n}\n\nvoid TestDeleteCommand::cleanupTestCase()\n{\n    delete scene; // 会删除子项\n}\n\nvoid TestDeleteCommand::testUndoRedo()\n{\n    // 初始场景应有1个项\n    QCOMPARE(scene->items().count(), 1);\n    \n    DeleteCommand cmd(testItem, scene);\n    \n    // 执行 redo (删除)\n    cmd.redo();\n    QCOMPARE(scene->items().count(), 0);\n    \n    // 执行 undo (恢复)\n    cmd.undo();\n    QCOMPARE(scene->items().count(), 1);\n    \n    // 项应回到原位\n    QCOMPARE(testItem->pos(), QPointF(0, 0));\n}\n\nQTEST_MAIN(TestDeleteCommand)\n#include \"test_deletecommand.moc\""
+        },
+        {
+          "path": "tests/generated/test_diagrampath.cpp",
+          "content": "#include <QtTest>\n#include <QGraphicsScene>\n#include <QMenu>\n#include \"../diagramitem.h\"\n#include \"../diagrampath.h\"\n\nclass TestDiagramPath : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testConstructor();\n    void testQuadFunction();\n    void testUpdatePath();\n\nprivate:\n    QGraphicsScene *scene;\n    QMenu *dummyMenu;\n    DiagramItem *startItem;\n    DiagramItem *endItem;\n};\n\nvoid TestDiagramPath::initTestCase()\n{\n    scene = new QGraphicsScene();\n    dummyMenu = new QMenu();\n    startItem = new DiagramItem(DiagramItem::Step, dummyMenu);\n    endItem = new DiagramItem(DiagramItem::Step, dummyMenu);\n    scene->addItem(startItem);\n    scene->addItem(endItem);\n    startItem->setPos(0, 0);\n    endItem->setPos(200, 200);\n}\n\nvoid TestDiagramPath::cleanupTestCase()\n{\n    delete scene; // 会删除子项\n    delete dummyMenu;\n}\n\nvoid TestDiagramPath::testConstructor()\n{\n    DiagramPath path(startItem, endItem, DiagramItem::TF_Right, DiagramItem::TF_Left);\n    QVERIFY(path.getStartItem() == startItem);\n    QVERIFY(path.getEndItem() == endItem);\n    // 路径应已创建\n    QVERIFY(!path.path().isEmpty());\n}\n\nvoid TestDiagramPath::testQuadFunction()\n{\n    // 测试 quad 辅助函数（如果是 public 或我们测试其逻辑）\n    // 注意：quad 是私有函数，但我们可以通过路径状态间接测试，或假设其正确。\n    // 这里我们仅验证路径创建不崩溃。\n    DiagramPath path(startItem, endItem, DiagramItem::TF_Right, DiagramItem::TF_Left);\n    QVERIFY(true); // 占位\n}\n\nvoid TestDiagramPath::testUpdatePath()\n{\n    DiagramPath path(startItem, endItem, DiagramItem::TF_Right, DiagramItem::TF_Left);\n    QPainterPath originalPath = path.path();\n    \n    // 移动结束项\n    endItem->setPos(300, 300);\n    path.updatePath();\n    \n    QPainterPath newPath = path.path();\n    // 路径应已更新（可能不同）\n    QVERIFY(originalPath != newPath);\n}\n\nQTEST_MAIN(TestDiagramPath)\n#include \"test_diagrampath.moc\""
+        },
+        {
+          "path": "tests/generated/test_findreplacedialog.cpp",
+          "content": "#include <QtTest>\n#include <QSignalSpy>\n#include \"../findreplacedialog.h\"\n\nclass TestFindReplaceDialog : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testConstructor();\n    void testFindSignal();\n    void testReplaceSignal();\n    void testReplaceAllSignal();\n\nprivate:\n    FindReplaceDialog *dialog;\n};\n\nvoid TestFindReplaceDialog::initTestCase()\n{\n    dialog = new FindReplaceDialog();\n}\n\nvoid TestFindReplaceDialog::cleanupTestCase()\n{\n    delete dialog;\n}\n\nvoid TestFindReplaceDialog::testConstructor()\n{\n    QVERIFY(dialog != nullptr);\n    // 应包含三个按钮\n    QList<QPushButton *> buttons = dialog->findChildren<QPushButton *>();\n    QCOMPARE(buttons.size(), 3);\n}\n\nvoid TestFindReplaceDialog::testFindSignal()\n{\n    QSignalSpy spy(dialog, &FindReplaceDialog::findText);\n    dialog->findLineEdit->setText(\"test\");\n    QTest::mouseClick(dialog->findButton, Qt::LeftButton);\n    QCOMPARE(spy.count(), 1);\n    QCOMPARE(spy.at(0).at(0).toString(), QString(\"test\"));\n}\n\nvoid TestFindReplaceDialog::testReplaceSignal()\n{\n    QSignalSpy spy(dialog, &FindReplaceDialog::replaceText);\n    dialog->findLineEdit->setText(\"old\");\n    dialog->replaceLineEdit->setText(\"new\");\n    QTest::mouseClick(dialog->replaceButton, Qt::LeftButton);\n    QCOMPARE(spy.count(), 1);\n    QCOMPARE(spy.at(0).at(0).toString(), QString(\"old\"));\n    QCOMPARE(spy.at(0).at(1).toString(), QString(\"new\"));\n}\n\nvoid TestFindReplaceDialog::testReplaceAllSignal()\n{\n    QSignalSpy spy(dialog, &FindReplaceDialog::replaceAllText);\n    dialog->findLineEdit->setText(\"old\");\n    dialog->replaceLineEdit->setText(\"new\");\n    QTest::mouseClick(dialog->replaceAllButton, Qt::LeftButton);\n    QCOMPARE(spy.count(), 1);\n    QCOMPARE(spy.at(0).at(0).toString(), QString(\"old\"));\n    QCOMPARE(spy.at(0).at(1).toString(), QString(\"new\"));\n}\n\nQTEST_MAIN(TestFindReplaceDialog)\n#include \"test_findreplacedialog.moc\""
+        }
+      ],
+      "stats": {
+        "files_generated": 7,
+        "cases_approx": 24
+      }
+    },
+    "applied": [
+      "tests/generated/test_diagramitem.cpp (7 cases)",
+      "tests/generated/test_deletecommand.cpp (4 cases)",
+      "tests/generated/tests.pro (0 cases)",
+      "tests/generated/test_diagramitem.cpp (5 cases)",
+      "tests/generated/test_deletecommand.cpp (1 cases)",
+      "tests/generated/test_diagrampath.cpp (3 cases)",
+      "tests/generated/test_findreplacedialog.cpp (4 cases)"
+    ],
+    "total_cases_count": 24
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：7 个文件，共约 24 个用例",
+      "details": "生成文件明细：\ntests/generated/test_diagramitem.cpp (7 cases)\ntests/generated/test_deletecommand.cpp (4 cases)\ntests/generated/tests.pro (0 cases)\ntests/generated/test_diagramitem.cpp (5 cases)\ntests/generated/test_deletecommand.cpp (1 cases)\ntests/generated/test_diagrampath.cpp (3 cases)\ntests/generated/test_findreplacedialog.cpp (4 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

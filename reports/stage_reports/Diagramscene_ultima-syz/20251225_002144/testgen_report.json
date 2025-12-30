@@ -1,0 +1,51 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251225_002144",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [],
+      "patches": [],
+      "stats": {
+        "files_generated": 0,
+        "cases_approx": 0
+      }
+    },
+    "applied": [],
+    "total_cases_count": 0
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: {\n    \"schema\": \"qt_test_files\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/tests.pro\",\n            \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow \\\\\\n    test_geometry_utils \\\\\\n    test_item_selection \\\\\\n    test_z_order \\\\\\n    test_item_properties \\\\\\n    test_scene_coordinates \\\\\\n    test_path_operations \\\\\\n    test_text_operations \\\\\\n    test_command_pattern \\\\\\n    test_undo_redo \\\\\\n    test_scene_serialization \\\\\\n    test_item_factory \\\\\\n    test_collision_detection \\\\\\n    test_group_operations \\\\\\n    test_alignment_tools \\\\\\n    test_distance_calculation \\\\\\n    test_bounding_boxes \\\\\\n    test_item_transform \\\\\\n    test_color_management \\\\\\n    test_font_handling \\\\\\n    test_pen_brush_styles \\\\\\n    test_scene_grid \\\\\\n    test_snap_to_grid \\\\\\n    test_connection_points \\\\\\n    test_line_geometry \\\\\\n    test_polygon_operations \\\\\\n    test_text_wrapping \\\\\\n    test_item_cloning \\\\\\n    test_scene_export \\\\\\n    test_import_export \\\\\\n    test_metadata_storage \\\\\\n    test_version_compatibility \\\\\\n    test_performance_benchmarks \\\\\\n    test_memory_management \\\\\\n    test_edge_cases \\\\\\n    test_error_handling \\\\\\n    test_invalid_input \\\\\\n    test_boundary_conditions \\\\\\n    test_random_operations \\\\\\n    test_stress_tests \\\\\\n    test_integration_scenarios\\n\\nCONFIG += ordered\\n\"\n        },\n        {\n            \"name\": \"tests/generated/test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include \\\"diagramitem.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testConstructor();\\n    void testBoundingRect();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testRotationA",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: {\n    \"schema\": \"QtTest project with minimal smoke tests for DiagramScene components\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/tests.pro\",\n            \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow \\\\\\n    test_geometry_utils \\\\\\n    test_item_selection \\\\\\n    test_z_order \\\\\\n    test_item_properties \\\\\\n    test_scene_coordinates \\\\\\n    test_path_operations \\\\\\n    test_text_operations \\\\\\n    test_command_pattern \\\\\\n    test_undo_redo \\\\\\n    test_scene_serialization \\\\\\n    test_item_factory \\\\\\n    test_collision_detection \\\\\\n    test_group_operations \\\\\\n    test_alignment_tools \\\\\\n    test_distance_calculation \\\\\\n    test_bounding_boxes \\\\\\n    test_item_transform \\\\\\n    test_color_management \\\\\\n    test_font_handling \\\\\\n    test_pen_brush_styles \\\\\\n    test_scene_grid \\\\\\n    test_snap_to_grid \\\\\\n    test_connection_points \\\\\\n    test_line_geometry \\\\\\n    test_polygon_operations \\\\\\n    test_text_wrapping \\\\\\n    test_item_cloning \\\\\\n    test_scene_export \\\\\\n    test_import_export \\\\\\n    test_metadata_storage \\\\\\n    test_version_compatibility \\\\\\n    test_performance_benchmarks \\\\\\n    test_memory_management \\\\\\n    test_edge_cases \\\\\\n    test_error_handling \\\\\\n    test_invalid_input \\\\\\n    test_boundary_conditions \\\\\\n    test_random_operations \\\\\\n    test_stress_tests \\\\\\n    test_integration_scenarios\\n\\nCONFIG += ordered\\n\"\n        },\n        {\n            \"name\": \"tests/generated/test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include \\\"../../diagramitem.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase() {}\\n    void cleanupTestCase() {}\\n    void testConstructor() {\\n        DiagramItem item(DiagramItem::Step,",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "未写入任何 QtTest 文件（LLM 输出为空或不合法）",
+      "details": "",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

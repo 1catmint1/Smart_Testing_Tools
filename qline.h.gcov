@@ -1,0 +1,438 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qline.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/diagramscene.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/diagramscene.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2022 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QLINE_H
+        -:    5:#define QLINE_H
+        -:    6:
+        -:    7:#include <QtCore/qpoint.h>
+        -:    8:
+        -:    9:QT_BEGIN_NAMESPACE
+        -:   10:
+        -:   11:class QDataStream;
+        -:   12:class QLineF;
+        -:   13:
+        -:   14:/*******************************************************************************
+        -:   15: * class QLine
+        -:   16: *******************************************************************************/
+        -:   17:
+        -:   18:class Q_CORE_EXPORT QLine
+        -:   19:{
+        -:   20:public:
+        -:   21:    constexpr inline QLine();
+        -:   22:    constexpr inline QLine(const QPoint &pt1, const QPoint &pt2);
+        -:   23:    constexpr inline QLine(int x1, int y1, int x2, int y2);
+        -:   24:
+        -:   25:    constexpr inline bool isNull() const;
+        -:   26:
+        -:   27:    constexpr inline QPoint p1() const;
+        -:   28:    constexpr inline QPoint p2() const;
+        -:   29:
+        -:   30:    constexpr inline int x1() const;
+        -:   31:    constexpr inline int y1() const;
+        -:   32:
+        -:   33:    constexpr inline int x2() const;
+        -:   34:    constexpr inline int y2() const;
+        -:   35:
+        -:   36:    constexpr inline int dx() const;
+        -:   37:    constexpr inline int dy() const;
+        -:   38:
+        -:   39:    constexpr inline void translate(const QPoint &p);
+        -:   40:    constexpr inline void translate(int dx, int dy);
+        -:   41:
+        -:   42:    [[nodiscard]] constexpr inline QLine translated(const QPoint &p) const;
+        -:   43:    [[nodiscard]] constexpr inline QLine translated(int dx, int dy) const;
+        -:   44:
+        -:   45:    [[nodiscard]] constexpr inline QPoint center() const;
+        -:   46:
+        -:   47:    inline void setP1(const QPoint &p1);
+        -:   48:    inline void setP2(const QPoint &p2);
+        -:   49:    inline void setPoints(const QPoint &p1, const QPoint &p2);
+        -:   50:    inline void setLine(int x1, int y1, int x2, int y2);
+        -:   51:
+        -:   52:#if QT_CORE_REMOVED_SINCE(6, 8)
+        -:   53:    constexpr inline bool operator==(const QLine &d) const noexcept;
+        -:   54:    constexpr inline bool operator!=(const QLine &d) const noexcept { return !operator==(d); }
+        -:   55:#endif
+        -:   56:
+        -:   57:    [[nodiscard]] constexpr inline QLineF toLineF() const noexcept;
+        -:   58:
+        -:   59:private:
+        -:   60:    friend constexpr bool comparesEqual(const QLine &lhs, const QLine &rhs) noexcept
+        -:   61:    { return lhs.pt1 == rhs.pt1 && lhs.pt2 == rhs.pt2; }
+        -:   62:#if !QT_CORE_REMOVED_SINCE(6, 8)
+        -:   63:    Q_DECLARE_EQUALITY_COMPARABLE_LITERAL_TYPE(QLine)
+        -:   64:#endif
+        -:   65:
+        -:   66:    QPoint pt1, pt2;
+        -:   67:};
+        -:   68:Q_DECLARE_TYPEINFO(QLine, Q_PRIMITIVE_TYPE);
+        -:   69:
+        -:   70:/*******************************************************************************
+        -:   71: * class QLine inline members
+        -:   72: *******************************************************************************/
+        -:   73:
+        -:   74:constexpr inline QLine::QLine() { }
+        -:   75:
+        -:   76:constexpr inline QLine::QLine(const QPoint &pt1_, const QPoint &pt2_) : pt1(pt1_), pt2(pt2_) { }
+        -:   77:
+    #####:   78:constexpr inline QLine::QLine(int x1pos, int y1pos, int x2pos, int y2pos) : pt1(QPoint(x1pos, y1pos)), pt2(QPoint(x2pos, y2pos)) { }
+        -:   79:
+        -:   80:constexpr inline bool QLine::isNull() const
+        -:   81:{
+        -:   82:    return pt1 == pt2;
+        -:   83:}
+        -:   84:
+        -:   85:constexpr inline int QLine::x1() const
+        -:   86:{
+        -:   87:    return pt1.x();
+        -:   88:}
+        -:   89:
+        -:   90:constexpr inline int QLine::y1() const
+        -:   91:{
+        -:   92:    return pt1.y();
+        -:   93:}
+        -:   94:
+        -:   95:constexpr inline int QLine::x2() const
+        -:   96:{
+        -:   97:    return pt2.x();
+        -:   98:}
+        -:   99:
+        -:  100:constexpr inline int QLine::y2() const
+        -:  101:{
+        -:  102:    return pt2.y();
+        -:  103:}
+        -:  104:
+        -:  105:constexpr inline QPoint QLine::p1() const
+        -:  106:{
+        -:  107:    return pt1;
+        -:  108:}
+        -:  109:
+        -:  110:constexpr inline QPoint QLine::p2() const
+        -:  111:{
+        -:  112:    return pt2;
+        -:  113:}
+        -:  114:
+        -:  115:constexpr inline int QLine::dx() const
+        -:  116:{
+        -:  117:    return (pt2.xp - pt1.xp).value();
+        -:  118:}
+        -:  119:
+        -:  120:constexpr inline int QLine::dy() const
+        -:  121:{
+        -:  122:    return (pt2.yp - pt1.yp).value();
+        -:  123:}
+        -:  124:
+        -:  125:constexpr inline void QLine::translate(const QPoint &point)
+        -:  126:{
+        -:  127:    pt1 += point;
+        -:  128:    pt2 += point;
+        -:  129:}
+        -:  130:
+        -:  131:constexpr inline void QLine::translate(int adx, int ady)
+        -:  132:{
+        -:  133:    this->translate(QPoint(adx, ady));
+        -:  134:}
+        -:  135:
+        -:  136:constexpr inline QLine QLine::translated(const QPoint &p) const
+        -:  137:{
+        -:  138:    return QLine(pt1 + p, pt2 + p);
+        -:  139:}
+        -:  140:
+        -:  141:constexpr inline QLine QLine::translated(int adx, int ady) const
+        -:  142:{
+        -:  143:    return translated(QPoint(adx, ady));
+        -:  144:}
+        -:  145:
+        -:  146:constexpr inline QPoint QLine::center() const
+        -:  147:{
+        -:  148:    return QPoint(int((qint64(pt1.x()) + pt2.x()) / 2), int((qint64(pt1.y()) + pt2.y()) / 2));
+        -:  149:}
+        -:  150:
+        -:  151:inline void QLine::setP1(const QPoint &aP1)
+        -:  152:{
+        -:  153:    pt1 = aP1;
+        -:  154:}
+        -:  155:
+        -:  156:inline void QLine::setP2(const QPoint &aP2)
+        -:  157:{
+        -:  158:    pt2 = aP2;
+        -:  159:}
+        -:  160:
+        -:  161:inline void QLine::setPoints(const QPoint &aP1, const QPoint &aP2)
+        -:  162:{
+        -:  163:    pt1 = aP1;
+        -:  164:    pt2 = aP2;
+        -:  165:}
+        -:  166:
+        -:  167:inline void QLine::setLine(int aX1, int aY1, int aX2, int aY2)
+        -:  168:{
+        -:  169:    pt1 = QPoint(aX1, aY1);
+        -:  170:    pt2 = QPoint(aX2, aY2);
+        -:  171:}
+        -:  172:
+        -:  173:#if QT_CORE_REMOVED_SINCE(6, 8)
+        -:  174:constexpr inline bool QLine::operator==(const QLine &d) const noexcept
+        -:  175:{
+        -:  176:    return comparesEqual(*this, d);
+        -:  177:}
+        -:  178:#endif
+        -:  179:
+        -:  180:#ifndef QT_NO_DEBUG_STREAM
+        -:  181:Q_CORE_EXPORT QDebug operator<<(QDebug d, const QLine &p);
+        -:  182:#endif
+        -:  183:
+        -:  184:#ifndef QT_NO_DATASTREAM
+        -:  185:Q_CORE_EXPORT QDataStream &operator<<(QDataStream &, const QLine &);
+        -:  186:Q_CORE_EXPORT QDataStream &operator>>(QDataStream &, QLine &);
+        -:  187:#endif
+        -:  188:
+        -:  189:/*******************************************************************************
+        -:  190: * class QLineF
+        -:  191: *******************************************************************************/
+        -:  192:class Q_CORE_EXPORT QLineF
+        -:  193:{
+        -:  194:public:
+        -:  195:
+        -:  196:    enum IntersectionType { NoIntersection, BoundedIntersection, UnboundedIntersection };
+        -:  197:    using IntersectType = IntersectionType; // deprecated name
+        -:  198:
+        -:  199:    constexpr inline QLineF();
+        -:  200:    constexpr inline QLineF(const QPointF &pt1, const QPointF &pt2);
+        -:  201:    constexpr inline QLineF(qreal x1, qreal y1, qreal x2, qreal y2);
+        -:  202:    constexpr inline QLineF(const QLine &line) : pt1(line.p1()), pt2(line.p2()) { }
+        -:  203:
+        -:  204:    [[nodiscard]] static QLineF fromPolar(qreal length, qreal angle);
+        -:  205:
+        -:  206:    constexpr bool isNull() const;
+        -:  207:
+        -:  208:    constexpr inline QPointF p1() const;
+        -:  209:    constexpr inline QPointF p2() const;
+        -:  210:
+        -:  211:    constexpr inline qreal x1() const;
+        -:  212:    constexpr inline qreal y1() const;
+        -:  213:
+        -:  214:    constexpr inline qreal x2() const;
+        -:  215:    constexpr inline qreal y2() const;
+        -:  216:
+        -:  217:    constexpr inline qreal dx() const;
+        -:  218:    constexpr inline qreal dy() const;
+        -:  219:
+        -:  220:    qreal length() const;
+        -:  221:    void setLength(qreal len);
+        -:  222:
+        -:  223:    qreal angle() const;
+        -:  224:    void setAngle(qreal angle);
+        -:  225:
+        -:  226:    qreal angleTo(const QLineF &l) const;
+        -:  227:
+        -:  228:    [[nodiscard]] QLineF unitVector() const;
+        -:  229:    [[nodiscard]] constexpr inline QLineF normalVector() const;
+        -:  230:
+        -:  231:    IntersectionType intersects(const QLineF &l, QPointF *intersectionPoint = nullptr) const;
+        -:  232:
+        -:  233:    constexpr inline QPointF pointAt(qreal t) const;
+        -:  234:    constexpr inline void translate(const QPointF &p);
+        -:  235:    constexpr inline void translate(qreal dx, qreal dy);
+        -:  236:
+        -:  237:    [[nodiscard]] constexpr inline QLineF translated(const QPointF &p) const;
+        -:  238:    [[nodiscard]] constexpr inline QLineF translated(qreal dx, qreal dy) const;
+        -:  239:
+        -:  240:    [[nodiscard]] constexpr inline QPointF center() const;
+        -:  241:
+        -:  242:    inline void setP1(const QPointF &p1);
+        -:  243:    inline void setP2(const QPointF &p2);
+        -:  244:    inline void setPoints(const QPointF &p1, const QPointF &p2);
+        -:  245:    inline void setLine(qreal x1, qreal y1, qreal x2, qreal y2);
+        -:  246:
+        -:  247:#if QT_CORE_REMOVED_SINCE(6, 8)
+        -:  248:    constexpr inline bool operator==(const QLineF &d) const;
+        -:  249:    constexpr inline bool operator!=(const QLineF &d) const { return !operator==(d); }
+        -:  250:#endif
+        -:  251:
+        -:  252:    constexpr QLine toLine() const;
+        -:  253:
+        -:  254:private:
+        -:  255:    friend constexpr bool comparesEqual(const QLineF &lhs, const QLineF &rhs) noexcept
+        -:  256:    { return lhs.pt1 == rhs.pt1 && lhs.pt2 == rhs.pt2; }
+        -:  257:#if !QT_CORE_REMOVED_SINCE(6, 8)
+        -:  258:    Q_DECLARE_EQUALITY_COMPARABLE_LITERAL_TYPE(QLineF)
+        -:  259:#endif
+        -:  260:
+        -:  261:    friend constexpr bool comparesEqual(const QLineF &lhs, const QLine &rhs) noexcept
+        -:  262:    { return comparesEqual(lhs, rhs.toLineF()); }
+        -:  263:    Q_DECLARE_EQUALITY_COMPARABLE_LITERAL_TYPE(QLineF, QLine)
+        -:  264:
+        -:  265:    friend constexpr bool qFuzzyCompare(const QLineF &lhs, const QLineF &rhs) noexcept
+        -:  266:    { return qFuzzyCompare(lhs.pt1, rhs.pt1) && qFuzzyCompare(lhs.pt2, rhs.pt2); }
+        -:  267:
+        -:  268:    friend constexpr bool qFuzzyIsNull(const QLineF &line) noexcept
+        -:  269:    { return qFuzzyCompare(line.pt1, line.pt2); }
+        -:  270:
+        -:  271:    QPointF pt1, pt2;
+        -:  272:};
+        -:  273:Q_DECLARE_TYPEINFO(QLineF, Q_PRIMITIVE_TYPE);
+        -:  274:
+        -:  275:/*******************************************************************************
+        -:  276: * class QLineF inline members
+        -:  277: *******************************************************************************/
+        -:  278:
+        -:  279:constexpr inline QLineF::QLineF()
+        -:  280:{
+        -:  281:}
+        -:  282:
+    #####:  283:constexpr inline QLineF::QLineF(const QPointF &apt1, const QPointF &apt2)
+    #####:  284:    : pt1(apt1), pt2(apt2)
+        -:  285:{
+    #####:  286:}
+        -:  287:
+        -:  288:constexpr inline QLineF::QLineF(qreal x1pos, qreal y1pos, qreal x2pos, qreal y2pos)
+        -:  289:    : pt1(x1pos, y1pos), pt2(x2pos, y2pos)
+        -:  290:{
+        -:  291:}
+        -:  292:
+        -:  293:constexpr inline qreal QLineF::x1() const
+        -:  294:{
+        -:  295:    return pt1.x();
+        -:  296:}
+        -:  297:
+        -:  298:constexpr inline qreal QLineF::y1() const
+        -:  299:{
+        -:  300:    return pt1.y();
+        -:  301:}
+        -:  302:
+        -:  303:constexpr inline qreal QLineF::x2() const
+        -:  304:{
+        -:  305:    return pt2.x();
+        -:  306:}
+        -:  307:
+        -:  308:constexpr inline qreal QLineF::y2() const
+        -:  309:{
+        -:  310:    return pt2.y();
+        -:  311:}
+        -:  312:
+        -:  313:constexpr inline bool QLineF::isNull() const
+        -:  314:{
+        -:  315:    return qFuzzyCompare(pt1, pt2);
+        -:  316:}
+        -:  317:
+    #####:  318:constexpr inline QPointF QLineF::p1() const
+        -:  319:{
+    #####:  320:    return pt1;
+        -:  321:}
+        -:  322:
+    #####:  323:constexpr inline QPointF QLineF::p2() const
+        -:  324:{
+    #####:  325:    return pt2;
+        -:  326:}
+        -:  327:
+        -:  328:constexpr inline qreal QLineF::dx() const
+        -:  329:{
+        -:  330:    return pt2.x() - pt1.x();
+        -:  331:}
+        -:  332:
+        -:  333:constexpr inline qreal QLineF::dy() const
+        -:  334:{
+        -:  335:    return pt2.y() - pt1.y();
+        -:  336:}
+        -:  337:
+        -:  338:constexpr inline QLineF QLineF::normalVector() const
+        -:  339:{
+        -:  340:    return QLineF(p1(), p1() + QPointF(dy(), -dx()));
+        -:  341:}
+        -:  342:
+        -:  343:constexpr inline void QLineF::translate(const QPointF &point)
+        -:  344:{
+        -:  345:    pt1 += point;
+        -:  346:    pt2 += point;
+        -:  347:}
+        -:  348:
+        -:  349:constexpr inline void QLineF::translate(qreal adx, qreal ady)
+        -:  350:{
+        -:  351:    this->translate(QPointF(adx, ady));
+        -:  352:}
+        -:  353:
+        -:  354:constexpr inline QLineF QLineF::translated(const QPointF &p) const
+        -:  355:{
+        -:  356:    return QLineF(pt1 + p, pt2 + p);
+        -:  357:}
+        -:  358:
+        -:  359:constexpr inline QLineF QLineF::translated(qreal adx, qreal ady) const
+        -:  360:{
+        -:  361:    return translated(QPointF(adx, ady));
+        -:  362:}
+        -:  363:
+        -:  364:constexpr inline QPointF QLineF::center() const
+        -:  365:{
+        -:  366:    return QPointF(0.5 * pt1.x() + 0.5 * pt2.x(), 0.5 * pt1.y() + 0.5 * pt2.y());
+        -:  367:}
+        -:  368:
+        -:  369:inline void QLineF::setLength(qreal len)
+        -:  370:{
+        -:  371:    Q_ASSERT(qIsFinite(len));
+        -:  372:    const qreal oldLength = length();
+        -:  373:    Q_ASSERT(qIsFinite(oldLength));
+        -:  374:    // Scale len by dx() / length() and dy() / length(), two O(1) quantities,
+        -:  375:    // rather than scaling dx() and dy() by len / length(), which might overflow.
+        -:  376:    if (oldLength > 0)
+        -:  377:        pt2 = QPointF(pt1.x() + len * (dx() / oldLength), pt1.y() + len * (dy() / oldLength));
+        -:  378:}
+        -:  379:
+        -:  380:constexpr inline QPointF QLineF::pointAt(qreal t) const
+        -:  381:{
+        -:  382:    return QPointF(pt1.x() + (pt2.x() - pt1.x()) * t, pt1.y() + (pt2.y() - pt1.y()) * t);
+        -:  383:}
+        -:  384:
+        -:  385:constexpr inline QLineF QLine::toLineF() const noexcept { return *this; }
+        -:  386:
+        -:  387:constexpr inline QLine QLineF::toLine() const
+        -:  388:{
+        -:  389:    return QLine(pt1.toPoint(), pt2.toPoint());
+        -:  390:}
+        -:  391:
+        -:  392:
+        -:  393:inline void QLineF::setP1(const QPointF &aP1)
+        -:  394:{
+        -:  395:    pt1 = aP1;
+        -:  396:}
+        -:  397:
+        -:  398:inline void QLineF::setP2(const QPointF &aP2)
+        -:  399:{
+        -:  400:    pt2 = aP2;
+        -:  401:}
+        -:  402:
+        -:  403:inline void QLineF::setPoints(const QPointF &aP1, const QPointF &aP2)
+        -:  404:{
+        -:  405:    pt1 = aP1;
+        -:  406:    pt2 = aP2;
+        -:  407:}
+        -:  408:
+        -:  409:inline void QLineF::setLine(qreal aX1, qreal aY1, qreal aX2, qreal aY2)
+        -:  410:{
+        -:  411:    pt1 = QPointF(aX1, aY1);
+        -:  412:    pt2 = QPointF(aX2, aY2);
+        -:  413:}
+        -:  414:
+        -:  415:#if QT_CORE_REMOVED_SINCE(6, 8)
+        -:  416:constexpr inline bool QLineF::operator==(const QLineF &d) const
+        -:  417:{
+        -:  418:    return comparesEqual(*this, d);
+        -:  419:}
+        -:  420:#endif
+        -:  421:
+        -:  422:
+        -:  423:#ifndef QT_NO_DEBUG_STREAM
+        -:  424:Q_CORE_EXPORT QDebug operator<<(QDebug d, const QLineF &p);
+        -:  425:#endif
+        -:  426:
+        -:  427:#ifndef QT_NO_DATASTREAM
+        -:  428:Q_CORE_EXPORT QDataStream &operator<<(QDataStream &, const QLineF &);
+        -:  429:Q_CORE_EXPORT QDataStream &operator>>(QDataStream &, QLineF &);
+        -:  430:#endif
+        -:  431:
+        -:  432:QT_END_NAMESPACE
+        -:  433:
+        -:  434:#endif // QLINE_H

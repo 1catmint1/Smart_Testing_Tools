@@ -1,0 +1,98 @@
+[stage] tests
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[time] 20251226_063411
+[meta] cmd: cmd /c "set PATH=D:\Qt\6.10.1\mingw_64\bin;D:\Qt\Tools\mingw1310_64\bin;%PATH% && cd /d C:\Users\lenovo\Desktop\Diagramscene_ultima-syz && cd tests\generated && qmake tests.pro && mingw32-make clean && mingw32-make -f Makefile.Debug && debug\tests.exe && move debug\*.gc* ."
+[meta] cwd: C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[meta] returncode: 2
+[meta] timed_out: False
+[meta] timeout_s: 600.0
+
+== findings ==
+- tests | error | 测试命令执行失败
+
+== stdout (truncated) ==
+mingw32-make -f Makefile.Release clean
+mingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+del release\moc_predefs.h
+del release\moc_diagramscene.cpp release\moc_diagramtextitem.cpp release\moc_findreplacedialog.cpp release\moc_mainwindow.cpp
+del release\test_arrow.moc
+del release\test_arrow.o release\arrow.o release\diagramitem.o release\diagramitemgroup.o release\diagrampath.o release\diagramscene.o release\diagramtextitem.o release\findreplacedialog.o release\mainwindow.o release\moc_diagramscene.o release\moc_diagramtextitem.o release\moc_findreplacedialog.o release\moc_mainwindow.o
+mingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+mingw32-make -f Makefile.Debug clean
+mingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+del debug\moc_predefs.h
+del debug\moc_diagramscene.cpp debug\moc_diagramtextitem.cpp debug\moc_findreplacedialog.cpp debug\moc_mainwindow.cpp
+del debug\test_arrow.moc
+del debug\test_arrow.o debug\arrow.o debug\diagramitem.o debug\diagramitemgroup.o debug\diagrampath.o debug\diagramscene.o debug\diagramtextitem.o debug\findreplacedialog.o debug\mainwindow.o debug\moc_diagramscene.o debug\moc_diagramtextitem.o debug\moc_findreplacedialog.o debug\moc_mainwindow.o
+mingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+g++ -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -dM -E -o debug\moc_predefs.h D:\Qt\6.10.1\mingw_64\mkspecs\features\data\dummy.cpp
+D:\Qt\6.10.1\mingw_64\bin\moc.exe -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR="\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\"" --include C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/debug/moc_predefs.h -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++ -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -ID:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include test_arrow.cpp -o debug\test_arrow.moc
+g++ -c -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR="\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\"" -I. -I../.. -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -Idebug -I/include -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++  -o debug\test_arrow.o test_arrow.cpp
+
+== stderr (truncated) ==
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\release\moc_predefs.h
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\release\moc_diagramscene.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\release\test_arrow.moc
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\release\test_arrow.o
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\debug\moc_diagramscene.cpp
+test_arrow.cpp: In member function 'void TestArrow::testConstructor()':
+test_arrow.cpp:22:20: error: aggregate 'QGraphicsScene scene' has incomplete type and cannot be defined
+   22 |     QGraphicsScene scene;
+      |                    ^~~~~
+In file included from D:/Qt/6.10.1/mingw_64/include/QtTest/qtesteventloop.h:8,
+                 from D:/Qt/6.10.1/mingw_64/include/QtTest/qsignalspy.h:10,
+                 from D:/Qt/6.10.1/mingw_64/include/QtTest/QtTest:10,
+                 from test_arrow.cpp:1:
+test_arrow.cpp:29:19: error: 'DiagramItem* Arrow::myStartItem' is private within this context
+   29 |     QVERIFY(arrow.myStartItem == &startItem);
+      |                   ^~~~~~~~~~~
+D:/Qt/6.10.1/mingw_64/include/QtTest/qtestcase.h:67:43: note: in definition of macro 'QVERIFY'
+   67 |     if (!QTest::qVerify(static_cast<bool>(statement), #statement, "", __FILE__, __LINE__))\
+      |                                           ^~~~~~~~~
+In file included from test_arrow.cpp:5:
+../../arrow.h:34:18: note: declared private here
+   34 |     DiagramItem *myStartItem;
+      |                  ^~~~~~~~~~~
+test_arrow.cpp:29:19: note: field 'DiagramItem* Arrow::myStartItem' can be accessed via 'DiagramItem* Arrow::startItem() const'
+   29 |     QVERIFY(arrow.myStartItem == &startItem);
+      |                   ^~~~~~~~~~~
+D:/Qt/6.10.1/mingw_64/include/QtTest/qtestcase.h:67:43: note: in definition of macro 'QVERIFY'
+   67 |     if (!QTest::qVerify(static_cast<bool>(statement), #statement, "", __FILE__, __LINE__))\
+      |                                           ^~~~~~~~~
+test_arrow.cpp:30:19: error: 'DiagramItem* Arrow::myEndItem' is private within this context
+   30 |     QVERIFY(arrow.myEndItem == &endItem);
+      |                   ^~~~~~~~~
+D:/Qt/6.10.1/mingw_64/include/QtTest/qtestcase.h:67:43: note: in definition of macro 'QVERIFY'
+   67 |     if (!QTest::qVerify(static_cast<bool>(statement), #statement, "", __FILE__, __LINE__))\
+      |                                           ^~~~~~~~~
+../../arrow.h:35:18: note: declared private here
+   35 |     DiagramItem *myEndItem;
+      |                  ^~~~~~~~~
+test_arrow.cpp:30:19: note: field 'DiagramItem* Arrow::myEndItem' can be accessed via 'DiagramItem* Arrow::endItem() const'
+   30 |     QVERIFY(arrow.myEndItem == &endItem);
+      |                   ^~~~~~~~~
+D:/Qt/6.10.1/mingw_64/include/QtTest/qtestcase.h:67:43: note: in definition of macro 'QVERIFY'
+   67 |     if (!QTest::qVerify(static_cast<bool>(statement), #statement, "", __FILE__, __LINE__))\
+      |                                           ^~~~~~~~~
+test_arrow.cpp:32:41: error: 'QColor Arrow::myColor' is private within this context
+   32 |     QCOMPARE(arrow.pen().color(), arrow.myColor);
+      |                                         ^~~~~~~
+D:/Qt/6.10.1/mingw_64/include/QtTest/qtestcase.h:90:34: note: in definition of macro 'QCOMPARE'
+   90 |     if (!QTest::qCompare(actual, expected, #actual, #expected, __FILE__, __LINE__))\
+      |                                  ^~~~~~~~
+../../arrow.h:37:12: note: declared private here
+   37 |     QColor myColor = Qt::black;
+      |            ^~~~~~~
+test_arrow.cpp: In member function 'void TestArrow::testBoundingRect()':
+test_arrow.cpp:38:20: error: aggregate 'QGraphicsScene scene' has incomplete type and cannot be defined
+   38 |     QGraphicsScene scene;
+      |                    ^~~~~
+test_arrow.cpp: In member function 'void TestArrow::testUpdatePosition()':
+test_arrow.cpp:63:20: error: aggregate 'QGraphicsScene scene' has incomplete type and cannot be defined
+   63 |     QGraphicsScene scene;
+      |                    ^~~~~
+test_arrow.cpp: In member function 'void TestArrow::testPaintDoesNotCrash()':
+test_arrow.cpp:85:20: error: aggregate 'QGraphicsScene scene' has incomplete type and cannot be defined
+   85 |     QGraphicsScene scene;
+      |                    ^~~~~
+mingw32-make: *** [Makefile.Debug:1938: debug/test_arrow.o] Error 1

@@ -1,0 +1,624 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qtmochelpers.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_findreplacedialog.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_findreplacedialog.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2022 Intel Corporation.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QTMOCHELPERS_H
+        -:    5:#define QTMOCHELPERS_H
+        -:    6:
+        -:    7://
+        -:    8://  W A R N I N G
+        -:    9://  -------------
+        -:   10://
+        -:   11:// This file is not part of the Qt API. It exists to be used by the code that
+        -:   12:// moc generates. This file will not change quickly, but it over the long term,
+        -:   13:// it will likely change or even be removed.
+        -:   14://
+        -:   15:// We mean it.
+        -:   16://
+        -:   17:
+        -:   18:#include <QtCore/qmetatype.h>
+        -:   19:#include <QtCore/qtmocconstants.h>
+        -:   20:
+        -:   21:#include <QtCore/q20algorithm.h>    // std::min, std::copy_n
+        -:   22:#include <QtCore/q23type_traits.h>  // std::is_scoped_enum
+        -:   23:#include <limits>
+        -:   24:
+        -:   25:#if 0
+        -:   26:#pragma qt_no_master_include
+        -:   27:#endif
+        -:   28:
+        -:   29:QT_BEGIN_NAMESPACE
+        -:   30:namespace QtMocHelpers {
+        -:   31:// The maximum Size of a string literal is 2 GB on 32-bit and 4 GB on 64-bit
+        -:   32:// (but the compiler is likely to give up before you get anywhere near that much)
+        -:   33:static constexpr size_t MaxStringSize =
+        -:   34:        (std::min)(size_t((std::numeric_limits<uint>::max)()),
+        -:   35:                   size_t((std::numeric_limits<qsizetype>::max)()));
+        -:   36:
+        -:   37:template <uint UCount, uint SCount, size_t SSize, uint MCount> struct MetaObjectContents
+        -:   38:{
+        -:   39:    struct StaticContent {
+        -:   40:        uint data[UCount];
+        -:   41:        uint stringdata[SCount];
+        -:   42:        char strings[SSize];
+        -:   43:    } staticData = {};
+        -:   44:    struct RelocatingContent {
+        -:   45:        const QtPrivate::QMetaTypeInterface *metaTypes[MCount];
+        -:   46:    } relocatingData = {};
+        -:   47:};
+        -:   48:
+        -:   49:template <int Count, size_t StringSize> struct StringData
+        -:   50:{
+        -:   51:    static_assert(StringSize <= MaxStringSize, "Meta Object data is too big");
+        -:   52:    uint offsetsAndSizes[Count] = {};
+        -:   53:    char stringdata0[StringSize] = {};
+        -:   54:    constexpr StringData() = default;
+        -:   55:};
+        -:   56:
+        -:   57:template <typename... Strings> struct StringRefStorage
+        -:   58:{
+        -:   59:    static constexpr size_t stringSizeHelper() noexcept
+        -:   60:    {
+        -:   61:        // same as:
+        -:   62:        //   return (0 + ... + std::extent_v<Strings>);
+        -:   63:        // but not using the fold expression to avoid exceeding compiler limits
+        -:   64:        size_t total = 0;
+        -:   65:        int sizes[] = { std::extent_v<Strings>... };
+        -:   66:        for (int n : sizes)
+        -:   67:            total += n;
+        -:   68:        return size_t(total);
+        -:   69:    }
+        -:   70:
+        -:   71:    static constexpr int StringCount = sizeof...(Strings);
+        -:   72:    static constexpr size_t StringSize = stringSizeHelper();
+        -:   73:    static_assert(StringSize <= MaxStringSize, "Meta Object data is too big");
+        -:   74:    const char *inputs[StringCount];
+        -:   75:
+        -:   76:    constexpr StringRefStorage(const Strings &... strings) noexcept
+        -:   77:        : inputs{ strings... }
+        -:   78:    { }
+        -:   79:
+        -:   80:    constexpr void
+        -:   81:    writeTo(uint (&offsets)[2 * StringCount], char (&data)[StringSize]) const noexcept
+        -:   82:    {
+        -:   83:        int sizes[] = { std::extent_v<Strings>... };
+        -:   84:
+        -:   85:        uint offset = 0;
+        -:   86:        char *output = data;
+        -:   87:        for (size_t i = 0; i < sizeof...(Strings); ++i) {
+        -:   88:            // copy the input string, including the terminating null
+        -:   89:            int len = sizes[i];
+        -:   90:            for (int j = 0; j < len; ++j)
+        -:   91:                output[offset + j] = inputs[i][j];
+        -:   92:            offsets[2 * i] = offset + sizeof(offsets);
+        -:   93:            offsets[2 * i + 1] = len - 1;
+        -:   94:            offset += len;
+        -:   95:        }
+        -:   96:    }
+        -:   97:
+        -:   98:    constexpr auto create() const noexcept
+        -:   99:    {
+        -:  100:        StringData<2 * StringCount, StringSize>  result;
+        -:  101:        writeTo(result.offsetsAndSizes, result.stringdata0);
+        -:  102:        return result;
+        -:  103:    }
+        -:  104:};
+        -:  105:
+        -:  106:template <uint... Nx> constexpr auto stringData(const char (&...strings)[Nx])
+        -:  107:{
+        -:  108:    return StringRefStorage(strings...).create();
+        -:  109:}
+        -:  110:
+        6:  111:template <typename FuncType> inline bool indexOfMethod(void **_a, FuncType f, int index) noexcept
+        -:  112:{
+        6:  113:    int *result = static_cast<int *>(_a[0]);
+        6:  114:    auto candidate = reinterpret_cast<FuncType *>(_a[1]);
+       6*:  115:    if (*candidate != f)
+        3:  116:        return false;
+        3:  117:    *result = index;
+        3:  118:    return true;
+        -:  119:}
+        -:  120:
+        -:  121:template <typename Prop, typename Value> inline bool setProperty(Prop &property, Value &&value)
+        -:  122:{
+        -:  123:    if (property == value)
+        -:  124:        return false;
+        -:  125:    property = std::forward<Value>(value);
+        -:  126:    return true;
+        -:  127:}
+        -:  128:
+        -:  129:struct NoType {};
+        -:  130:
+        -:  131:namespace detail {
+        -:  132:template<typename Enum> constexpr int payloadSizeForEnum()
+        -:  133:{
+        -:  134:    // How many uint blocks do we need to store the values of this enum and the
+        -:  135:    // string indices for the enumeration labels? We only support 8- 16-, 32-
+        -:  136:    // and 64-bit enums at the time of this writing, so this code is extra
+        -:  137:    // pedantic allowing for 48-, 96-, 128-bit, etc.
+        -:  138:    int n = int(sizeof(Enum) + sizeof(uint)) - 1;
+        -:  139:    return 1 + n / sizeof(uint);
+        -:  140:}
+        -:  141:
+        -:  142:template <uint H, uint P> struct UintDataBlock
+        -:  143:{
+        -:  144:    static constexpr uint headerSize() { return H; }
+        -:  145:    static constexpr uint payloadSize() { return P; }
+        -:  146:    uint header[H ? H : 1] = {};
+        -:  147:    uint payload[P ? P : 1] = {};
+        -:  148:};
+        -:  149:
+        -:  150:// By default, we allow metatypes for incomplete types to be stored in the
+        -:  151:// metatype array, but we provide a way to require them to be complete by using
+        -:  152:// void as the Unique type (used by moc if --require-complete-types is passed
+        -:  153:// or some internal heuristic for QML matches) or by using the enum below, for
+        -:  154:// properties and enums.
+        -:  155:enum TypeCompletenessForMetaType : bool {
+        -:  156:    TypeMayBeIncomplete = false,
+        -:  157:    TypeMustBeComplete = true,
+        -:  158:};
+        -:  159:
+        -:  160:template <bool TypeMustBeComplete, typename... T> struct MetaTypeList
+        -:  161:{
+        -:  162:    static constexpr int count() { return sizeof...(T); }
+        -:  163:    template <typename Unique, typename Result> static constexpr void
+        -:  164:    copyTo(Result &result, uint &metatypeoffset)
+        -:  165:    {
+        -:  166:        if constexpr (count()) {
+        -:  167:            using namespace QtPrivate;
+        -:  168:            using U = std::conditional_t<TypeMustBeComplete, void, Unique>;
+        -:  169:            const QMetaTypeInterface *metaTypes[] = {
+        -:  170:                qTryMetaTypeInterfaceForType<U, T>()...
+        -:  171:            };
+        -:  172:            for (const QMetaTypeInterface *mt : metaTypes)
+        -:  173:                result.relocatingData.metaTypes[metatypeoffset++] = mt;
+        -:  174:        }
+        -:  175:    }
+        -:  176:};
+        -:  177:
+        -:  178:template <int Idx, typename T> struct UintDataEntry
+        -:  179:{
+        -:  180:    T entry;
+        -:  181:    constexpr UintDataEntry(T &&entry_) : entry(std::move(entry_)) {}
+        -:  182:};
+        -:  183:
+        -:  184:// This storage type is designed similar to libc++'s std::tuple, in that it
+        -:  185:// derives from a type unique to each of the types in the template parameter
+        -:  186:// pack (even if they are the same type). That way, we can refer to each of
+        -:  187:// entries uniquely by just casting *this to that unique type.
+        -:  188://
+        -:  189:// Testing reveals this to compile MUCH faster than recursive approaches and
+        -:  190:// avoids compiler constexpr-time limits.
+        -:  191:template <typename Idx, typename... T> struct UintDataStorage;
+        -:  192:template <int... Idx, typename... T> struct UintDataStorage<std::integer_sequence<int, Idx...>, T...>
+        -:  193:        : UintDataEntry<Idx, T>...
+        -:  194:{
+        -:  195:    constexpr UintDataStorage(T &&... data)
+        -:  196:        : UintDataEntry<Idx, T>(std::move(data))...
+        -:  197:    {}
+        -:  198:
+        -:  199:    template <typename F> constexpr void forEach(F &&f) const
+        -:  200:    {
+        -:  201:        [[maybe_unused]] auto invoke = [&f](const auto &entry_) { f(entry_.entry); return 0; };
+        -:  202:        int dummy[] = {
+        -:  203:            0,
+        -:  204:            invoke(static_cast<const UintDataEntry<Idx, T> &>(*this))...
+        -:  205:        };
+        -:  206:        (void) dummy;
+        -:  207:    }
+        -:  208:};
+        -:  209:} // namespace detail
+        -:  210:
+        -:  211:template <typename... Block> struct UintData
+        -:  212:{
+        -:  213:    constexpr UintData(Block &&... data_)
+        -:  214:        : data(std::move(data_)...)
+        -:  215:    {}
+        -:  216:
+        -:  217:    static constexpr uint count() { return sizeof...(Block); }
+        -:  218:    static constexpr uint headerSize()
+        -:  219:    {
+        -:  220:        // same as:
+        -:  221:        //   return (0 + ... + Block::headerSize());
+        -:  222:        // but not using the fold expression to avoid exceeding compiler limits
+        -:  223:        // (calculation done using int to get compile-time overflow checking)
+        -:  224:        int total = 0;
+        -:  225:        int sizes[] = { 0, Block::headerSize()... };
+        -:  226:        for (int n : sizes)
+        -:  227:            total += n;
+        -:  228:        return total;
+        -:  229:    }
+        -:  230:    static constexpr uint payloadSize()
+        -:  231:    {
+        -:  232:        // ditto
+        -:  233:        int total = 0;
+        -:  234:        int sizes[] = { 0, Block::payloadSize()... };
+        -:  235:        for (int n : sizes)
+        -:  236:            total += n;
+        -:  237:        return total;
+        -:  238:    }
+        -:  239:    static constexpr uint dataSize() { return headerSize() + payloadSize(); }
+        -:  240:    static constexpr int metaTypeCount()
+        -:  241:    {
+        -:  242:        // ditto again
+        -:  243:        int total = 0;
+        -:  244:        int sizes[] = { 0, decltype(Block::metaTypes())::count()... };
+        -:  245:        for (int n : sizes)
+        -:  246:            total += n;
+        -:  247:        return total;
+        -:  248:    }
+        -:  249:
+        -:  250:    template <typename Unique, typename Result> constexpr void
+        -:  251:    copyTo(Result &result, size_t dataoffset, uint &metatypeoffset) const
+        -:  252:    {
+        -:  253:        uint *ptr = result.staticData.data;
+        -:  254:        size_t payloadoffset = dataoffset + headerSize();
+        -:  255:        data.forEach([&](const auto &input) {
+        -:  256:            // copy the uint data
+        -:  257:            q20::copy_n(input.header, input.headerSize(), ptr + dataoffset);
+        -:  258:            q20::copy_n(input.payload, input.payloadSize(), ptr + payloadoffset);
+        -:  259:            input.adjustOffsets(ptr, uint(dataoffset), uint(payloadoffset), metatypeoffset);
+        -:  260:
+        -:  261:            // copy the metatypes
+        -:  262:            decltype(input.metaTypes())::template copyTo<Unique>(result, metatypeoffset);
+        -:  263:
+        -:  264:            dataoffset += input.headerSize();
+        -:  265:            payloadoffset += input.payloadSize();
+        -:  266:        });
+        -:  267:    }
+        -:  268:
+        -:  269:    template <typename F> constexpr void forEach(F &&f) const
+        -:  270:    {
+        -:  271:        data.forEach(std::forward<F>(f));
+        -:  272:    }
+        -:  273:
+        -:  274:private:
+        -:  275:    detail::UintDataStorage<std::make_integer_sequence<int, count()>, Block...> data;
+        -:  276:};
+        -:  277:
+        -:  278:template <int N> struct ClassInfos : detail::UintDataBlock<2 * N, 0>
+        -:  279:{
+        -:  280:    constexpr ClassInfos() = default;
+        -:  281:    constexpr ClassInfos(const std::array<uint, 2> (&infos)[N])
+        -:  282:    {
+        -:  283:        uint *out = this->header;
+        -:  284:        for (int i = 0; i < N; ++i) {
+        -:  285:            *out++ = infos[i][0];
+        -:  286:            *out++ = infos[i][1];
+        -:  287:        }
+        -:  288:    }
+        -:  289:};
+        -:  290:
+        -:  291:template <typename PropertyType> struct PropertyData : detail::UintDataBlock<5, 0>
+        -:  292:{
+        -:  293:    constexpr PropertyData(uint nameIndex, uint typeIndex, uint flags, uint notifyId = uint(-1), uint revision = 0)
+        -:  294:    {
+        -:  295:        this->header[0] = nameIndex;
+        -:  296:        this->header[1] = typeIndex;
+        -:  297:        this->header[2] = flags;
+        -:  298:        this->header[3] = notifyId;
+        -:  299:        this->header[4] = revision;
+        -:  300:    }
+        -:  301:
+        -:  302:    static constexpr auto metaTypes()
+        -:  303:    { return detail::MetaTypeList<detail::TypeMustBeComplete, PropertyType>{}; }
+        -:  304:
+        -:  305:    static constexpr void adjustOffsets(uint *, uint, uint, uint) noexcept {}
+        -:  306:};
+        -:  307:
+        -:  308:template <typename Enum, int N = 0>
+        -:  309:struct EnumData : detail::UintDataBlock<5, N * detail::payloadSizeForEnum<Enum>()>
+        -:  310:{
+        -:  311:private:
+        -:  312:    static_assert(sizeof(Enum) <= 2 * sizeof(uint), "Cannot store enumeration of this size");
+        -:  313:    template <typename T> struct RealEnum { using Type = T; };
+        -:  314:    template <typename T> struct RealEnum<QFlags<T>> { using Type = T; };
+        -:  315:public:
+        -:  316:    struct EnumEntry {
+        -:  317:        int nameIndex;
+        -:  318:        typename RealEnum<Enum>::Type value;
+        -:  319:    };
+        -:  320:
+        -:  321:    constexpr EnumData(uint nameOffset, uint aliasOffset, uint flags)
+        -:  322:    {
+        -:  323:        this->header[0] = nameOffset;
+        -:  324:        this->header[1] = aliasOffset;
+        -:  325:        this->header[2] = flags;
+        -:  326:        this->header[3] = N;
+        -:  327:        this->header[4] = 0;        // will be set in adjustOffsets()
+        -:  328:
+        -:  329:        if (nameOffset != aliasOffset || QtPrivate::IsQFlags<Enum>::value)
+        -:  330:            this->header[2] |= QtMocConstants::EnumIsFlag;
+        -:  331:        if constexpr (q23::is_scoped_enum_v<Enum>)
+        -:  332:            this->header[2] |= QtMocConstants::EnumIsScoped;
+        -:  333:    }
+        -:  334:
+        -:  335:    template <int Added> constexpr auto add(const EnumEntry (&entries)[Added]) const
+        -:  336:    {
+        -:  337:        EnumData<Enum, N + Added> result(this->header[0], this->header[1], this->header[2]);
+        -:  338:
+        -:  339:        q20::copy_n(this->payload, this->payloadSize(), result.payload);
+        -:  340:        uint o = this->payloadSize();
+        -:  341:        for (auto entry : entries) {
+        -:  342:            result.payload[o++] = uint(entry.nameIndex);
+        -:  343:            auto value = qToUnderlying(entry.value);
+        -:  344:            result.payload[o++] = uint(value);
+        -:  345:        }
+        -:  346:
+        -:  347:        if constexpr (sizeof(Enum) > sizeof(uint)) {
+        -:  348:            static_assert(N == 0, "Unimplemented: merging with non-empty EnumData");
+        -:  349:            result.header[2] |= QtMocConstants::EnumIs64Bit;
+        -:  350:            for (auto entry : entries) {
+        -:  351:                auto value = qToUnderlying(entry.value);
+        -:  352:                result.payload[o++] = uint(value >> 32);
+        -:  353:            }
+        -:  354:        }
+        -:  355:        return result;
+        -:  356:    }
+        -:  357:
+        -:  358:    static constexpr auto metaTypes()
+        -:  359:    { return detail::MetaTypeList<detail::TypeMustBeComplete, Enum>{}; }
+        -:  360:
+        -:  361:    static constexpr void
+        -:  362:    adjustOffsets(uint *ptr, uint dataoffset, uint payloadoffset, uint metatypeoffset) noexcept
+        -:  363:    {
+        -:  364:        ptr[dataoffset + 4] += uint(payloadoffset);
+        -:  365:        (void) metatypeoffset;
+        -:  366:    }
+        -:  367:};
+        -:  368:
+        -:  369:template <typename F, uint ExtraFlags> struct FunctionData;
+        -:  370:template <typename Ret, typename... Args, uint ExtraFlags>
+        -:  371:struct FunctionData<Ret (Args...), ExtraFlags>
+        -:  372:    : detail::UintDataBlock<6, 2 * sizeof...(Args) + 1 + (ExtraFlags & QtMocConstants::MethodRevisioned ? 1 : 0)>
+        -:  373:{
+        -:  374:    static constexpr bool IsRevisioned = (ExtraFlags & QtMocConstants::MethodRevisioned) != 0;
+        -:  375:    struct FunctionParameter {
+        -:  376:        uint typeIdx;   // or static meta type ID
+        -:  377:        uint nameIdx;
+        -:  378:    };
+        -:  379:    using ParametersArray = std::array<FunctionParameter, sizeof...(Args)>;
+        -:  380:
+        -:  381:    static auto metaTypes()
+        -:  382:    {
+        -:  383:        using namespace QtMocConstants;
+        -:  384:        if constexpr (std::is_same_v<Ret, NoType>) {
+        -:  385:            // constructors have no return type
+        -:  386:            static_assert((ExtraFlags & MethodConstructor) == MethodConstructor,
+        -:  387:                    "NoType return type used on a non-constructor");
+        -:  388:            static_assert((ExtraFlags & MethodIsConst) == 0,
+        -:  389:                    "Constructors cannot be const");
+        -:  390:            return detail::MetaTypeList<detail::TypeMayBeIncomplete, Args...>{};
+        -:  391:        } else {
+        -:  392:            static_assert((ExtraFlags & MethodConstructor) != MethodConstructor,
+        -:  393:                    "Constructors must use NoType as return type");
+        -:  394:            return detail::MetaTypeList<detail::TypeMayBeIncomplete, Ret, Args...>{};
+        -:  395:        }
+        -:  396:    }
+        -:  397:
+        -:  398:    static constexpr void
+        -:  399:    adjustOffsets(uint *ptr, uint dataoffset, uint payloadoffset, uint metatypeoffset) noexcept
+        -:  400:    {
+        -:  401:        if constexpr (IsRevisioned)
+        -:  402:            ++payloadoffset;
+        -:  403:        ptr[dataoffset + 2] += uint(payloadoffset);
+        -:  404:        ptr[dataoffset + 5] = metatypeoffset;
+        -:  405:    }
+        -:  406:
+        -:  407:    constexpr
+        -:  408:    FunctionData(uint nameIndex, uint tagIndex, uint flags,
+        -:  409:                 uint returnType, ParametersArray params = {})
+        -:  410:    {
+        -:  411:        this->header[0] = nameIndex;
+        -:  412:        this->header[1] = sizeof...(Args);
+        -:  413:        this->header[2] = 0;        // will be set in adjustOffsets()
+        -:  414:        this->header[3] = tagIndex;
+        -:  415:        this->header[4] = flags | ExtraFlags;
+        -:  416:        this->header[5] = 0;        // will be set in adjustOffsets()
+        -:  417:
+        -:  418:        uint *p = this->payload;
+        -:  419:        if constexpr (ExtraFlags & QtMocConstants::MethodRevisioned)
+        -:  420:            ++p;
+        -:  421:        *p++ = returnType;
+        -:  422:        if constexpr (sizeof...(Args)) {
+        -:  423:            for (uint i = 0; i < sizeof...(Args); ++i)
+        -:  424:                *p++ = params[i].typeIdx;
+        -:  425:            for (uint i = 0; i < sizeof...(Args); ++i)
+        -:  426:                *p++ = params[i].nameIdx;
+        -:  427:        } else {
+        -:  428:            Q_UNUSED(params);
+        -:  429:        }
+        -:  430:    }
+        -:  431:
+        -:  432:    constexpr
+        -:  433:    FunctionData(uint nameIndex, uint tagIndex, uint flags, uint revision,
+        -:  434:                 uint returnType, ParametersArray params = {})
+        -:  435:#ifdef __cpp_concepts
+        -:  436:            requires(IsRevisioned)
+        -:  437:#endif
+        -:  438:        : FunctionData(nameIndex, tagIndex, flags, returnType, params)
+        -:  439:    {
+        -:  440:        // note: we place the revision differently from meta object revision 12
+        -:  441:        this->payload[0] = revision;
+        -:  442:    }
+        -:  443:};
+        -:  444:
+        -:  445:template <typename Ret, typename... Args, uint ExtraFlags>
+        -:  446:struct FunctionData<Ret (Args...) const, ExtraFlags>
+        -:  447:    : FunctionData<Ret (Args...), ExtraFlags | QtMocConstants::MethodIsConst>
+        -:  448:{
+        -:  449:    using FunctionData<Ret (Args...), ExtraFlags | QtMocConstants::MethodIsConst>::FunctionData;
+        -:  450:};
+        -:  451:
+        -:  452:template <typename F> struct MethodData : FunctionData<F, QtMocConstants::MethodMethod>
+        -:  453:{
+        -:  454:    using FunctionData<F, QtMocConstants::MethodMethod>::FunctionData;
+        -:  455:};
+        -:  456:
+        -:  457:template <typename F> struct SignalData : FunctionData<F, QtMocConstants::MethodSignal>
+        -:  458:{
+        -:  459:    using FunctionData<F, QtMocConstants::MethodSignal>::FunctionData;
+        -:  460:};
+        -:  461:
+        -:  462:template <typename F> struct SlotData : FunctionData<F, QtMocConstants::MethodSlot>
+        -:  463:{
+        -:  464:    using FunctionData<F, QtMocConstants::MethodSlot>::FunctionData;
+        -:  465:};
+        -:  466:
+        -:  467:template <typename F> struct ConstructorData : FunctionData<F, QtMocConstants::MethodConstructor>
+        -:  468:{
+        -:  469:    using Base = FunctionData<F, QtMocConstants::MethodConstructor>;
+        -:  470:
+        -:  471:    // the name for a constructor is always the class name (string index zero)
+        -:  472:    // and it has no return type
+        -:  473:    constexpr ConstructorData(uint tagIndex, uint flags, typename Base::ParametersArray params = {})
+        -:  474:        : Base(0, tagIndex, flags, QMetaType::UnknownType, params)
+        -:  475:    {}
+        -:  476:};
+        -:  477:
+        -:  478:template <typename F> struct RevisionedMethodData :
+        -:  479:        FunctionData<F, QtMocConstants::MethodRevisioned | QtMocConstants::MethodMethod>
+        -:  480:{
+        -:  481:    using FunctionData<F, QtMocConstants::MethodRevisioned | QtMocConstants::MethodMethod>::FunctionData;
+        -:  482:};
+        -:  483:
+        -:  484:template <typename F> struct RevisionedSignalData :
+        -:  485:        FunctionData<F, QtMocConstants::MethodRevisioned | QtMocConstants::MethodSignal>
+        -:  486:{
+        -:  487:    using FunctionData<F, QtMocConstants::MethodRevisioned | QtMocConstants::MethodSignal>::FunctionData;
+        -:  488:};
+        -:  489:
+        -:  490:template <typename F> struct RevisionedSlotData :
+        -:  491:        FunctionData<F, QtMocConstants::MethodRevisioned | QtMocConstants::MethodSlot>
+        -:  492:{
+        -:  493:    using FunctionData<F, QtMocConstants::MethodRevisioned | QtMocConstants::MethodSlot>::FunctionData;
+        -:  494:};
+        -:  495:
+        -:  496:template <typename F> struct RevisionedConstructorData :
+        -:  497:        FunctionData<F, QtMocConstants::MethodRevisioned | QtMocConstants::MethodConstructor>
+        -:  498:{
+        -:  499:    using Base = FunctionData<F, QtMocConstants::MethodRevisioned | QtMocConstants::MethodConstructor>;
+        -:  500:
+        -:  501:    // the name for a constructor is always the class name (string index zero)
+        -:  502:    // and it has no return type
+        -:  503:    constexpr RevisionedConstructorData(uint tagIndex, uint flags, uint revision,
+        -:  504:                                        typename Base::ParametersArray params = {})
+        -:  505:        : Base(0, tagIndex, flags, revision, QMetaType::UnknownType, params)
+        -:  506:    {}
+        -:  507:};
+        -:  508:
+        -:  509:template <typename ObjectType, typename Unique, typename Strings,
+        -:  510:          typename Methods, typename Properties, typename Enums,
+        -:  511:          typename Constructors = UintData<>, typename ClassInfo = detail::UintDataBlock<0, 0>>
+        -:  512:constexpr auto metaObjectData(uint flags, const Strings &strings,
+        -:  513:                              const Methods &methods, const Properties &properties,
+        -:  514:                              const Enums &enums, const Constructors &constructors = {},
+        -:  515:                              const ClassInfo &classInfo = {})
+        -:  516:{
+        -:  517:    constexpr uint MetaTypeCount = Properties::metaTypeCount()
+        -:  518:            + Enums::metaTypeCount()
+        -:  519:            + 1     // the gadget's or void
+        -:  520:            + Methods::metaTypeCount()
+        -:  521:            + Constructors::metaTypeCount();
+        -:  522:
+        -:  523:    constexpr uint HeaderSize = 14;
+        -:  524:    constexpr uint TotalSize = HeaderSize
+        -:  525:            + Properties::dataSize()
+        -:  526:            + Enums::dataSize()
+        -:  527:            + Methods::dataSize()
+        -:  528:            + Constructors::dataSize()
+        -:  529:            + ClassInfo::headerSize() // + ClassInfo::payloadSize()
+        -:  530:            + 1;    // empty EOD
+        -:  531:
+        -:  532:    MetaObjectContents<TotalSize, 2 * Strings::StringCount, Strings::StringSize,
+        -:  533:            MetaTypeCount> result = {};
+        -:  534:    strings.writeTo(result.staticData.stringdata, result.staticData.strings);
+        -:  535:
+        -:  536:    uint dataoffset = HeaderSize;
+        -:  537:    uint metatypeoffset = 0;
+        -:  538:    uint *data = result.staticData.data;
+        -:  539:
+        -:  540:    data[0] = QtMocConstants::OutputRevision;
+        -:  541:    data[1] = 0;     // class name index (it's always 0)
+        -:  542:
+        -:  543:    data[2] = ClassInfo::headerSize() / 2;
+        -:  544:    data[3] = ClassInfo::headerSize() ? dataoffset : 0;
+        -:  545:    q20::copy_n(classInfo.header, classInfo.headerSize(), data + dataoffset);
+        -:  546:    dataoffset += ClassInfo::headerSize();
+        -:  547:
+        -:  548:    data[6] = properties.count();
+        -:  549:    data[7] = properties.count() ? dataoffset : 0;
+        -:  550:    properties.template copyTo<Unique>(result, dataoffset, metatypeoffset);
+        -:  551:    dataoffset += properties.dataSize();
+        -:  552:
+        -:  553:    data[8] = enums.count();
+        -:  554:    data[9] = enums.count() ? dataoffset : 0;
+        -:  555:    enums.template copyTo<Unique>(result, dataoffset, metatypeoffset);
+        -:  556:    dataoffset += enums.dataSize();
+        -:  557:
+        -:  558:    // the meta type referring to the object itself
+        -:  559:    result.relocatingData.metaTypes[metatypeoffset++] = QMetaType::fromType<ObjectType>().iface();
+        -:  560:
+        -:  561:    data[4] = methods.count();
+        -:  562:    data[5] = methods.count() ? dataoffset : 0;
+        -:  563:    methods.template copyTo<Unique>(result, dataoffset, metatypeoffset);
+        -:  564:    dataoffset += methods.dataSize();
+        -:  565:
+        -:  566:    data[10] = constructors.count();
+        -:  567:    data[11] = constructors.count() ? dataoffset : 0;
+        -:  568:    constructors.template copyTo<Unique>(result, dataoffset, metatypeoffset);
+        -:  569:    dataoffset += constructors.dataSize();
+        -:  570:
+        -:  571:    data[12] = flags;
+        -:  572:
+        -:  573:    // count the number of signals
+        -:  574:    if constexpr (Methods::count()) {
+        -:  575:        constexpr uint MethodHeaderSize = Methods::headerSize() / Methods::count();
+        -:  576:        const uint *ptr = &data[data[5]];
+        -:  577:        const uint *end = &data[data[5] + MethodHeaderSize * Methods::count()];
+        -:  578:        for ( ; ptr < end; ptr += MethodHeaderSize) {
+        -:  579:            if ((ptr[4] & QtMocConstants::MethodSignal) == 0)
+        -:  580:                break;
+        -:  581:            ++data[13];
+        -:  582:        }
+        -:  583:    }
+        -:  584:
+        -:  585:    return result;
+        -:  586:}
+        -:  587:
+        -:  588:template <typename T> inline std::enable_if_t<std::is_enum_v<T>> assignFlags(void *v, T t) noexcept
+        -:  589:{
+        -:  590:    *static_cast<T *>(v) = t;
+        -:  591:}
+        -:  592:
+        -:  593:template <typename T> inline std::enable_if_t<QtPrivate::IsQFlags<T>::value> assignFlags(void *v, T t) noexcept
+        -:  594:{
+        -:  595:    *static_cast<T *>(v) = t;
+        -:  596:}
+        -:  597:
+        -:  598:#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0)
+        -:  599:template <typename T>
+        -:  600:Q_DECL_DEPRECATED_X("Returning int/uint from a Q_PROPERTY that is a Q_FLAG is deprecated; "
+        -:  601:                    "please update to return the actual property's type")
+        -:  602:inline void assignFlagsFromInteger(QFlags<T> &f, int i) noexcept
+        -:  603:{
+        -:  604:     f = QFlag(i);
+        -:  605:}
+        -:  606:
+        -:  607:template <typename T, typename I>
+        -:  608:inline std::enable_if_t<QtPrivate::IsQFlags<T>::value && sizeof(T) == sizeof(int) && std::is_integral_v<I>>
+        -:  609:assignFlags(void *v, I i) noexcept
+        -:  610:{
+        -:  611:    assignFlagsFromInteger(*static_cast<T *>(v), i);
+        -:  612:}
+        -:  613:#endif  // Qt 7
+        -:  614:
+        -:  615:} // namespace QtMocHelpers
+        -:  616:QT_END_NAMESPACE
+        -:  617:
+        -:  618:QT_USE_NAMESPACE
+        -:  619:
+        -:  620:#endif // QTMOCHELPERS_H

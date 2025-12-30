@@ -1,0 +1,51 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251225_060641",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [],
+      "patches": [],
+      "stats": {
+        "files_generated": 0,
+        "cases_approx": 0
+      }
+    },
+    "applied": [],
+    "total_cases_count": 0
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: {\n  \"schema\": \"qt_test_files\",\n  \"files\": [\n    {\n      \"name\": \"tests/generated/tests.pro\",\n      \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_mainwindow \\\\\\n    test_deletecommand \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_findreplacedialog \\\\\\n    test_arrow \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene\\n\\nCONFIG += ordered\\n\"\n    },\n    {\n      \"name\": \"tests/generated/test_mainwindow.cpp\",\n      \"content\": \"#include <QtTest>\\n#include \\\"../mainwindow.h\\\"\\n#include \\\"../diagramscene.h\\\"\\n\\nclass TestMainWindow : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testSaveLoadPicPath();\\n    void testWindowTitle();\\n    void testSceneCreation();\\n\\nprivate:\\n    MainWindow *mainWindow;\\n};\\n\\nvoid TestMainWindow::initTestCase()\\n{\\n    mainWindow = new MainWindow();\\n}\\n\\nvoid TestMainWindow::cleanupTestCase()\\n{\\n    delete mainWindow;\\n}\\n\\nvoid TestMainWindow::testSaveLoadPicPath()\\n{\\n    QString testPath = \\\"/tmp/test_path.txt\\\";\\n    mainWindow->saveSavePicPath(testPath);\\n    QString loadedPath = mainWindow->loadSavePicPath();\\n    QCOMPARE(loadedPath, testPath);\\n}\\n\\nvoid TestMainWindow::testWindowTitle()\\n{\\n    QCOMPARE(mainWindow->windowTitle(), QString(\\\"流程图工程界面\\\"));\\n}\\n\\nvoid TestMainWindow::testSceneCreation()\\n{\\n    // Verify that the scene is created and has correct dimensions\\n    QVERIFY(mainWindow->scene != nullptr);\\n    QCOMPARE(mainWindow->scene->sceneRect(), QRectF(0, 0, 1920, 1080));\\n}\\n\\nQTEST_MAIN(TestMainWindow)\\n#include \\\"test_mainwindow.moc\\\"\\n\"\n    },\n    {\n      \"name\": \"tests/generated/test_deletecommand.cpp\",\n      \"content\": \"#include <QtTest>\\n#include \\\"../deletecommand.h\\\"\\n#include \\\"../diagramitem.h\\\"\\n#include <QGraphicsScene>\\n\\nclass TestDeleteCommand : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testUndoRedo();\\n   ",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: {\n  \"schema\": \"QtTest project with QObject test classes and QTEST_MAIN\",\n  \"files\": [\n    {\n      \"name\": \"tests/generated/tests.pro\",\n      \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_mainwindow \\\\\\n    test_deletecommand \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_findreplacedialog \\\\\\n    test_arrow \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene\\n\\nCONFIG += ordered\\n\"\n    },\n    {\n      \"name\": \"tests/generated/test_mainwindow.cpp\",\n      \"content\": \"#include <QtTest>\\n#include \\\"mainwindow.h\\\"\\n#include \\\"findreplacedialog.h\\\"\\n\\nclass TestMainWindow : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testFindReplaceDialogCreation();\\n    void testSavePicPathFunctions();\\n};\\n\\nvoid TestMainWindow::initTestCase()\\n{\\n    // 初始化代码（如果需要）\\n}\\n\\nvoid TestMainWindow::cleanupTestCase()\\n{\\n    // 清理代码（如果需要）\\n}\\n\\nvoid TestMainWindow::testFindReplaceDialogCreation()\\n{\\n    MainWindow w;\\n    // 测试 findReplaceDialog 是否被正确创建\\n    QVERIFY(w.findReplaceDialog != nullptr);\\n    QCOMPARE(w.findReplaceDialog->parent(), &w);\\n}\\n\\nvoid TestMainWindow::testSavePicPathFunctions()\\n{\\n    // 测试保存和加载图片路径的函数\\n    QString testPath = \\\"/tmp/test/path\\\";\\n    \\n    // 由于 saveSavePicPath 和 loadSavePicPath 是 MainWindow 的成员函数，\\n    // 我们需要创建一个 MainWindow 实例来测试它们\\n    MainWindow w;\\n    \\n    // 调用保存函数\\n    w.saveSavePicPath(testPath);\\n    \\n    // 调用加载函数并验证\\n    QString loadedPath = w.loadSavePicPath();\\n    QCOMPARE(loadedPath, testPath);\\n}\\n\\nQTEST_MAIN(TestMainWindow)\\n#include \\\"test_mainwindow.moc\\\"\\n\"\n    },\n    {\n      \"name\": \"tests/generated/test_deletecommand.cpp\",\n      \"content\": \"#include <QtTest>\\n#include \\\"deletecommand.h\\\"\\n#include \\\"diagramitem.h\\\"\\n#include <QGraphicsScene>\\n\\nclass TestDeleteCommand : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testConstructor()",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "未写入任何 QtTest 文件（LLM 输出为空或不合法）",
+      "details": "",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

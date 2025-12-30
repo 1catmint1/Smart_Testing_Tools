@@ -1,0 +1,8 @@
+[stage] testgen
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[time] 20251225_053010
+
+== findings ==
+- testgen | error | 批量生成失败
+- testgen | error | 批量生成失败
+- testgen | warning | 未写入任何 QtTest 文件（LLM 输出为空或不合法）

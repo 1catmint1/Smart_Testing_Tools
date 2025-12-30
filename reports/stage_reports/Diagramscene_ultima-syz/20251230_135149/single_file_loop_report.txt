@@ -1,0 +1,18 @@
+[stage] single_file_loop
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[time] 20251230_135149
+
+== findings ==
+- testgen | warning | 生成文件失败: tests/generated/tests.pro
+- testgen | info | 已生成 QtTest：2 个文件，共约 28 个用例
+- tests | error | 测试命令执行失败
+- testgen | info | 已生成 QtTest：2 个文件，共约 26 个用例
+- tests | error | 测试命令执行失败
+- testgen | info | 已生成 QtTest：2 个文件，共约 36 个用例
+- tests | error | 测试命令执行失败
+- testgen | warning | 生成文件失败: tests/generated/test_diagramitem.cpp
+- testgen | warning | 生成文件失败: tests/generated/tests.pro
+- testgen | info | 已生成 QtTest：2 个文件，共约 30 个用例
+- tests | error | 测试命令执行失败
+- tests | info | 测试命令执行完成
+- coverage | info | 覆盖率收集完成

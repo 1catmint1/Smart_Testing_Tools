@@ -1,0 +1,1047 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtGui/qevent.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/diagramscene.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/diagramscene.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QEVENT_H
+        -:    5:#define QEVENT_H
+        -:    6:
+        -:    7:#if 0
+        -:    8:#pragma qt_class(QtEvents)
+        -:    9:#endif
+        -:   10:
+        -:   11:#include <QtGui/qtguiglobal.h>
+        -:   12:
+        -:   13:#include <QtCore/qcoreevent.h>
+        -:   14:#include <QtCore/qiodevice.h>
+        -:   15:#include <QtCore/qlist.h>
+        -:   16:#include <QtCore/qnamespace.h>
+        -:   17:#include <QtCore/qstring.h>
+        -:   18:#include <QtCore/qurl.h>
+        -:   19:#include <QtCore/qvariant.h>
+        -:   20:#include <QtGui/qeventpoint.h>
+        -:   21:#include <QtGui/qpointingdevice.h>
+        -:   22:#include <QtGui/qregion.h>
+        -:   23:#include <QtGui/qwindowdefs.h>
+        -:   24:
+        -:   25:#if QT_CONFIG(shortcut)
+        -:   26:#  include <QtGui/qkeysequence.h>
+        -:   27:#endif
+        -:   28:
+        -:   29:class tst_QEvent;
+        -:   30:
+        -:   31:QT_BEGIN_NAMESPACE
+        -:   32:
+        -:   33:class QFile;
+        -:   34:class QAction;
+        -:   35:class QMouseEvent;
+        -:   36:template <typename T> class QPointer;
+        -:   37:class QPointerEvent;
+        -:   38:class QScreen;
+        -:   39:#if QT_CONFIG(shortcut)
+        -:   40:class QShortcut;
+        -:   41:#endif
+        -:   42:class QTabletEvent;
+        -:   43:class QTouchEvent;
+        -:   44:#if QT_CONFIG(gestures)
+        -:   45:class QGesture;
+        -:   46:#endif
+        -:   47:
+        -:   48:class Q_GUI_EXPORT QInputEvent : public QEvent
+        -:   49:{
+        -:   50:    Q_DECL_EVENT_COMMON(QInputEvent)
+        -:   51:public:
+        -:   52:    explicit QInputEvent(Type type, const QInputDevice *m_dev, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+        -:   53:
+        -:   54:    const QInputDevice *device() const { return m_dev; }
+        -:   55:    QInputDevice::DeviceType deviceType() const { return m_dev ? m_dev->type() : QInputDevice::DeviceType::Unknown; }
+        -:   56:    inline Qt::KeyboardModifiers modifiers() const { return m_modState; }
+        -:   57:    inline void setModifiers(Qt::KeyboardModifiers modifiers) { m_modState = modifiers; }
+        -:   58:    inline quint64 timestamp() const { return m_timeStamp; }
+        -:   59:    virtual void setTimestamp(quint64 timestamp) { m_timeStamp = timestamp; }
+        -:   60:
+        -:   61:protected:
+        -:   62:    QInputEvent(Type type, PointerEventTag, const QInputDevice *dev, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+        -:   63:    QInputEvent(Type type, SinglePointEventTag, const QInputDevice *dev, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+        -:   64:
+        -:   65:    const QInputDevice *m_dev = nullptr;
+        -:   66:    quint64 m_timeStamp = 0;
+        -:   67:    Qt::KeyboardModifiers m_modState = Qt::NoModifier;
+        -:   68:    // fill up to the closest 8-byte aligned size: 48
+        -:   69:    quint32 m_reserved = 0;
+        -:   70:};
+        -:   71:
+        -:   72:class Q_GUI_EXPORT QPointerEvent : public QInputEvent
+        -:   73:{
+        -:   74:    Q_GADGET
+        -:   75:    Q_DECL_EVENT_COMMON(QPointerEvent)
+        -:   76:public:
+        -:   77:    explicit QPointerEvent(Type type, const QPointingDevice *dev,
+        -:   78:                           Qt::KeyboardModifiers modifiers = Qt::NoModifier, const QList<QEventPoint> &points = {});
+        -:   79:
+        -:   80:    const QPointingDevice *pointingDevice() const;
+        -:   81:    QPointingDevice::PointerType pointerType() const {
+        -:   82:        return pointingDevice() ? pointingDevice()->pointerType() : QPointingDevice::PointerType::Unknown;
+        -:   83:    }
+        -:   84:    void setTimestamp(quint64 timestamp) override;
+        -:   85:    qsizetype pointCount() const { return m_points.size(); }
+        -:   86:    QEventPoint &point(qsizetype i);
+        -:   87:    const QList<QEventPoint> &points() const { return m_points; }
+        -:   88:    QEventPoint *pointById(int id);
+        -:   89:    bool allPointsGrabbed() const;
+        -:   90:    virtual bool isBeginEvent() const { return false; }
+        -:   91:    virtual bool isUpdateEvent() const { return false; }
+        -:   92:    virtual bool isEndEvent() const { return false; }
+        -:   93:    bool allPointsAccepted() const;
+        -:   94:    virtual void setAccepted(bool accepted) override;
+        -:   95:    QObject *exclusiveGrabber(const QEventPoint &point) const;
+        -:   96:    void setExclusiveGrabber(const QEventPoint &point, QObject *exclusiveGrabber);
+        -:   97:    QList<QPointer <QObject>> passiveGrabbers(const QEventPoint &point) const;
+        -:   98:    void clearPassiveGrabbers(const QEventPoint &point);
+        -:   99:    bool addPassiveGrabber(const QEventPoint &point, QObject *grabber);
+        -:  100:    bool removePassiveGrabber(const QEventPoint &point, QObject *grabber);
+        -:  101:
+        -:  102:protected:
+        -:  103:    QPointerEvent(Type type, SinglePointEventTag, const QInputDevice *dev, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+        -:  104:
+        -:  105:    QList<QEventPoint> m_points;
+        -:  106:};
+        -:  107:
+        -:  108:class Q_GUI_EXPORT QSinglePointEvent : public QPointerEvent
+        -:  109:{
+        -:  110:    Q_GADGET
+        -:  111:    Q_PROPERTY(QObject *exclusivePointGrabber READ exclusivePointGrabber
+        -:  112:               WRITE setExclusivePointGrabber)
+        -:  113:
+        -:  114:    Q_DECL_EVENT_COMMON(QSinglePointEvent)
+        -:  115:public:
+        -:  116:    inline Qt::MouseButton button() const { return m_button; }
+        -:  117:    inline Qt::MouseButtons buttons() const { return m_mouseState; }
+        -:  118:
+        -:  119:    inline QPointF position() const
+        -:  120:    { Q_ASSERT(!m_points.isEmpty()); return m_points.first().position(); }
+        -:  121:    inline QPointF scenePosition() const
+        -:  122:    { Q_ASSERT(!m_points.isEmpty()); return m_points.first().scenePosition(); }
+        -:  123:    inline QPointF globalPosition() const
+        -:  124:    { Q_ASSERT(!m_points.isEmpty()); return m_points.first().globalPosition(); }
+        -:  125:
+        -:  126:    bool isBeginEvent() const override;
+        -:  127:    bool isUpdateEvent() const override;
+        -:  128:    bool isEndEvent() const override;
+        -:  129:
+        -:  130:    QObject *exclusivePointGrabber() const
+        -:  131:    { return QPointerEvent::exclusiveGrabber(points().first()); }
+        -:  132:    void setExclusivePointGrabber(QObject *exclusiveGrabber)
+        -:  133:    { QPointerEvent::setExclusiveGrabber(points().first(), exclusiveGrabber); }
+        -:  134:
+        -:  135:protected:
+        -:  136:    friend class ::tst_QEvent;
+        -:  137:    friend class QMutableSinglePointEvent;
+        -:  138:    QSinglePointEvent(Type type, const QPointingDevice *dev, const QEventPoint &point,
+        -:  139:                      Qt::MouseButton button, Qt::MouseButtons buttons,
+        -:  140:                      Qt::KeyboardModifiers modifiers, Qt::MouseEventSource source);
+        -:  141:    QSinglePointEvent(Type type, const QPointingDevice *dev, const QPointF &localPos,
+        -:  142:                      const QPointF &scenePos, const QPointF &globalPos,
+        -:  143:                      Qt::MouseButton button, Qt::MouseButtons buttons,
+        -:  144:                      Qt::KeyboardModifiers modifiers,
+        -:  145:                      Qt::MouseEventSource source = Qt::MouseEventNotSynthesized);
+        -:  146:
+        -:  147:    Qt::MouseButton m_button = Qt::NoButton;
+        -:  148:    Qt::MouseButtons m_mouseState = Qt::NoButton;
+        -:  149:    Qt::MouseEventSource m_source;
+        -:  150:    /*
+        -:  151:        Fill up to the next 8-byte aligned size: 88
+        -:  152:        We have 32bits left, use some for QSinglePointEvent subclasses so that
+        -:  153:        we don't end up with gaps.
+        -:  154:    */
+        -:  155:    // split this in two quint16; with a quint32, MSVC would 32-bit align it
+        -:  156:    quint16 m_reserved;
+        -:  157:    quint16 m_reserved2  : 11;
+        -:  158:    // for QMouseEvent
+        -:  159:    quint16 m_doubleClick : 1;
+        -:  160:    // for QWheelEvent
+        -:  161:    quint16 m_phase : 3;
+        -:  162:    quint16 m_invertedScrolling : 1;
+        -:  163:};
+        -:  164:
+        -:  165:class Q_GUI_EXPORT QEnterEvent : public QSinglePointEvent
+        -:  166:{
+        -:  167:    Q_DECL_EVENT_COMMON(QEnterEvent)
+        -:  168:public:
+        -:  169:    QEnterEvent(const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos,
+        -:  170:                const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+        -:  171:
+        -:  172:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  173:#ifndef QT_NO_INTEGER_EVENT_COORDINATES
+        -:  174:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  175:    inline QPoint pos() const { return position().toPoint(); }
+        -:  176:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  177:    inline QPoint globalPos() const { return globalPosition().toPoint(); }
+        -:  178:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  179:    inline int x() const { return qRound(position().x()); }
+        -:  180:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  181:    inline int y() const { return qRound(position().y()); }
+        -:  182:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  183:    inline int globalX() const { return qRound(globalPosition().x()); }
+        -:  184:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  185:    inline int globalY() const { return qRound(globalPosition().y()); }
+        -:  186:#endif
+        -:  187:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  188:    QPointF localPos() const { return position(); }
+        -:  189:    QT_DEPRECATED_VERSION_X_6_0("Use scenePosition()")
+        -:  190:    QPointF windowPos() const { return scenePosition(); }
+        -:  191:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  192:    QPointF screenPos() const { return globalPosition(); }
+        -:  193:#endif // QT_DEPRECATED_SINCE(6, 0)
+        -:  194:};
+        -:  195:
+        -:  196:class Q_GUI_EXPORT QMouseEvent : public QSinglePointEvent
+        -:  197:{
+        -:  198:    Q_DECL_EVENT_COMMON(QMouseEvent)
+        -:  199:public:
+        -:  200:#if QT_DEPRECATED_SINCE(6, 4)
+        -:  201:    QT_DEPRECATED_VERSION_X_6_4("Use another constructor")
+        -:  202:    QMouseEvent(Type type, const QPointF &localPos, Qt::MouseButton button,
+        -:  203:                Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers,
+        -:  204:                const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+        -:  205:#endif
+        -:  206:    QMouseEvent(Type type, const QPointF &localPos, const QPointF &globalPos,
+        -:  207:                Qt::MouseButton button, Qt::MouseButtons buttons,
+        -:  208:                Qt::KeyboardModifiers modifiers,
+        -:  209:                const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+        -:  210:    QMouseEvent(Type type, const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos,
+        -:  211:                Qt::MouseButton button, Qt::MouseButtons buttons,
+        -:  212:                Qt::KeyboardModifiers modifiers,
+        -:  213:                const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+        -:  214:    QMouseEvent(Type type, const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos,
+        -:  215:                Qt::MouseButton button, Qt::MouseButtons buttons,
+        -:  216:                Qt::KeyboardModifiers modifiers, Qt::MouseEventSource source,
+        -:  217:                const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+        -:  218:
+        -:  219:#ifndef QT_NO_INTEGER_EVENT_COORDINATES
+        -:  220:    inline QPoint pos() const { return position().toPoint(); }
+        -:  221:#endif
+        -:  222:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  223:#ifndef QT_NO_INTEGER_EVENT_COORDINATES
+        -:  224:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  225:    inline QPoint globalPos() const { return globalPosition().toPoint(); }
+        -:  226:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  227:    inline int x() const { return qRound(position().x()); }
+        -:  228:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  229:    inline int y() const { return qRound(position().y()); }
+        -:  230:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  231:    inline int globalX() const { return qRound(globalPosition().x()); }
+        -:  232:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  233:    inline int globalY() const { return qRound(globalPosition().y()); }
+        -:  234:#endif // QT_NO_INTEGER_EVENT_COORDINATES
+        -:  235:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  236:    QPointF localPos() const { return position(); }
+        -:  237:    QT_DEPRECATED_VERSION_X_6_0("Use scenePosition()")
+        -:  238:    QPointF windowPos() const { return scenePosition(); }
+        -:  239:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  240:    QPointF screenPos() const { return globalPosition(); }
+        -:  241:#endif // QT_DEPRECATED_SINCE(6, 0)
+        -:  242:    Qt::MouseEventSource source() const;
+        -:  243:    Qt::MouseEventFlags flags() const;
+        -:  244:};
+        -:  245:
+        -:  246:class Q_GUI_EXPORT QHoverEvent : public QSinglePointEvent
+        -:  247:{
+        -:  248:    Q_DECL_EVENT_COMMON(QHoverEvent)
+        -:  249:public:
+        -:  250:    QHoverEvent(Type type, const QPointF &scenePos, const QPointF &globalPos, const QPointF &oldPos,
+        -:  251:                Qt::KeyboardModifiers modifiers = Qt::NoModifier,
+        -:  252:                const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+        -:  253:#if QT_DEPRECATED_SINCE(6, 3)
+        -:  254:    QT_DEPRECATED_VERSION_X_6_3("Use the other constructor")
+        -:  255:    QHoverEvent(Type type, const QPointF &pos, const QPointF &oldPos,
+        -:  256:                Qt::KeyboardModifiers modifiers = Qt::NoModifier,
+        -:  257:                const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+        -:  258:#endif
+        -:  259:
+        -:  260:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  261:#ifndef QT_NO_INTEGER_EVENT_COORDINATES
+        -:  262:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  263:    inline QPoint pos() const { return position().toPoint(); }
+        -:  264:#endif
+        -:  265:
+        -:  266:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  267:    inline QPointF posF() const { return position(); }
+        -:  268:#endif // QT_DEPRECATED_SINCE(6, 0)
+        -:  269:
+        -:  270:    bool isUpdateEvent() const override  { return true; }
+        -:  271:
+        -:  272:    // TODO deprecate when we figure out an actual replacement (point history?)
+        -:  273:    inline QPoint oldPos() const { return m_oldPos.toPoint(); }
+        -:  274:    inline QPointF oldPosF() const { return m_oldPos; }
+        -:  275:
+        -:  276:protected:
+        -:  277:    QPointF m_oldPos; // TODO remove?
+        -:  278:};
+        -:  279:
+        -:  280:#if QT_CONFIG(wheelevent)
+        -:  281:class Q_GUI_EXPORT QWheelEvent : public QSinglePointEvent
+        -:  282:{
+        -:  283:    Q_GADGET
+        -:  284:    Q_PROPERTY(const QPointingDevice *device READ pointingDevice)
+        -:  285:    Q_PROPERTY(QPoint pixelDelta READ pixelDelta)
+        -:  286:    Q_PROPERTY(QPoint angleDelta READ angleDelta)
+        -:  287:    Q_PROPERTY(Qt::ScrollPhase phase READ phase)
+        -:  288:    Q_PROPERTY(bool inverted READ inverted)
+        -:  289:
+        -:  290:    Q_DECL_EVENT_COMMON(QWheelEvent)
+        -:  291:public:
+        -:  292:    enum { DefaultDeltasPerStep = 120 };
+        -:  293:
+        -:  294:    QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta,
+        -:  295:                Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers, Qt::ScrollPhase phase,
+        -:  296:                bool inverted, Qt::MouseEventSource source = Qt::MouseEventNotSynthesized,
+        -:  297:                const QPointingDevice *device = QPointingDevice::primaryPointingDevice());
+        -:  298:
+        -:  299:    inline QPoint pixelDelta() const { return m_pixelDelta; }
+        -:  300:    inline QPoint angleDelta() const { return m_angleDelta; }
+        -:  301:
+        -:  302:    inline Qt::ScrollPhase phase() const { return Qt::ScrollPhase(m_phase); }
+        -:  303:    inline bool inverted() const { return m_invertedScrolling; }
+        -:  304:    inline bool isInverted() const { return m_invertedScrolling; }
+        -:  305:    inline bool hasPixelDelta() const { return !m_pixelDelta.isNull(); }
+        -:  306:
+        -:  307:    bool isBeginEvent() const override;
+        -:  308:    bool isUpdateEvent() const override;
+        -:  309:    bool isEndEvent() const override;
+        -:  310:    Qt::MouseEventSource source() const { return Qt::MouseEventSource(m_source); }
+        -:  311:
+        -:  312:protected:
+        -:  313:    QPoint m_pixelDelta;
+        -:  314:    QPoint m_angleDelta;
+        -:  315:};
+        -:  316:#endif
+        -:  317:
+        -:  318:#if QT_CONFIG(tabletevent)
+        -:  319:class Q_GUI_EXPORT QTabletEvent : public QSinglePointEvent
+        -:  320:{
+        -:  321:    Q_DECL_EVENT_COMMON(QTabletEvent)
+        -:  322:public:
+        -:  323:    QTabletEvent(Type t, const QPointingDevice *device,
+        -:  324:                 const QPointF &pos, const QPointF &globalPos,
+        -:  325:                 qreal pressure, float xTilt, float yTilt,
+        -:  326:                 float tangentialPressure, qreal rotation, float z,
+        -:  327:                 Qt::KeyboardModifiers keyState,
+        -:  328:                 Qt::MouseButton button, Qt::MouseButtons buttons);
+        -:  329:
+        -:  330:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  331:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  332:    inline QPoint pos() const { return position().toPoint(); }
+        -:  333:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  334:    inline QPoint globalPos() const { return globalPosition().toPoint(); }
+        -:  335:
+        -:  336:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  337:    inline const QPointF posF() const { return position(); }
+        -:  338:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  339:    inline const QPointF globalPosF() const { return globalPosition(); }
+        -:  340:    QT_DEPRECATED_VERSION_X_6_0("Use position().x()")
+        -:  341:    inline int x() const { return qRound(position().x()); }
+        -:  342:    QT_DEPRECATED_VERSION_X_6_0("Use position().y()")
+        -:  343:    inline int y() const { return qRound(position().y()); }
+        -:  344:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition().x()")
+        -:  345:    inline int globalX() const { return qRound(globalPosition().x()); }
+        -:  346:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition().y()")
+        -:  347:    inline int globalY() const { return qRound(globalPosition().y()); }
+        -:  348:    QT_DEPRECATED_VERSION_X_6_0("use globalPosition().x()")
+        -:  349:    inline qreal hiResGlobalX() const { return globalPosition().x(); }
+        -:  350:    QT_DEPRECATED_VERSION_X_6_0("use globalPosition().y()")
+        -:  351:    inline qreal hiResGlobalY() const { return globalPosition().y(); }
+        -:  352:    QT_DEPRECATED_VERSION_X_6_0("use pointingDevice().uniqueId()")
+        -:  353:    inline qint64 uniqueId() const { return pointingDevice() ? pointingDevice()->uniqueId().numericId() : -1; }
+        -:  354:#endif
+        -:  355:    inline qreal pressure() const { Q_ASSERT(!points().isEmpty()); return points().first().pressure(); }
+        -:  356:    inline qreal rotation() const { Q_ASSERT(!points().isEmpty()); return points().first().rotation(); }
+        -:  357:    inline qreal z() const { return m_z; }
+        -:  358:    inline qreal tangentialPressure() const { return m_tangential; }
+        -:  359:    inline qreal xTilt() const { return m_xTilt; }
+        -:  360:    inline qreal yTilt() const { return m_yTilt; }
+        -:  361:
+        -:  362:protected:
+        -:  363:    float m_tangential;
+        -:  364:    float m_xTilt;
+        -:  365:    float m_yTilt;
+        -:  366:    float m_z;
+        -:  367:};
+        -:  368:#endif // QT_CONFIG(tabletevent)
+        -:  369:
+        -:  370:#if QT_CONFIG(gestures)
+        -:  371:class Q_GUI_EXPORT QNativeGestureEvent : public QSinglePointEvent
+        -:  372:{
+        -:  373:    Q_DECL_EVENT_COMMON(QNativeGestureEvent)
+        -:  374:public:
+        -:  375:#if QT_DEPRECATED_SINCE(6, 2)
+        -:  376:    QT_DEPRECATED_VERSION_X_6_2("Use the other constructor")
+        -:  377:    QNativeGestureEvent(Qt::NativeGestureType type, const QPointingDevice *dev, const QPointF &localPos, const QPointF &scenePos,
+        -:  378:                        const QPointF &globalPos, qreal value, quint64 sequenceId, quint64 intArgument);
+        -:  379:#endif
+        -:  380:    QNativeGestureEvent(Qt::NativeGestureType type, const QPointingDevice *dev, int fingerCount,
+        -:  381:                        const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos,
+        -:  382:                        qreal value, const QPointF &delta, quint64 sequenceId = UINT64_MAX);
+        -:  383:
+        -:  384:    Qt::NativeGestureType gestureType() const { return m_gestureType; }
+        -:  385:    int fingerCount() const { return m_fingerCount; }
+        -:  386:    qreal value() const { return m_realValue; }
+        -:  387:    QPointF delta() const {
+        -:  388:#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0)
+        -:  389:        return m_delta.toPointF();
+        -:  390:#else
+        -:  391:        return m_delta;
+        -:  392:#endif
+        -:  393:    }
+        -:  394:
+        -:  395:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  396:#ifndef QT_NO_INTEGER_EVENT_COORDINATES
+        -:  397:    QT_DEPRECATED_VERSION_X_6_0("Use position().toPoint()")
+        -:  398:    inline const QPoint pos() const { return position().toPoint(); }
+        -:  399:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition().toPoint()")
+        -:  400:    inline const QPoint globalPos() const { return globalPosition().toPoint(); }
+        -:  401:#endif
+        -:  402:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  403:    QPointF localPos() const { return position(); }
+        -:  404:    QT_DEPRECATED_VERSION_X_6_0("Use scenePosition()")
+        -:  405:    QPointF windowPos() const { return scenePosition(); }
+        -:  406:    QT_DEPRECATED_VERSION_X_6_0("Use globalPosition()")
+        -:  407:    QPointF screenPos() const { return globalPosition(); }
+        -:  408:#endif
+        -:  409:
+        -:  410:protected:
+        -:  411:    quint64 m_sequenceId;
+        -:  412:#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0)
+        -:  413:    QVector2D m_delta;
+        -:  414:#else
+        -:  415:    QPointF m_delta;
+        -:  416:#endif
+        -:  417:    qreal m_realValue;
+        -:  418:    Qt::NativeGestureType m_gestureType;
+        -:  419:    quint32 m_fingerCount : 4;
+        -:  420:    quint32 m_reserved : 28;
+        -:  421:};
+        -:  422:#endif // QT_CONFIG(gestures)
+        -:  423:
+        -:  424:class Q_GUI_EXPORT QKeyEvent : public QInputEvent
+        -:  425:{
+        -:  426:    Q_DECL_EVENT_COMMON(QKeyEvent)
+        -:  427:public:
+        -:  428:    QKeyEvent(Type type, int key, Qt::KeyboardModifiers modifiers, const QString& text = QString(),
+        -:  429:              bool autorep = false, quint16 count = 1);
+        -:  430:    QKeyEvent(Type type, int key, Qt::KeyboardModifiers modifiers,
+        -:  431:              quint32 nativeScanCode, quint32 nativeVirtualKey, quint32 nativeModifiers,
+        -:  432:              const QString &text = QString(), bool autorep = false, quint16 count = 1,
+        -:  433:              const QInputDevice *device = QInputDevice::primaryKeyboard());
+        -:  434:
+    #####:  435:    int key() const { return m_key; }
+        -:  436:#if QT_CONFIG(shortcut)
+        -:  437:    bool matches(QKeySequence::StandardKey key) const;
+        -:  438:#endif
+        -:  439:    Qt::KeyboardModifiers modifiers() const;
+        -:  440:    QKeyCombination keyCombination() const
+        -:  441:    {
+        -:  442:        return QKeyCombination(modifiers(), Qt::Key(m_key));
+        -:  443:    }
+        -:  444:    inline QString text() const { return m_text; }
+        -:  445:    inline bool isAutoRepeat() const { return m_autoRepeat; }
+        -:  446:    inline int count() const { return int(m_count); }
+        -:  447:
+        -:  448:    inline quint32 nativeScanCode() const { return m_scanCode; }
+        -:  449:    inline quint32 nativeVirtualKey() const { return m_virtualKey; }
+        -:  450:    inline quint32 nativeModifiers() const { return m_nativeModifiers; }
+        -:  451:
+        -:  452:#if QT_CONFIG(shortcut)
+        -:  453:    friend inline bool operator==(QKeyEvent *e, QKeySequence::StandardKey key)
+        -:  454:    { return (e ? e->matches(key) : false); }
+        -:  455:    friend inline bool operator==(QKeySequence::StandardKey key, QKeyEvent *e)
+        -:  456:    { return (e ? e->matches(key) : false); }
+        -:  457:#endif // QT_CONFIG(shortcut)
+        -:  458:
+        -:  459:protected:
+        -:  460:    QString m_text;
+        -:  461:    int m_key;
+        -:  462:    quint32 m_scanCode;
+        -:  463:    quint32 m_virtualKey;
+        -:  464:    quint32 m_nativeModifiers;
+        -:  465:    quint16 m_count      : 15;
+        -:  466:    quint16 m_autoRepeat : 1;
+        -:  467:};
+        -:  468:
+        -:  469:
+        -:  470:class Q_GUI_EXPORT QFocusEvent : public QEvent
+        -:  471:{
+        -:  472:    Q_DECL_EVENT_COMMON(QFocusEvent)
+        -:  473:public:
+        -:  474:    explicit QFocusEvent(Type type, Qt::FocusReason reason=Qt::OtherFocusReason);
+        -:  475:
+        -:  476:    inline bool gotFocus() const { return type() == FocusIn; }
+        -:  477:    inline bool lostFocus() const { return type() == FocusOut; }
+        -:  478:
+        -:  479:    Qt::FocusReason reason() const;
+        -:  480:
+        -:  481:private:
+        -:  482:    Qt::FocusReason m_reason;
+        -:  483:};
+        -:  484:
+        -:  485:
+        -:  486:class Q_GUI_EXPORT QPaintEvent : public QEvent
+        -:  487:{
+        -:  488:    Q_DECL_EVENT_COMMON(QPaintEvent)
+        -:  489:public:
+        -:  490:    explicit QPaintEvent(const QRegion& paintRegion);
+        -:  491:    explicit QPaintEvent(const QRect &paintRect);
+        -:  492:
+        -:  493:    inline const QRect &rect() const { return m_rect; }
+        -:  494:    inline const QRegion &region() const { return m_region; }
+        -:  495:
+        -:  496:protected:
+        -:  497:    QRect m_rect;
+        -:  498:    QRegion m_region;
+        -:  499:    bool m_erased;
+        -:  500:};
+        -:  501:
+        -:  502:class Q_GUI_EXPORT QMoveEvent : public QEvent
+        -:  503:{
+        -:  504:    Q_DECL_EVENT_COMMON(QMoveEvent)
+        -:  505:public:
+        -:  506:    QMoveEvent(const QPoint &pos, const QPoint &oldPos);
+        -:  507:
+        -:  508:    inline const QPoint &pos() const { return m_pos; }
+        -:  509:    inline const QPoint &oldPos() const { return m_oldPos;}
+        -:  510:protected:
+        -:  511:    QPoint m_pos, m_oldPos;
+        -:  512:    friend class QApplication;
+        -:  513:    friend class QApplicationPrivate;
+        -:  514:};
+        -:  515:
+        -:  516:class Q_GUI_EXPORT QExposeEvent : public QEvent
+        -:  517:{
+        -:  518:    Q_DECL_EVENT_COMMON(QExposeEvent)
+        -:  519:public:
+        -:  520:    explicit QExposeEvent(const QRegion &m_region);
+        -:  521:
+        -:  522:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  523:    QT_DEPRECATED_VERSION_X_6_0("Handle QPaintEvent instead")
+        -:  524:    inline const QRegion &region() const { return m_region; }
+        -:  525:#endif
+        -:  526:
+        -:  527:protected:
+        -:  528:    QRegion m_region;
+        -:  529:    friend class QWidgetWindow;
+        -:  530:};
+        -:  531:
+        -:  532:class Q_GUI_EXPORT QPlatformSurfaceEvent : public QEvent
+        -:  533:{
+        -:  534:    Q_DECL_EVENT_COMMON(QPlatformSurfaceEvent)
+        -:  535:public:
+        -:  536:    enum SurfaceEventType {
+        -:  537:        SurfaceCreated,
+        -:  538:        SurfaceAboutToBeDestroyed
+        -:  539:    };
+        -:  540:
+        -:  541:    explicit QPlatformSurfaceEvent(SurfaceEventType surfaceEventType);
+        -:  542:
+        -:  543:    inline SurfaceEventType surfaceEventType() const { return m_surfaceEventType; }
+        -:  544:
+        -:  545:protected:
+        -:  546:    SurfaceEventType m_surfaceEventType;
+        -:  547:};
+        -:  548:
+        -:  549:class Q_GUI_EXPORT QResizeEvent : public QEvent
+        -:  550:{
+        -:  551:    Q_DECL_EVENT_COMMON(QResizeEvent)
+        -:  552:public:
+        -:  553:    QResizeEvent(const QSize &size, const QSize &oldSize);
+        -:  554:
+        -:  555:    inline const QSize &size() const { return m_size; }
+        -:  556:    inline const QSize &oldSize()const { return m_oldSize;}
+        -:  557:protected:
+        -:  558:    QSize m_size, m_oldSize;
+        -:  559:    friend class QApplication;
+        -:  560:    friend class QApplicationPrivate;
+        -:  561:};
+        -:  562:
+        -:  563:
+        -:  564:class Q_GUI_EXPORT QCloseEvent : public QEvent
+        -:  565:{
+        -:  566:    Q_DECL_EVENT_COMMON(QCloseEvent)
+        -:  567:public:
+        -:  568:    QCloseEvent();
+        -:  569:};
+        -:  570:
+        -:  571:
+        -:  572:class Q_GUI_EXPORT QIconDragEvent : public QEvent
+        -:  573:{
+        -:  574:    Q_DECL_EVENT_COMMON(QIconDragEvent)
+        -:  575:public:
+        -:  576:    QIconDragEvent();
+        -:  577:};
+        -:  578:
+        -:  579:
+        -:  580:class Q_GUI_EXPORT QShowEvent : public QEvent
+        -:  581:{
+        -:  582:    Q_DECL_EVENT_COMMON(QShowEvent)
+        -:  583:public:
+        -:  584:    QShowEvent();
+        -:  585:};
+        -:  586:
+        -:  587:
+        -:  588:class Q_GUI_EXPORT QHideEvent : public QEvent
+        -:  589:{
+        -:  590:    Q_DECL_EVENT_COMMON(QHideEvent)
+        -:  591:public:
+        -:  592:    QHideEvent();
+        -:  593:};
+        -:  594:
+        -:  595:#ifndef QT_NO_CONTEXTMENU
+        -:  596:class Q_GUI_EXPORT QContextMenuEvent : public QInputEvent
+        -:  597:{
+        -:  598:    Q_DECL_EVENT_COMMON(QContextMenuEvent)
+        -:  599:public:
+        -:  600:    enum Reason { Mouse, Keyboard, Other };
+        -:  601:
+        -:  602:    QContextMenuEvent(Reason reason, const QPoint &pos, const QPoint &globalPos,
+        -:  603:                      Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+        -:  604:#if QT_DEPRECATED_SINCE(6, 4)
+        -:  605:    QT_DEPRECATED_VERSION_X_6_4("Use the other constructor")
+        -:  606:    QContextMenuEvent(Reason reason, const QPoint &pos);
+        -:  607:#endif
+        -:  608:
+        -:  609:    inline int x() const { return m_pos.x(); }
+        -:  610:    inline int y() const { return m_pos.y(); }
+        -:  611:    inline int globalX() const { return m_globalPos.x(); }
+        -:  612:    inline int globalY() const { return m_globalPos.y(); }
+        -:  613:
+        -:  614:    inline const QPoint& pos() const { return m_pos; }
+        -:  615:    inline const QPoint& globalPos() const { return m_globalPos; }
+        -:  616:
+        -:  617:    inline Reason reason() const { return Reason(m_reason); }
+        -:  618:
+        -:  619:protected:
+        -:  620:    QPoint m_pos;
+        -:  621:    QPoint m_globalPos;
+        -:  622:    uint m_reason : 8;
+        -:  623:};
+        -:  624:#endif // QT_NO_CONTEXTMENU
+        -:  625:
+        -:  626:#ifndef QT_NO_INPUTMETHOD
+        -:  627:class Q_GUI_EXPORT QInputMethodEvent : public QEvent
+        -:  628:{
+        -:  629:    Q_DECL_EVENT_COMMON(QInputMethodEvent)
+        -:  630:public:
+        -:  631:    enum AttributeType {
+        -:  632:       TextFormat,
+        -:  633:       Cursor,
+        -:  634:       Language,
+        -:  635:       Ruby,
+        -:  636:       Selection,
+        -:  637:       MimeData
+        -:  638:    };
+        -:  639:    class Attribute {
+        -:  640:    public:
+        -:  641:        Attribute(AttributeType typ, int s, int l, QVariant val) : type(typ), start(s), length(l), value(std::move(val)) {}
+        -:  642:        Attribute(AttributeType typ, int s, int l) : type(typ), start(s), length(l), value() {}
+        -:  643:
+        -:  644:        AttributeType type;
+        -:  645:        int start;
+        -:  646:        int length;
+        -:  647:        QVariant value;
+        -:  648:    };
+        -:  649:    QInputMethodEvent();
+        -:  650:    QInputMethodEvent(const QString &preeditText, const QList<Attribute> &attributes);
+        -:  651:
+        -:  652:    void setCommitString(const QString &commitString, int replaceFrom = 0, int replaceLength = 0);
+        -:  653:    inline const QList<Attribute> &attributes() const { return m_attributes; }
+        -:  654:    inline const QString &preeditString() const { return m_preedit; }
+        -:  655:
+        -:  656:    inline const QString &commitString() const { return m_commit; }
+        -:  657:    inline int replacementStart() const { return m_replacementStart; }
+        -:  658:    inline int replacementLength() const { return m_replacementLength; }
+        -:  659:
+        -:  660:    inline friend bool operator==(const QInputMethodEvent::Attribute &lhs,
+        -:  661:                                  const QInputMethodEvent::Attribute &rhs)
+        -:  662:    {
+        -:  663:        return lhs.type == rhs.type && lhs.start == rhs.start
+        -:  664:                && lhs.length == rhs.length && lhs.value == rhs.value;
+        -:  665:    }
+        -:  666:
+        -:  667:    inline friend bool operator!=(const QInputMethodEvent::Attribute &lhs,
+        -:  668:                                  const QInputMethodEvent::Attribute &rhs)
+        -:  669:    {
+        -:  670:        return !(lhs == rhs);
+        -:  671:    }
+        -:  672:
+        -:  673:private:
+        -:  674:    QString m_preedit;
+        -:  675:    QString m_commit;
+        -:  676:    QList<Attribute> m_attributes;
+        -:  677:    int m_replacementStart;
+        -:  678:    int m_replacementLength;
+        -:  679:};
+        -:  680:Q_DECLARE_TYPEINFO(QInputMethodEvent::Attribute, Q_RELOCATABLE_TYPE);
+        -:  681:
+        -:  682:class Q_GUI_EXPORT QInputMethodQueryEvent : public QEvent
+        -:  683:{
+        -:  684:    Q_DECL_EVENT_COMMON(QInputMethodQueryEvent)
+        -:  685:public:
+        -:  686:    explicit QInputMethodQueryEvent(Qt::InputMethodQueries queries);
+        -:  687:
+        -:  688:    Qt::InputMethodQueries queries() const { return m_queries; }
+        -:  689:
+        -:  690:    void setValue(Qt::InputMethodQuery query, const QVariant &value);
+        -:  691:    QVariant value(Qt::InputMethodQuery query) const;
+        -:  692:private:
+        -:  693:    Qt::InputMethodQueries m_queries;
+        -:  694:    struct QueryPair {
+        -:  695:        Qt::InputMethodQuery query;
+        -:  696:        QVariant value;
+        -:  697:    };
+        -:  698:    friend QTypeInfo<QueryPair>;
+        -:  699:    QList<QueryPair> m_values;
+        -:  700:};
+        -:  701:Q_DECLARE_TYPEINFO(QInputMethodQueryEvent::QueryPair, Q_RELOCATABLE_TYPE);
+        -:  702:
+        -:  703:#endif // QT_NO_INPUTMETHOD
+        -:  704:
+        -:  705:#if QT_CONFIG(draganddrop)
+        -:  706:
+        -:  707:class QMimeData;
+        -:  708:
+        -:  709:class Q_GUI_EXPORT QDropEvent : public QEvent
+        -:  710:{
+        -:  711:    Q_DECL_EVENT_COMMON(QDropEvent)
+        -:  712:public:
+        -:  713:    QDropEvent(const QPointF& pos, Qt::DropActions actions, const QMimeData *data,
+        -:  714:               Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers, Type type = Drop);
+        -:  715:
+        -:  716:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  717:    QT_DEPRECATED_VERSION_X_6_0("Use position().toPoint()")
+        -:  718:    inline QPoint pos() const { return position().toPoint(); }
+        -:  719:    QT_DEPRECATED_VERSION_X_6_0("Use position()")
+        -:  720:    inline QPointF posF() const { return position(); }
+        -:  721:    QT_DEPRECATED_VERSION_X_6_0("Use buttons()")
+        -:  722:    inline Qt::MouseButtons mouseButtons() const { return buttons(); }
+        -:  723:    QT_DEPRECATED_VERSION_X_6_0("Use modifiers()")
+        -:  724:    inline Qt::KeyboardModifiers keyboardModifiers() const { return modifiers(); }
+        -:  725:#endif // QT_DEPRECATED_SINCE(6, 0)
+        -:  726:
+        -:  727:    QPointF position() const { return m_pos; }
+        -:  728:    inline Qt::MouseButtons buttons() const { return m_mouseState; }
+        -:  729:    inline Qt::KeyboardModifiers modifiers() const { return m_modState; }
+        -:  730:
+        -:  731:    inline Qt::DropActions possibleActions() const { return m_actions; }
+        -:  732:    inline Qt::DropAction proposedAction() const { return m_defaultAction; }
+        -:  733:    inline void acceptProposedAction() { m_dropAction = m_defaultAction; accept(); }
+        -:  734:
+        -:  735:    inline Qt::DropAction dropAction() const { return m_dropAction; }
+        -:  736:    void setDropAction(Qt::DropAction action);
+        -:  737:
+        -:  738:    QObject* source() const;
+        -:  739:    inline const QMimeData *mimeData() const { return m_data; }
+        -:  740:
+        -:  741:protected:
+        -:  742:    friend class QApplication;
+        -:  743:    QPointF m_pos;
+        -:  744:    Qt::MouseButtons m_mouseState;
+        -:  745:    Qt::KeyboardModifiers m_modState;
+        -:  746:    Qt::DropActions m_actions;
+        -:  747:    Qt::DropAction m_dropAction;
+        -:  748:    Qt::DropAction m_defaultAction;
+        -:  749:    const QMimeData *m_data;
+        -:  750:};
+        -:  751:
+        -:  752:
+        -:  753:class Q_GUI_EXPORT QDragMoveEvent : public QDropEvent
+        -:  754:{
+        -:  755:    Q_DECL_EVENT_COMMON(QDragMoveEvent)
+        -:  756:public:
+        -:  757:    QDragMoveEvent(const QPoint &pos, Qt::DropActions actions, const QMimeData *data,
+        -:  758:                   Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers, Type type = DragMove);
+        -:  759:
+        -:  760:    inline QRect answerRect() const { return m_rect; }
+        -:  761:
+        -:  762:    inline void accept() { QDropEvent::accept(); }
+        -:  763:    inline void ignore() { QDropEvent::ignore(); }
+        -:  764:
+        -:  765:    inline void accept(const QRect & r) { accept(); m_rect = r; }
+        -:  766:    inline void ignore(const QRect & r) { ignore(); m_rect = r; }
+        -:  767:
+        -:  768:protected:
+        -:  769:    QRect m_rect;
+        -:  770:};
+        -:  771:
+        -:  772:
+        -:  773:class Q_GUI_EXPORT QDragEnterEvent : public QDragMoveEvent
+        -:  774:{
+        -:  775:    Q_DECL_EVENT_COMMON(QDragEnterEvent)
+        -:  776:public:
+        -:  777:    QDragEnterEvent(const QPoint &pos, Qt::DropActions actions, const QMimeData *data,
+        -:  778:                    Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers);
+        -:  779:};
+        -:  780:
+        -:  781:
+        -:  782:class Q_GUI_EXPORT QDragLeaveEvent : public QEvent
+        -:  783:{
+        -:  784:    Q_DECL_EVENT_COMMON(QDragLeaveEvent)
+        -:  785:public:
+        -:  786:    QDragLeaveEvent();
+        -:  787:};
+        -:  788:#endif // QT_CONFIG(draganddrop)
+        -:  789:
+        -:  790:
+        -:  791:class Q_GUI_EXPORT QHelpEvent : public QEvent
+        -:  792:{
+        -:  793:    Q_DECL_EVENT_COMMON(QHelpEvent)
+        -:  794:public:
+        -:  795:    QHelpEvent(Type type, const QPoint &pos, const QPoint &globalPos);
+        -:  796:
+        -:  797:    inline int x() const { return m_pos.x(); }
+        -:  798:    inline int y() const { return m_pos.y(); }
+        -:  799:    inline int globalX() const { return m_globalPos.x(); }
+        -:  800:    inline int globalY() const { return m_globalPos.y(); }
+        -:  801:
+        -:  802:    inline const QPoint& pos()  const { return m_pos; }
+        -:  803:    inline const QPoint& globalPos() const { return m_globalPos; }
+        -:  804:
+        -:  805:private:
+        -:  806:    QPoint m_pos;
+        -:  807:    QPoint m_globalPos;
+        -:  808:};
+        -:  809:
+        -:  810:#ifndef QT_NO_STATUSTIP
+        -:  811:class Q_GUI_EXPORT QStatusTipEvent : public QEvent
+        -:  812:{
+        -:  813:    Q_DECL_EVENT_COMMON(QStatusTipEvent)
+        -:  814:public:
+        -:  815:    explicit QStatusTipEvent(const QString &tip);
+        -:  816:
+        -:  817:    inline QString tip() const { return m_tip; }
+        -:  818:private:
+        -:  819:    QString m_tip;
+        -:  820:};
+        -:  821:#endif
+        -:  822:
+        -:  823:#if QT_CONFIG(whatsthis)
+        -:  824:class Q_GUI_EXPORT QWhatsThisClickedEvent : public QEvent
+        -:  825:{
+        -:  826:    Q_DECL_EVENT_COMMON(QWhatsThisClickedEvent)
+        -:  827:public:
+        -:  828:    explicit QWhatsThisClickedEvent(const QString &href);
+        -:  829:
+        -:  830:    inline QString href() const { return m_href; }
+        -:  831:private:
+        -:  832:    QString m_href;
+        -:  833:};
+        -:  834:#endif
+        -:  835:
+        -:  836:#if QT_CONFIG(action)
+        -:  837:class Q_GUI_EXPORT QActionEvent : public QEvent
+        -:  838:{
+        -:  839:    Q_DECL_EVENT_COMMON(QActionEvent)
+        -:  840:public:
+        -:  841:    QActionEvent(int type, QAction *action, QAction *before = nullptr);
+        -:  842:
+        -:  843:    inline QAction *action() const { return m_action; }
+        -:  844:    inline QAction *before() const { return m_before; }
+        -:  845:private:
+        -:  846:    QAction *m_action;
+        -:  847:    QAction *m_before;
+        -:  848:};
+        -:  849:#endif // QT_CONFIG(action)
+        -:  850:
+        -:  851:class Q_GUI_EXPORT QFileOpenEvent : public QEvent
+        -:  852:{
+        -:  853:    Q_DECL_EVENT_COMMON(QFileOpenEvent)
+        -:  854:public:
+        -:  855:    explicit QFileOpenEvent(const QString &file);
+        -:  856:    explicit QFileOpenEvent(const QUrl &url);
+        -:  857:
+        -:  858:    inline QString file() const { return m_file; }
+        -:  859:    QUrl url() const { return m_url; }
+        -:  860:#if QT_DEPRECATED_SINCE(6, 6)
+        -:  861:    QT_DEPRECATED_VERSION_X_6_6("Interpret the string returned by file()")
+        -:  862:    bool openFile(QFile &file, QIODevice::OpenMode flags) const;
+        -:  863:#endif
+        -:  864:private:
+        -:  865:    QString m_file;
+        -:  866:    QUrl m_url;
+        -:  867:};
+        -:  868:
+        -:  869:#ifndef QT_NO_TOOLBAR
+        -:  870:class Q_GUI_EXPORT QToolBarChangeEvent : public QEvent
+        -:  871:{
+        -:  872:    Q_DECL_EVENT_COMMON(QToolBarChangeEvent)
+        -:  873:public:
+        -:  874:    explicit QToolBarChangeEvent(bool t);
+        -:  875:
+        -:  876:    inline bool toggle() const { return m_toggle; }
+        -:  877:private:
+        -:  878:    bool m_toggle;
+        -:  879:};
+        -:  880:#endif
+        -:  881:
+        -:  882:#if QT_CONFIG(shortcut)
+        -:  883:class Q_GUI_EXPORT QShortcutEvent : public QEvent
+        -:  884:{
+        -:  885:    Q_DECL_EVENT_COMMON(QShortcutEvent)
+        -:  886:public:
+        -:  887:    // Note this is publicly deprecated, but should remain as internal constructor:
+        -:  888:    QShortcutEvent(const QKeySequence &key, int id, bool ambiguous = false);
+        -:  889:    QShortcutEvent(const QKeySequence &key, const QShortcut *shortcut = nullptr, bool ambiguous = false);
+        -:  890:
+        -:  891:    inline const QKeySequence &key() const { return m_sequence; }
+        -:  892:    // Note this is publicly deprecated, but should remain as internal getter:
+        -:  893:    inline int shortcutId() const { return m_shortcutId; }
+        -:  894:    inline bool isAmbiguous() const { return m_ambiguous; }
+        -:  895:protected:
+        -:  896:    QKeySequence m_sequence;
+        -:  897:    int  m_shortcutId;
+        -:  898:    bool m_ambiguous;
+        -:  899:};
+        -:  900:#endif
+        -:  901:
+        -:  902:class Q_GUI_EXPORT QWindowStateChangeEvent: public QEvent
+        -:  903:{
+        -:  904:    Q_DECL_EVENT_COMMON(QWindowStateChangeEvent)
+        -:  905:public:
+        -:  906:    explicit QWindowStateChangeEvent(Qt::WindowStates oldState, bool isOverride = false);
+        -:  907:
+        -:  908:    inline Qt::WindowStates oldState() const { return m_oldStates; }
+        -:  909:    bool isOverride() const;
+        -:  910:
+        -:  911:private:
+        -:  912:    Qt::WindowStates m_oldStates;
+        -:  913:    bool m_override;
+        -:  914:};
+        -:  915:
+        -:  916:#ifndef QT_NO_DEBUG_STREAM
+        -:  917:// ### Qt 7: move this to Qt Core and add a hook to allow GUI events to be printed: QTBUG-127680
+        -:  918:Q_GUI_EXPORT QDebug operator<<(QDebug, const QEvent *);
+        -:  919:#endif
+        -:  920:
+        -:  921:class Q_GUI_EXPORT QTouchEvent : public QPointerEvent
+        -:  922:{
+        -:  923:    Q_DECL_EVENT_COMMON(QTouchEvent)
+        -:  924:public:
+        -:  925:    using TouchPoint = QEventPoint; // source compat
+        -:  926:
+        -:  927:    explicit QTouchEvent(QEvent::Type eventType,
+        -:  928:                         const QPointingDevice *device = nullptr,
+        -:  929:                         Qt::KeyboardModifiers modifiers = Qt::NoModifier,
+        -:  930:                         const QList<QEventPoint> &touchPoints = {});
+        -:  931:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  932:    QT_DEPRECATED_VERSION_X_6_0("Use another constructor")
+        -:  933:    explicit QTouchEvent(QEvent::Type eventType,
+        -:  934:                         const QPointingDevice *device,
+        -:  935:                         Qt::KeyboardModifiers modifiers,
+        -:  936:                         QEventPoint::States touchPointStates,
+        -:  937:                         const QList<QEventPoint> &touchPoints = {});
+        -:  938:#endif
+        -:  939:
+        -:  940:    inline QObject *target() const { return m_target; }
+        -:  941:    inline QEventPoint::States touchPointStates() const { return m_touchPointStates; }
+        -:  942:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  943:    QT_DEPRECATED_VERSION_X_6_0("Use points()")
+        -:  944:    const QList<QEventPoint> &touchPoints() const { return points(); }
+        -:  945:#endif
+        -:  946:    bool isBeginEvent() const override;
+        -:  947:    bool isUpdateEvent() const override;
+        -:  948:    bool isEndEvent() const override;
+        -:  949:
+        -:  950:protected:
+        -:  951:    friend class QMutableTouchEvent;
+        -:  952:    QObject *m_target = nullptr;
+        -:  953:    QEventPoint::States m_touchPointStates = QEventPoint::State::Unknown;
+        -:  954:    quint32 m_reserved : 24;
+        -:  955:};
+        -:  956:
+        -:  957:class Q_GUI_EXPORT QScrollPrepareEvent : public QEvent
+        -:  958:{
+        -:  959:    Q_DECL_EVENT_COMMON(QScrollPrepareEvent)
+        -:  960:public:
+        -:  961:    explicit QScrollPrepareEvent(const QPointF &startPos);
+        -:  962:
+        -:  963:    QPointF startPos() const { return m_startPos; }
+        -:  964:
+        -:  965:    QSizeF viewportSize() const { return m_viewportSize; }
+        -:  966:    QRectF contentPosRange() const { return m_contentPosRange; }
+        -:  967:    QPointF contentPos() const { return m_contentPos; }
+        -:  968:
+        -:  969:    void setViewportSize(const QSizeF &size);
+        -:  970:    void setContentPosRange(const QRectF &rect);
+        -:  971:    void setContentPos(const QPointF &pos);
+        -:  972:
+        -:  973:private:
+        -:  974:    QRectF m_contentPosRange;
+        -:  975:    QSizeF m_viewportSize;
+        -:  976:    QPointF m_startPos;
+        -:  977:    QPointF m_contentPos;
+        -:  978:};
+        -:  979:
+        -:  980:
+        -:  981:class Q_GUI_EXPORT QScrollEvent : public QEvent
+        -:  982:{
+        -:  983:    Q_DECL_EVENT_COMMON(QScrollEvent)
+        -:  984:public:
+        -:  985:    enum ScrollState
+        -:  986:    {
+        -:  987:        ScrollStarted,
+        -:  988:        ScrollUpdated,
+        -:  989:        ScrollFinished
+        -:  990:    };
+        -:  991:
+        -:  992:    QScrollEvent(const QPointF &contentPos, const QPointF &overshoot, ScrollState scrollState);
+        -:  993:
+        -:  994:    QPointF contentPos() const { return m_contentPos; }
+        -:  995:    QPointF overshootDistance() const { return m_overshoot; }
+        -:  996:    ScrollState scrollState() const { return m_state; }
+        -:  997:
+        -:  998:private:
+        -:  999:    QPointF m_contentPos;
+        -: 1000:    QPointF m_overshoot;
+        -: 1001:    QScrollEvent::ScrollState m_state;
+        -: 1002:};
+        -: 1003:
+        -: 1004:class Q_GUI_EXPORT QScreenOrientationChangeEvent : public QEvent
+        -: 1005:{
+        -: 1006:    Q_DECL_EVENT_COMMON(QScreenOrientationChangeEvent)
+        -: 1007:public:
+        -: 1008:    QScreenOrientationChangeEvent(QScreen *screen, Qt::ScreenOrientation orientation);
+        -: 1009:
+        -: 1010:    QScreen *screen() const { return m_screen; }
+        -: 1011:    Qt::ScreenOrientation orientation() const { return m_orientation; }
+        -: 1012:
+        -: 1013:private:
+        -: 1014:    QScreen *m_screen;
+        -: 1015:    Qt::ScreenOrientation m_orientation;
+        -: 1016:};
+        -: 1017:
+        -: 1018:class Q_GUI_EXPORT QApplicationStateChangeEvent : public QEvent
+        -: 1019:{
+        -: 1020:    Q_DECL_EVENT_COMMON(QApplicationStateChangeEvent)
+        -: 1021:public:
+        -: 1022:    explicit QApplicationStateChangeEvent(Qt::ApplicationState state);
+        -: 1023:
+        -: 1024:    Qt::ApplicationState applicationState() const { return m_applicationState; }
+        -: 1025:
+        -: 1026:private:
+        -: 1027:    Qt::ApplicationState m_applicationState;
+        -: 1028:};
+        -: 1029:
+        -: 1030:class Q_GUI_EXPORT QChildWindowEvent : public QEvent
+        -: 1031:{
+        -: 1032:    Q_DECL_EVENT_COMMON(QChildWindowEvent)
+        -: 1033:public:
+        -: 1034:    explicit QChildWindowEvent(Type type, QWindow *childWindow);
+        -: 1035:    QWindow *child() const { return c; }
+        -: 1036:
+        -: 1037:private:
+        -: 1038:    QWindow *c;
+        -: 1039:};
+        -: 1040:
+        -: 1041:QT_END_NAMESPACE
+        -: 1042:
+        -: 1043:#endif // QEVENT_H

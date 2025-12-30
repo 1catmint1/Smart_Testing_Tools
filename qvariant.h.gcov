@@ -1,0 +1,1036 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qvariant.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:// Qt-Security score:critical reason:data-parser
+        -:    4:
+        -:    5:#ifndef QVARIANT_H
+        -:    6:#define QVARIANT_H
+        -:    7:
+        -:    8:#include <QtCore/qatomic.h>
+        -:    9:#include <QtCore/qcompare.h>
+        -:   10:#include <QtCore/qcontainerfwd.h>
+        -:   11:#include <QtCore/qmetatype.h>
+        -:   12:#ifndef QT_NO_DEBUG_STREAM
+        -:   13:#include <QtCore/qdebug.h>
+        -:   14:#endif
+        -:   15:
+        -:   16:#include <memory>
+        -:   17:#include <QtCore/q20type_traits.h>
+        -:   18:#include <QtCore/q23utility.h>
+        -:   19:#include <variant>
+        -:   20:
+        -:   21:#if !defined(QT_LEAN_HEADERS) || QT_LEAN_HEADERS < 1
+        -:   22:#  include <QtCore/qlist.h>
+        -:   23:#  include <QtCore/qstringlist.h>
+        -:   24:#  include <QtCore/qbytearraylist.h>
+        -:   25:#  include <QtCore/qhash.h>
+        -:   26:#  include <QtCore/qmap.h>
+        -:   27:#  include <QtCore/qobject.h>
+        -:   28:#endif
+        -:   29:
+        -:   30:QT_BEGIN_NAMESPACE
+        -:   31:
+        -:   32:QT_ENABLE_P0846_SEMANTICS_FOR(get_if)
+        -:   33:QT_ENABLE_P0846_SEMANTICS_FOR(get)
+        -:   34:
+        -:   35:class QBitArray;
+        -:   36:class QDataStream;
+        -:   37:class QDate;
+        -:   38:class QDateTime;
+        -:   39:class QEasingCurve;
+        -:   40:class QLine;
+        -:   41:class QLineF;
+        -:   42:class QLocale;
+        -:   43:class QModelIndex;
+        -:   44:class QPersistentModelIndex;
+        -:   45:class QPoint;
+        -:   46:class QPointF;
+        -:   47:class QRect;
+        -:   48:class QRectF;
+        -:   49:class QRegularExpression;
+        -:   50:class QSize;
+        -:   51:class QSizeF;
+        -:   52:class QTextFormat;
+        -:   53:class QTextLength;
+        -:   54:class QTime;
+        -:   55:class QTransform;
+        -:   56:class QUrl;
+        -:   57:class QVariant;
+        -:   58:
+        -:   59:template<typename T>
+        -:   60:inline T qvariant_cast(const QVariant &);
+        -:   61:
+        -:   62:namespace QtPrivate {
+        -:   63:template<> constexpr inline bool qIsRelocatable<QVariant> = true;
+        -:   64:
+        -:   65:template<typename Referred>
+        -:   66:class ConstReference;
+        -:   67:
+        -:   68:template<typename Referred>
+        -:   69:class Reference;
+        -:   70:
+        -:   71:template<typename Pointed>
+        -:   72:class ConstPointer;
+        -:   73:
+        -:   74:template<typename Pointed>
+        -:   75:class Pointer;
+        -:   76:} // namespace QtPrivate
+        -:   77:
+        -:   78:class Q_CORE_EXPORT QVariant
+        -:   79:{
+        -:   80:    template <typename T, typename... Args>
+        -:   81:    using if_constructible = std::enable_if_t<
+        -:   82:        std::conjunction_v<
+        -:   83:            std::is_copy_constructible<q20::remove_cvref_t<T>>,
+        -:   84:            std::is_destructible<q20::remove_cvref_t<T>>,
+        -:   85:            std::is_constructible<q20::remove_cvref_t<T>, Args...>
+        -:   86:        >,
+        -:   87:    bool>;
+        -:   88:
+        -:   89:    template <typename T>
+        -:   90:    using if_rvalue = std::enable_if_t<!std::is_reference_v<T>, bool>;
+        -:   91:
+        -:   92:    struct CborValueStandIn { qint64 n; void *c; int t; };
+        -:   93:public:
+        -:   94:    struct PrivateShared
+        -:   95:    {
+        -:   96:    private:
+        -:   97:        inline PrivateShared() : ref(1) { }
+        -:   98:    public:
+        -:   99:        static int computeOffset(PrivateShared *ps, size_t align);
+        -:  100:        static size_t computeAllocationSize(size_t size, size_t align);
+        -:  101:        static PrivateShared *create(size_t size, size_t align);
+        -:  102:        static void free(PrivateShared *p);
+        -:  103:
+        -:  104:        alignas(8) QAtomicInt ref;
+        -:  105:        int offset;
+        -:  106:
+        -:  107:        const void *data() const { return reinterpret_cast<const uchar *>(this) + offset; }
+    #####:  108:        void *data() { return reinterpret_cast<uchar *>(this) + offset; }
+        -:  109:    };
+        -:  110:
+        -:  111:    struct Private
+        -:  112:    {
+        -:  113:        static constexpr size_t MaxInternalSize = 3 * sizeof(void *);
+        -:  114:        template <size_t S> static constexpr bool FitsInInternalSize = S <= MaxInternalSize;
+        -:  115:        template<typename T> static constexpr bool CanUseInternalSpace =
+        -:  116:                (QTypeInfo<T>::isRelocatable && FitsInInternalSize<sizeof(T)> && alignof(T) <= alignof(double));
+        -:  117:        static constexpr bool canUseInternalSpace(const QtPrivate::QMetaTypeInterface *type)
+        -:  118:        {
+        -:  119:            Q_ASSERT(type);
+        -:  120:            return QMetaType::TypeFlags(type->flags) & QMetaType::RelocatableType &&
+        -:  121:                   size_t(type->size) <= MaxInternalSize && size_t(type->alignment) <= alignof(double);
+        -:  122:        }
+        -:  123:
+        -:  124:        union
+        -:  125:        {
+        -:  126:            uchar data[MaxInternalSize] = {};
+        -:  127:            PrivateShared *shared;
+        -:  128:            double _forAlignment; // we want an 8byte alignment on 32bit systems as well
+        -:  129:        } data;
+        -:  130:        quintptr is_shared : 1;
+        -:  131:        quintptr is_null : 1;
+        -:  132:        quintptr packedType : sizeof(QMetaType) * 8 - 2;
+        -:  133:
+        7:  134:        constexpr Private() noexcept : is_shared(false), is_null(true), packedType(0) {}
+        -:  135:        explicit Private(const QtPrivate::QMetaTypeInterface *iface) noexcept;
+        -:  136:        template <typename T> explicit Private(std::piecewise_construct_t, const T &t);
+        -:  137:
+    #####:  138:        const void *storage() const
+    #####:  139:        { return is_shared ? data.shared->data() : &data.data; }
+        -:  140:
+    #####:  141:        template<typename T> const T &get() const
+    #####:  142:        { return *static_cast<const T *>(storage()); }
+        -:  143:
+    #####:  144:        inline const QtPrivate::QMetaTypeInterface *typeInterface() const
+        -:  145:        {
+    #####:  146:            return reinterpret_cast<const QtPrivate::QMetaTypeInterface *>(packedType << 2);
+        -:  147:        }
+        -:  148:
+    #####:  149:        inline QMetaType type() const
+        -:  150:        {
+    #####:  151:            return QMetaType(typeInterface());
+        -:  152:        }
+        -:  153:    };
+        -:  154:
+        -:  155:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  156:    enum QT_DEPRECATED_VERSION_X_6_0("Use QMetaType::Type instead.") Type
+        -:  157:    {
+        -:  158:        Invalid = QMetaType::UnknownType,
+        -:  159:        Bool = QMetaType::Bool,
+        -:  160:        Int = QMetaType::Int,
+        -:  161:        UInt = QMetaType::UInt,
+        -:  162:        LongLong = QMetaType::LongLong,
+        -:  163:        ULongLong = QMetaType::ULongLong,
+        -:  164:        Double = QMetaType::Double,
+        -:  165:        Char = QMetaType::QChar,
+        -:  166:        Map = QMetaType::QVariantMap,
+        -:  167:        List = QMetaType::QVariantList,
+        -:  168:        String = QMetaType::QString,
+        -:  169:        StringList = QMetaType::QStringList,
+        -:  170:        ByteArray = QMetaType::QByteArray,
+        -:  171:        BitArray = QMetaType::QBitArray,
+        -:  172:        Date = QMetaType::QDate,
+        -:  173:        Time = QMetaType::QTime,
+        -:  174:        DateTime = QMetaType::QDateTime,
+        -:  175:        Url = QMetaType::QUrl,
+        -:  176:        Locale = QMetaType::QLocale,
+        -:  177:        Rect = QMetaType::QRect,
+        -:  178:        RectF = QMetaType::QRectF,
+        -:  179:        Size = QMetaType::QSize,
+        -:  180:        SizeF = QMetaType::QSizeF,
+        -:  181:        Line = QMetaType::QLine,
+        -:  182:        LineF = QMetaType::QLineF,
+        -:  183:        Point = QMetaType::QPoint,
+        -:  184:        PointF = QMetaType::QPointF,
+        -:  185:#if QT_CONFIG(regularexpression)
+        -:  186:        RegularExpression = QMetaType::QRegularExpression,
+        -:  187:#endif
+        -:  188:        Hash = QMetaType::QVariantHash,
+        -:  189:#if QT_CONFIG(easingcurve)
+        -:  190:        EasingCurve = QMetaType::QEasingCurve,
+        -:  191:#endif
+        -:  192:        Uuid = QMetaType::QUuid,
+        -:  193:#if QT_CONFIG(itemmodel)
+        -:  194:        ModelIndex = QMetaType::QModelIndex,
+        -:  195:        PersistentModelIndex = QMetaType::QPersistentModelIndex,
+        -:  196:#endif
+        -:  197:        LastCoreType = QMetaType::LastCoreType,
+        -:  198:
+        -:  199:        Font = QMetaType::QFont,
+        -:  200:        Pixmap = QMetaType::QPixmap,
+        -:  201:        Brush = QMetaType::QBrush,
+        -:  202:        Color = QMetaType::QColor,
+        -:  203:        Palette = QMetaType::QPalette,
+        -:  204:        Image = QMetaType::QImage,
+        -:  205:        Polygon = QMetaType::QPolygon,
+        -:  206:        Region = QMetaType::QRegion,
+        -:  207:        Bitmap = QMetaType::QBitmap,
+        -:  208:        Cursor = QMetaType::QCursor,
+        -:  209:#if QT_CONFIG(shortcut)
+        -:  210:        KeySequence = QMetaType::QKeySequence,
+        -:  211:#endif
+        -:  212:        Pen = QMetaType::QPen,
+        -:  213:        TextLength = QMetaType::QTextLength,
+        -:  214:        TextFormat = QMetaType::QTextFormat,
+        -:  215:        Transform = QMetaType::QTransform,
+        -:  216:        Matrix4x4 = QMetaType::QMatrix4x4,
+        -:  217:        Vector2D = QMetaType::QVector2D,
+        -:  218:        Vector3D = QMetaType::QVector3D,
+        -:  219:        Vector4D = QMetaType::QVector4D,
+        -:  220:        Quaternion = QMetaType::QQuaternion,
+        -:  221:        PolygonF = QMetaType::QPolygonF,
+        -:  222:        Icon = QMetaType::QIcon,
+        -:  223:        LastGuiType = QMetaType::LastGuiType,
+        -:  224:
+        -:  225:        SizePolicy = QMetaType::QSizePolicy,
+        -:  226:
+        -:  227:        UserType = QMetaType::User,
+        -:  228:        LastType = 0xffffffff // need this so that gcc >= 3.4 allocates 32 bits for Type
+        -:  229:    };
+        -:  230:#endif
+        7:  231:    QVariant() noexcept : d() {}
+        -:  232:    ~QVariant();
+        -:  233:    explicit QVariant(QMetaType type, const void *copy = nullptr);
+        -:  234:    QVariant(const QVariant &other);
+        -:  235:
+        -:  236:private:
+        -:  237:    template <typename T, typename ...Args>
+        -:  238:    using is_noexcept_constructible = std::conjunction<
+        -:  239:            std::bool_constant<Private::CanUseInternalSpace<T>>,
+        -:  240:            std::is_nothrow_constructible<T, Args...>
+        -:  241:        >;
+        -:  242:
+        -:  243:public:
+        -:  244:    template<typename Referred>
+        -:  245:    class ConstReference
+        -:  246:    {
+        -:  247:    private:
+        -:  248:        const Referred m_referred;
+        -:  249:
+        -:  250:    public:
+        -:  251:        // You can initialize a const reference from another one, but you can't assign to it.
+        -:  252:
+        -:  253:        explicit ConstReference(const Referred &referred)
+        -:  254:                noexcept(std::is_nothrow_copy_constructible_v<Referred>)
+        -:  255:            : m_referred(referred) {}
+        -:  256:        explicit ConstReference(Referred &&referred)
+        -:  257:                noexcept(std::is_nothrow_move_constructible_v<Referred>)
+        -:  258:            : m_referred(std::move(referred)) {}
+        -:  259:        ConstReference(const ConstReference &) = default;
+        -:  260:        ConstReference(ConstReference &&) = default;
+        -:  261:        ~ConstReference() = default;
+        -:  262:        ConstReference &operator=(const ConstReference &value) = delete;
+        -:  263:        ConstReference &operator=(ConstReference &&value) = delete;
+        -:  264:
+        -:  265:        // To be specialized for each Referred
+        -:  266:        operator QVariant() const noexcept(Referred::canNoexceptConvertToQVariant);
+        -:  267:    };
+        -:  268:
+        -:  269:    template<typename Referred>
+        -:  270:    class Reference
+        -:  271:    {
+        -:  272:    private:
+        -:  273:        Referred m_referred;
+        -:  274:
+        -:  275:        friend void swap(Reference a, Reference b) { return a.swap(std::move(b)); }
+        -:  276:
+        -:  277:    public:
+        -:  278:        // Assigning and initializing are different operations for references.
+        -:  279:
+        -:  280:        explicit Reference(const Referred &referred)
+        -:  281:                noexcept(std::is_nothrow_copy_constructible_v<Referred>)
+        -:  282:            : m_referred(referred) {}
+        -:  283:        explicit Reference(Referred &&referred)
+        -:  284:                noexcept(std::is_nothrow_move_constructible_v<Referred>)
+        -:  285:            : m_referred(std::move(referred)) {}
+        -:  286:        Reference(const Reference &) = default;
+        -:  287:        Reference(Reference &&) = default;
+        -:  288:        ~Reference() = default;
+        -:  289:
+        -:  290:        Reference &operator=(const Reference &value)
+        -:  291:                noexcept(Referred::canNoexceptAssignQVariant)
+        -:  292:        {
+        -:  293:            return operator=(QVariant(value));
+        -:  294:        }
+        -:  295:
+        -:  296:        Reference &operator=(Reference &&value)
+        -:  297:                noexcept(Referred::canNoexceptAssignQVariant)
+        -:  298:        {
+        -:  299:            return operator=(QVariant(value));
+        -:  300:        }
+        -:  301:
+        -:  302:        operator QVariant() const noexcept(Referred::canNoexceptConvertToQVariant)
+        -:  303:        {
+        -:  304:            return ConstReference(m_referred);
+        -:  305:        }
+        -:  306:
+        -:  307:        void swap(Reference b)
+        -:  308:        {
+        -:  309:            // swapping a reference is not swapping the referred item, but swapping its contents.
+        -:  310:            QVariant tmp = *this;
+        -:  311:            *this = std::move(b);
+        -:  312:            b = std::move(tmp);
+        -:  313:        }
+        -:  314:
+        -:  315:        // To be specialized for each Referred
+        -:  316:        Reference &operator=(const QVariant &value) noexcept(Referred::canNoexceptAssignQVariant);
+        -:  317:    };
+        -:  318:
+        -:  319:    template<typename Pointed>
+        -:  320:    class ConstPointer
+        -:  321:    {
+        -:  322:    private:
+        -:  323:        Pointed m_pointed;
+        -:  324:
+        -:  325:    public:
+        -:  326:        explicit ConstPointer(const Pointed &pointed)
+        -:  327:                noexcept(std::is_nothrow_copy_constructible_v<Pointed>)
+        -:  328:            : m_pointed(pointed) {}
+        -:  329:        explicit ConstPointer(Pointed &&pointed)
+        -:  330:                noexcept(std::is_nothrow_move_constructible_v<Pointed>)
+        -:  331:            : m_pointed(std::move(pointed)) {}
+        -:  332:
+        -:  333:        ConstReference<Pointed> operator*()
+        -:  334:                const noexcept(std::is_nothrow_copy_constructible_v<Pointed>)
+        -:  335:        {
+        -:  336:            return ConstReference<Pointed>(m_pointed);
+        -:  337:        }
+        -:  338:    };
+        -:  339:
+        -:  340:    template<typename Pointed>
+        -:  341:    class Pointer
+        -:  342:    {
+        -:  343:    private:
+        -:  344:        Pointed m_pointed;
+        -:  345:
+        -:  346:    public:
+        -:  347:        explicit Pointer(const Pointed &pointed)
+        -:  348:                noexcept(std::is_nothrow_copy_constructible_v<Pointed>)
+        -:  349:            : m_pointed(pointed) {}
+        -:  350:        explicit Pointer(Pointed &&pointed)
+        -:  351:                noexcept(std::is_nothrow_move_constructible_v<Pointed>)
+        -:  352:            : m_pointed(std::move(pointed)) {}
+        -:  353:
+        -:  354:        Reference<Pointed> operator*()
+        -:  355:                const noexcept(std::is_nothrow_copy_constructible_v<Pointed>)
+        -:  356:        {
+        -:  357:            return Reference<Pointed>(m_pointed);
+        -:  358:        }
+        -:  359:    };
+        -:  360:
+        -:  361:    template <typename T, typename... Args,
+        -:  362:             if_constructible<T, Args...> = true>
+        -:  363:    explicit QVariant(std::in_place_type_t<T>, Args&&... args)
+        -:  364:            noexcept(is_noexcept_constructible<q20::remove_cvref_t<T>, Args...>::value)
+        -:  365:        : QVariant(std::in_place, QMetaType::fromType<q20::remove_cvref_t<T>>() )
+        -:  366:    {
+        -:  367:        void *data = const_cast<void *>(constData());
+        -:  368:        new (data) T(std::forward<Args>(args)...);
+        -:  369:    }
+        -:  370:
+        -:  371:    template <typename T, typename U, typename... Args,
+        -:  372:             if_constructible<T, std::initializer_list<U> &, Args...> = true>
+        -:  373:    explicit QVariant(std::in_place_type_t<T>, std::initializer_list<U> il, Args&&... args)
+        -:  374:            noexcept(is_noexcept_constructible<q20::remove_cvref_t<T>,
+        -:  375:                                               std::initializer_list<U> &,
+        -:  376:                                               Args...
+        -:  377:                    >::value)
+        -:  378:        : QVariant(std::in_place, QMetaType::fromType<q20::remove_cvref_t<T>>())
+        -:  379:    {
+        -:  380:        char *data = static_cast<char *>(const_cast<void *>(constData()));
+        -:  381:        new (data) T(il, std::forward<Args>(args)...);
+        -:  382:    }
+        -:  383:
+        -:  384:    // primitives
+        -:  385:    QVariant(int i) noexcept;
+        -:  386:    QVariant(uint ui) noexcept;
+        -:  387:    QVariant(qlonglong ll) noexcept;
+        -:  388:    QVariant(qulonglong ull) noexcept;
+        -:  389:    QVariant(bool b) noexcept;
+        -:  390:    QVariant(double d) noexcept;
+        -:  391:    QVariant(float f) noexcept;
+        -:  392:
+        -:  393:    // trivial, trivially-copyable or COW
+        -:  394:    QVariant(QChar qchar) noexcept;
+        -:  395:    QVariant(QDate date) noexcept;
+        -:  396:    QVariant(QTime time) noexcept;
+        -:  397:    QVariant(const QBitArray &bitarray) noexcept;
+        -:  398:    QVariant(const QByteArray &bytearray) noexcept;
+        -:  399:    QVariant(const QDateTime &datetime) noexcept;
+        -:  400:    QVariant(const QHash<QString, QVariant> &hash) noexcept;
+        -:  401:    QVariant(const QJsonArray &jsonArray) noexcept;
+        -:  402:    QVariant(const QJsonObject &jsonObject) noexcept;
+        -:  403:    QVariant(const QList<QVariant> &list) noexcept;
+        -:  404:    QVariant(const QLocale &locale) noexcept;
+        -:  405:    QVariant(const QMap<QString, QVariant> &map) noexcept;
+        -:  406:    QVariant(const QRegularExpression &re) noexcept;
+        -:  407:    QVariant(const QString &string) noexcept;
+        -:  408:    QVariant(const QStringList &stringlist) noexcept;
+        -:  409:    QVariant(const QUrl &url) noexcept;
+        -:  410:
+        -:  411:    // conditionally noexcept trivial or trivially-copyable
+        -:  412:    // (most of these are noexcept on 64-bit)
+        -:  413:    QVariant(const QJsonValue &jsonValue) noexcept(Private::FitsInInternalSize<sizeof(CborValueStandIn)>);
+        -:  414:    QVariant(const QModelIndex &modelIndex) noexcept(Private::FitsInInternalSize<8 + 2 * sizeof(quintptr)>);
+        -:  415:    QVariant(QUuid uuid) noexcept(Private::FitsInInternalSize<16>);
+        -:  416:    QVariant(QSize size) noexcept;
+        -:  417:    QVariant(QSizeF size) noexcept(Private::FitsInInternalSize<sizeof(qreal) * 2>);
+        -:  418:    QVariant(QPoint pt) noexcept;
+        -:  419:    QVariant(QPointF pt) noexcept(Private::FitsInInternalSize<sizeof(qreal) * 2>);
+        -:  420:    QVariant(QLine line) noexcept(Private::FitsInInternalSize<sizeof(int) * 4>);
+        -:  421:    QVariant(QLineF line) noexcept(Private::FitsInInternalSize<sizeof(qreal) * 4>);
+        -:  422:    QVariant(QRect rect) noexcept(Private::FitsInInternalSize<sizeof(int) * 4>);
+        -:  423:    QVariant(QRectF rect) noexcept(Private::FitsInInternalSize<sizeof(qreal) * 4>);
+        -:  424:
+        -:  425:    // not noexcept
+        -:  426:    QVariant(const QEasingCurve &easing) noexcept(false);
+        -:  427:    QVariant(const QJsonDocument &jsonDocument) noexcept(false);
+        -:  428:    QVariant(const QPersistentModelIndex &modelIndex) noexcept(false);
+        -:  429:
+        -:  430:#ifndef QT_NO_CAST_FROM_ASCII
+        4:  431:    QT_ASCII_CAST_WARN QVariant(const char *str) noexcept(false)
+        4:  432:        : QVariant(QString::fromUtf8(str))
+        4:  433:    {}
+        -:  434:#endif
+        -:  435:    QVariant(QLatin1StringView string) noexcept(false); // converts to QString
+        -:  436:
+        -:  437:#if !defined(Q_CC_GHS)
+        -:  438:    // GHS has an ICE with this code; use the simplified version below
+        -:  439:    template <typename T,
+        -:  440:              std::enable_if_t<std::disjunction_v<std::is_pointer<T>, std::is_member_pointer<T>>, bool> = false>
+        -:  441:    QVariant(T) = delete;
+        -:  442:#else
+        -:  443:    QVariant(const volatile void *) = delete;
+        -:  444:#endif
+        -:  445:
+        -:  446:#if QT_CORE_REMOVED_SINCE(6, 5)
+        -:  447:    QVariant(const QSize &size);
+        -:  448:    QVariant(const QSizeF &size);
+        -:  449:    QVariant(const QPoint &pt);
+        -:  450:    QVariant(const QPointF &pt);
+        -:  451:    QVariant(const QLine &line);
+        -:  452:    QVariant(const QLineF &line);
+        -:  453:    QVariant(const QRect &rect);
+        -:  454:    QVariant(const QRectF &rect);
+        -:  455:    QVariant(const QUuid &uuid);
+        -:  456:#endif
+        -:  457:
+        -:  458:    QVariant& operator=(const QVariant &other);
+        -:  459:    inline QVariant(QVariant &&other) noexcept : d(other.d)
+        -:  460:    { other.d = Private(); }
+        -:  461:    QT_MOVE_ASSIGNMENT_OPERATOR_IMPL_VIA_MOVE_AND_SWAP(QVariant)
+        -:  462:
+        -:  463:    inline void swap(QVariant &other) noexcept { std::swap(d, other.d); }
+        -:  464:
+        -:  465:    int userType() const { return typeId(); }
+        -:  466:    int typeId() const
+        -:  467:    {
+        -:  468:        // QVariant types are always registered (see fromMetaType())
+        -:  469:        const QtPrivate::QMetaTypeInterface *mt = metaType().iface();
+        -:  470:        if (!mt)
+        -:  471:            return 0;
+        -:  472:        int id = mt->typeId.loadRelaxed();
+        -:  473:        // Q_ASSUME(id > 0);
+        -:  474:        return id;
+        -:  475:    }
+        -:  476:
+        -:  477:    QT_CORE_INLINE_SINCE(6, 10)
+        -:  478:    const char *typeName() const;
+        -:  479:    QT_CORE_INLINE_SINCE(6, 10)
+        -:  480:    QMetaType metaType() const;
+        -:  481:
+        -:  482:    bool canConvert(QMetaType targetType) const
+        -:  483:    { return QMetaType::canConvert(d.type(), targetType); }
+        -:  484:    bool convert(QMetaType type);
+        -:  485:
+        -:  486:    bool canView(QMetaType targetType) const
+        -:  487:    { return QMetaType::canView(d.type(), targetType); }
+        -:  488:
+        -:  489:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  490:    QT_DEPRECATED_VERSION_6_0
+        -:  491:    bool canConvert(int targetTypeId) const
+        -:  492:    { return QMetaType::canConvert(d.type(), QMetaType(targetTypeId)); }
+        -:  493:    QT_DEPRECATED_VERSION_6_0
+        -:  494:    bool convert(int targetTypeId)
+        -:  495:    { return convert(QMetaType(targetTypeId)); }
+        -:  496:#endif
+        -:  497:
+        -:  498:    inline bool isValid() const;
+        -:  499:    bool isNull() const;
+        -:  500:
+        -:  501:    void clear();
+        -:  502:
+        -:  503:    void detach();
+        -:  504:    inline bool isDetached() const;
+        -:  505:
+        -:  506:    int toInt(bool *ok = nullptr) const;
+        -:  507:    uint toUInt(bool *ok = nullptr) const;
+        -:  508:    qlonglong toLongLong(bool *ok = nullptr) const;
+        -:  509:    qulonglong toULongLong(bool *ok = nullptr) const;
+        -:  510:    bool toBool() const;
+        -:  511:    double toDouble(bool *ok = nullptr) const;
+        -:  512:    float toFloat(bool *ok = nullptr) const;
+        -:  513:    qreal toReal(bool *ok = nullptr) const;
+        -:  514:    QByteArray toByteArray() const;
+        -:  515:    QBitArray toBitArray() const;
+        -:  516:    QString toString() const;
+        -:  517:    QStringList toStringList() const;
+        -:  518:    QChar toChar() const;
+        -:  519:    QDate toDate() const;
+        -:  520:    QTime toTime() const;
+        -:  521:    QDateTime toDateTime() const;
+        -:  522:    QList<QVariant> toList() const;
+        -:  523:    QMap<QString, QVariant> toMap() const;
+        -:  524:    QHash<QString, QVariant> toHash() const;
+        -:  525:
+        -:  526:    QPoint toPoint() const;
+        -:  527:    QPointF toPointF() const;
+        -:  528:    QRect toRect() const;
+        -:  529:    QSize toSize() const;
+        -:  530:    QSizeF toSizeF() const;
+        -:  531:    QLine toLine() const;
+        -:  532:    QLineF toLineF() const;
+        -:  533:    QRectF toRectF() const;
+        -:  534:    QLocale toLocale() const;
+        -:  535:#if QT_CONFIG(regularexpression)
+        -:  536:    QRegularExpression toRegularExpression() const;
+        -:  537:#endif // QT_CONFIG(regularexpression)
+        -:  538:#if QT_CONFIG(easingcurve)
+        -:  539:    QEasingCurve toEasingCurve() const;
+        -:  540:#endif
+        -:  541:    QUuid toUuid() const;
+        -:  542:    QUrl toUrl() const;
+        -:  543:    QJsonValue toJsonValue() const;
+        -:  544:    QJsonObject toJsonObject() const;
+        -:  545:    QJsonArray toJsonArray() const;
+        -:  546:    QJsonDocument toJsonDocument() const;
+        -:  547:#if QT_CONFIG(itemmodel)
+        -:  548:    QModelIndex toModelIndex() const;
+        -:  549:    QPersistentModelIndex toPersistentModelIndex() const;
+        -:  550:#endif
+        -:  551:
+        -:  552:#ifndef QT_NO_DATASTREAM
+        -:  553:    void load(QDataStream &ds);
+        -:  554:    void save(QDataStream &ds) const;
+        -:  555:#endif
+        -:  556:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  557:    QT_WARNING_PUSH
+        -:  558:    QT_WARNING_DISABLE_DEPRECATED
+        -:  559:    QT_DEPRECATED_VERSION_X_6_0("Use the constructor taking a QMetaType instead.")
+        -:  560:    explicit QVariant(Type type)
+        -:  561:        : QVariant(QMetaType(int(type)))
+        -:  562:    {}
+        -:  563:    QT_DEPRECATED_VERSION_X_6_0("Use typeId() or metaType().")
+        -:  564:    Type type() const
+        -:  565:    {
+        -:  566:        int type = d.type().id();
+        -:  567:        return type >= QMetaType::User ? UserType : static_cast<Type>(type);
+        -:  568:    }
+        -:  569:    QT_DEPRECATED_VERSION_6_0
+        -:  570:    static const char *typeToName(int typeId)
+        -:  571:    { return QMetaType(typeId).name(); }
+        -:  572:    QT_DEPRECATED_VERSION_6_0
+        -:  573:    static Type nameToType(const char *name)
+        -:  574:    {
+        -:  575:        int metaType = QMetaType::fromName(name).id();
+        -:  576:        return metaType <= int(UserType) ? QVariant::Type(metaType) : UserType;
+        -:  577:    }
+        -:  578:    QT_WARNING_POP
+        -:  579:#endif
+        -:  580:
+        -:  581:    void *data();
+    #####:  582:    const void *constData() const
+    #####:  583:    { return d.storage(); }
+        -:  584:    inline const void *data() const { return constData(); }
+        -:  585:
+        -:  586:private:
+        -:  587:    template <typename T>
+        -:  588:    void verifySuitableForEmplace()
+        -:  589:    {
+        -:  590:        static_assert(!std::is_reference_v<T>,
+        -:  591:                      "QVariant does not support reference types");
+        -:  592:        static_assert(!std::is_const_v<T>,
+        -:  593:                      "QVariant does not support const types");
+        -:  594:        static_assert(std::is_copy_constructible_v<T>,
+        -:  595:                      "QVariant requires that the type is copyable");
+        -:  596:        static_assert(std::is_destructible_v<T>,
+        -:  597:                      "QVariant requires that the type is destructible");
+        -:  598:    }
+        -:  599:
+        -:  600:    template <typename T, typename... Args>
+        -:  601:    T &emplaceImpl(Args&&... args)
+        -:  602:    {
+        -:  603:        verifySuitableForEmplace<T>();
+        -:  604:        auto data = static_cast<T *>(prepareForEmplace(QMetaType::fromType<T>()));
+        -:  605:        return *q20::construct_at(data, std::forward<Args>(args)...);
+        -:  606:    }
+        -:  607:
+        -:  608:public:
+        -:  609:    template <typename T, typename... Args,
+        -:  610:              if_constructible<T, Args...> = true>
+        -:  611:    T &emplace(Args&&... args)
+        -:  612:    {
+        -:  613:        return emplaceImpl<T>(std::forward<Args>(args)...);
+        -:  614:    }
+        -:  615:
+        -:  616:    template <typename T, typename U, typename... Args,
+        -:  617:             if_constructible<T, std::initializer_list<U> &, Args...> = true>
+        -:  618:    T &emplace(std::initializer_list<U> list, Args&&... args)
+        -:  619:    {
+        -:  620:        return emplaceImpl<T>(list, std::forward<Args>(args)...);
+        -:  621:    }
+        -:  622:
+        -:  623:    template<typename T, typename = std::enable_if_t<!std::is_same_v<std::decay_t<T>, QVariant>>>
+        -:  624:    void setValue(T &&avalue)
+        -:  625:    {
+        -:  626:        using VT = std::decay_t<T>;
+        -:  627:        QMetaType metaType = QMetaType::fromType<VT>();
+        -:  628:        // If possible we reuse the current QVariant private.
+        -:  629:        if (isDetached() && d.type() == metaType) {
+        -:  630:            *reinterpret_cast<VT *>(const_cast<void *>(constData())) = std::forward<T>(avalue);
+        -:  631:            d.is_null = false;
+        -:  632:        } else {
+        -:  633:            *this = QVariant::fromValue<VT>(std::forward<T>(avalue));
+        -:  634:        }
+        -:  635:    }
+        -:  636:
+        -:  637:    void setValue(const QVariant &avalue)
+        -:  638:    {
+        -:  639:        *this = avalue;
+        -:  640:    }
+        -:  641:
+        -:  642:    void setValue(QVariant &&avalue)
+        -:  643:    {
+        -:  644:        *this = std::move(avalue);
+        -:  645:    }
+        -:  646:
+        -:  647:    template<typename T>
+        -:  648:    inline T value() const &
+        -:  649:    { return qvariant_cast<T>(*this); }
+        -:  650:
+        -:  651:    template<typename T>
+        -:  652:    inline T view()
+        -:  653:    {
+        -:  654:        T t{};
+        -:  655:        QMetaType::view(metaType(), data(), QMetaType::fromType<T>(), &t);
+        -:  656:        return t;
+        -:  657:    }
+        -:  658:
+        -:  659:    template<typename T>
+        -:  660:    inline T value() &&
+        -:  661:    { return qvariant_cast<T>(std::move(*this)); }
+        -:  662:
+        -:  663:    template<typename T, if_rvalue<T> = true>
+        -:  664:#ifndef Q_QDOC
+        -:  665:        /* needs is_copy_constructible for variants semantics, is_move_constructible so that moveConstruct works
+        -:  666:          (but copy_constructible implies move_constructble, so don't bother checking)
+        -:  667:        */
+        -:  668:    static inline auto fromValue(T &&value)
+        -:  669:        noexcept(std::is_nothrow_copy_constructible_v<T> && Private::CanUseInternalSpace<T>)
+        -:  670:        -> std::enable_if_t<std::conjunction_v<std::is_copy_constructible<T>,
+        -:  671:                                               std::is_destructible<T>>, QVariant>
+        -:  672:#else
+        -:  673:    static inline QVariant fromValue(T &&value)
+        -:  674:#endif
+        -:  675:    {
+        -:  676:        // handle special cases
+        -:  677:        using Type = std::remove_cv_t<T>;
+        -:  678:        if constexpr (std::is_null_pointer_v<Type>)
+        -:  679:            return QVariant::fromMetaType(QMetaType::fromType<std::nullptr_t>());
+        -:  680:        else if constexpr (std::is_same_v<Type, QVariant>)
+        -:  681:            return std::forward<T>(value);
+        -:  682:        else if constexpr (std::is_same_v<Type, std::monostate>)
+        -:  683:            return QVariant();
+        -:  684:        QMetaType mt = QMetaType::fromType<Type>();
+        -:  685:        mt.registerType(); // we want the type stored in QVariant to always be registered
+        -:  686:
+        -:  687:        // We only try to move if the type is actually moveable and not if T is const
+        -:  688:        // as in const int i; QVariant::fromValue(std::move(i));
+        -:  689:        if constexpr (std::conjunction_v<std::is_move_constructible<Type>, std::negation<std::is_const<T>>>)
+        -:  690:            return moveConstruct(QMetaType::fromType<Type>(), std::addressof(value));
+        -:  691:        else
+        -:  692:            return copyConstruct(mt, std::addressof(value));
+        -:  693:    }
+        -:  694:
+        -:  695:    template<typename T>
+        -:  696:#ifndef Q_QDOC
+        -:  697:    static inline auto fromValue(const T &value)
+        -:  698:        noexcept(std::is_nothrow_copy_constructible_v<T> && Private::CanUseInternalSpace<T>)
+        -:  699:        -> std::enable_if_t<std::is_copy_constructible_v<T> && std::is_destructible_v<T>, QVariant>
+        -:  700:#else
+        -:  701:    static inline QVariant fromValue(const T &value)
+        -:  702:#endif
+        -:  703:    {
+        -:  704:        if constexpr (std::is_null_pointer_v<T>)
+        -:  705:            return QVariant(QMetaType::fromType<std::nullptr_t>());
+        -:  706:        else if constexpr (std::is_same_v<T, QVariant>)
+        -:  707:            return value;
+        -:  708:        else if constexpr (std::is_same_v<T, std::monostate>)
+        -:  709:            return QVariant();
+        -:  710:        return QVariant(QMetaType::fromType<T>(), std::addressof(value));
+        -:  711:    }
+        -:  712:
+        -:  713:    template<typename... Types>
+        -:  714:    static inline QVariant fromStdVariant(const std::variant<Types...> &value)
+        -:  715:    {
+        -:  716:        return fromStdVariantImpl(value);
+        -:  717:    }
+        -:  718:
+        -:  719:    template<typename... Types>
+        -:  720:    static QVariant fromStdVariant(std::variant<Types...> &&value)
+        -:  721:    {
+        -:  722:        return fromStdVariantImpl(std::move(value));
+        -:  723:    }
+        -:  724:
+        -:  725:    static QVariant fromMetaType(QMetaType type, const void *copy = nullptr);
+        -:  726:
+        -:  727:    template<typename T>
+        -:  728:    bool canConvert() const
+        -:  729:    { return canConvert(QMetaType::fromType<T>()); }
+        -:  730:
+        -:  731:    template<typename T>
+        -:  732:    bool canView() const
+        -:  733:    { return canView(QMetaType::fromType<T>()); }
+        -:  734:
+        -:  735:    static QPartialOrdering compare(const QVariant &lhs, const QVariant &rhs);
+        -:  736:
+        -:  737:private:
+        -:  738:    template <typename StdVariant>
+        -:  739:    static QVariant fromStdVariantImpl(StdVariant &&v)
+        -:  740:    {
+        -:  741:        if (Q_UNLIKELY(v.valueless_by_exception()))
+        -:  742:            return QVariant();
+        -:  743:        auto visitor = [](auto &&arg) {
+        -:  744:            return QVariant::fromValue(q23::forward_like<StdVariant>(arg));
+        -:  745:        };
+        -:  746:        return std::visit(visitor, std::forward<StdVariant>(v));
+        -:  747:    }
+        -:  748:
+        -:  749:    friend bool comparesEqual(const QVariant &a, const QVariant &b)
+        -:  750:    { return a.equals(b); }
+        -:  751:    Q_DECLARE_EQUALITY_COMPARABLE_NON_NOEXCEPT(QVariant)
+        -:  752:
+        -:  753:#ifndef QT_NO_DEBUG_STREAM
+        -:  754:    template <typename T>
+        -:  755:    friend auto operator<<(const QDebug &debug, const T &variant) -> std::enable_if_t<std::is_same_v<T, QVariant>, QDebug> {
+        -:  756:        return  variant.qdebugHelper(debug);
+        -:  757:    }
+        -:  758:    QDebug qdebugHelper(QDebug) const;
+        -:  759:#endif
+        -:  760:
+        -:  761:    template <typename T>
+        -:  762:    friend T *get_if(QVariant *v) noexcept
+        -:  763:    {
+        -:  764:        // data() will detach from is_null, returning non-nullptr
+        -:  765:        if (!v || v->d.type() != QMetaType::fromType<T>())
+        -:  766:            return nullptr;
+        -:  767:        return static_cast<T*>(v->data());
+        -:  768:    }
+        -:  769:    template <typename T>
+        -:  770:    friend const T *get_if(const QVariant *v) noexcept
+        -:  771:    {
+        -:  772:        // (const) data() will not detach from is_null, return nullptr
+        -:  773:        if (!v || v->d.is_null || v->d.type() != QMetaType::fromType<T>())
+        -:  774:            return nullptr;
+        -:  775:        return static_cast<const T*>(v->data());
+        -:  776:    }
+        -:  777:
+        -:  778:#define Q_MK_GET(cvref) \
+        -:  779:    template <typename T> \
+        -:  780:    friend T cvref get(QVariant cvref v) \
+        -:  781:    { \
+        -:  782:        if constexpr (std::is_const_v<T cvref>) \
+        -:  783:            Q_ASSERT(!v.d.is_null); \
+        -:  784:        Q_ASSERT(v.d.type() == QMetaType::fromType<q20::remove_cvref_t<T>>()); \
+        -:  785:        return static_cast<T cvref>(*get_if<T>(&v)); \
+        -:  786:    } \
+        -:  787:    /* end */
+        -:  788:    Q_MK_GET(&)
+        -:  789:    Q_MK_GET(const &)
+        -:  790:    Q_MK_GET(&&)
+        -:  791:    Q_MK_GET(const &&)
+        -:  792:#undef Q_MK_GET
+        -:  793:
+        -:  794:    static QVariant moveConstruct(QMetaType type, void *data);
+        -:  795:    static QVariant copyConstruct(QMetaType type, const void *data);
+        -:  796:
+        -:  797:    template<typename T>
+        -:  798:    friend inline T qvariant_cast(const QVariant &);
+        -:  799:    template<typename T>
+        -:  800:    friend inline T qvariant_cast(QVariant &&);
+        -:  801:
+        -:  802:protected:
+        -:  803:    Private d;
+        -:  804:    void create(int type, const void *copy);
+        -:  805:    void create(QMetaType type, const void *copy);
+        -:  806:    bool equals(const QVariant &other) const;
+        -:  807:    bool convert(int type, void *ptr) const;
+        -:  808:    bool view(int type, void *ptr);
+        -:  809:
+        -:  810:private:
+        -:  811:    // force compile error, prevent QVariant(bool) to be called
+        -:  812:    inline QVariant(void *) = delete;
+        -:  813:    // QVariant::Type is marked as \obsolete, but we don't want to
+        -:  814:    // provide a constructor from its intended replacement,
+        -:  815:    // QMetaType::Type, instead, because the idea behind these
+        -:  816:    // constructors is flawed in the first place. But we also don't
+        -:  817:    // want QVariant(QMetaType::String) to compile and falsely be an
+        -:  818:    // int variant, so delete this constructor:
+        -:  819:    QVariant(QMetaType::Type) = delete;
+        -:  820:
+        -:  821:    // used to setup the QVariant internals for the "real" inplace ctor
+        -:  822:    QVariant(std::in_place_t, QMetaType type);
+        -:  823:    // helper for emplace
+        -:  824:    void *prepareForEmplace(QMetaType type);
+        -:  825:
+        -:  826:    // These constructors don't create QVariants of the type associated
+        -:  827:    // with the enum, as expected, but they would create a QVariant of
+        -:  828:    // type int with the value of the enum value.
+        -:  829:    // Use QVariant v = QColor(Qt::red) instead of QVariant v = Qt::red for
+        -:  830:    // example.
+        -:  831:    QVariant(Qt::GlobalColor) = delete;
+        -:  832:    QVariant(Qt::BrushStyle) = delete;
+        -:  833:    QVariant(Qt::PenStyle) = delete;
+        -:  834:    QVariant(Qt::CursorShape) = delete;
+        -:  835:#ifdef QT_NO_CAST_FROM_ASCII
+        -:  836:    // force compile error when implicit conversion is not wanted
+        -:  837:    inline QVariant(const char *) = delete;
+        -:  838:#endif
+        -:  839:public:
+        -:  840:    typedef Private DataPtr;
+        -:  841:    inline DataPtr &data_ptr() { return d; }
+        -:  842:    inline const DataPtr &data_ptr() const { return d; }
+        -:  843:};
+        -:  844:
+        -:  845:inline bool QVariant::isValid() const
+        -:  846:{
+        -:  847:    return d.type().isValid(QT6_CALL_NEW_OVERLOAD);
+        -:  848:}
+        -:  849:
+        -:  850:#ifndef QT_NO_DATASTREAM
+        -:  851:Q_CORE_EXPORT QDataStream &operator>>(QDataStream &s, QVariant &p);
+        -:  852:Q_CORE_EXPORT QDataStream &operator<<(QDataStream &s, const QVariant &p);
+        -:  853:
+        -:  854:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  855:QT_WARNING_PUSH
+        -:  856:QT_WARNING_DISABLE_DEPRECATED
+        -:  857:QT_DEPRECATED_VERSION_6_0
+        -:  858:inline QDataStream &operator>>(QDataStream &s, QVariant::Type &p)
+        -:  859:{
+        -:  860:    quint32 u;
+        -:  861:    s >> u;
+        -:  862:    p = static_cast<QVariant::Type>(u);
+        -:  863:    return s;
+        -:  864:}
+        -:  865:QT_DEPRECATED_VERSION_6_0
+        -:  866:inline QDataStream &operator<<(QDataStream &s, const QVariant::Type p)
+        -:  867:{
+        -:  868:    s << static_cast<quint32>(p);
+        -:  869:    return s;
+        -:  870:}
+        -:  871:QT_WARNING_POP
+        -:  872:#endif
+        -:  873:
+        -:  874:#endif
+        -:  875:
+        -:  876:#if QT_CORE_INLINE_IMPL_SINCE(6, 10)
+    #####:  877:QMetaType QVariant::metaType() const
+        -:  878:{
+    #####:  879:    return d.type();
+        -:  880:}
+        -:  881:
+        -:  882:const char *QVariant::typeName() const
+        -:  883:{
+        -:  884:    return d.type().name();
+        -:  885:}
+        -:  886:#endif
+        -:  887:
+        -:  888:inline bool QVariant::isDetached() const
+        -:  889:{ return !d.is_shared || d.data.shared->ref.loadRelaxed() == 1; }
+        -:  890:
+        -:  891:inline void swap(QVariant &value1, QVariant &value2) noexcept
+        -:  892:{ value1.swap(value2); }
+        -:  893:
+        -:  894:#ifndef QT_MOC
+        -:  895:
+        -:  896:template<typename T> inline T qvariant_cast(const QVariant &v)
+        -:  897:{
+        -:  898:    QMetaType targetType = QMetaType::fromType<T>();
+        -:  899:    if (v.d.type() == targetType)
+        -:  900:        return v.d.get<T>();
+        -:  901:    if constexpr (std::is_same_v<T,std::remove_const_t<std::remove_pointer_t<T>> const *>) {
+        -:  902:        using nonConstT = std::remove_const_t<std::remove_pointer_t<T>> *;
+        -:  903:        QMetaType nonConstTargetType = QMetaType::fromType<nonConstT>();
+        -:  904:        if (v.d.type() == nonConstTargetType)
+        -:  905:            return v.d.get<nonConstT>();
+        -:  906:    }
+        -:  907:
+        -:  908:    T t{};
+        -:  909:    QMetaType::convert(v.metaType(), v.constData(), targetType, &t);
+        -:  910:    return t;
+        -:  911:}
+        -:  912:
+    #####:  913:template<typename T> inline T qvariant_cast(QVariant &&v)
+        -:  914:{
+    #####:  915:    QMetaType targetType = QMetaType::fromType<T>();
+    #####:  916:    if (v.d.type() == targetType) {
+        -:  917:        if constexpr (QVariant::Private::FitsInInternalSize<sizeof(T)>) {
+        -:  918:            // If T in principle fits into the internal space, it may be using
+        -:  919:            // it (depending on e.g. QTypeInfo, which, generally, can change
+        -:  920:            // from version to version, so we need to check is_shared:
+    #####:  921:            if (!v.d.is_shared)
+    #####:  922:                return std::move(*reinterpret_cast<T *>(v.d.data.data));
+        -:  923:        }
+        -:  924:        // Otherwise, it cannot possibly be using internal space:
+    #####:  925:        Q_ASSERT(v.d.is_shared);
+    #####:  926:        if (v.d.data.shared->ref.loadRelaxed() == 1)
+    #####:  927:            return std::move(*reinterpret_cast<T *>(v.d.data.shared->data()));
+        -:  928:        else
+    #####:  929:            return v.d.get<T>();
+        -:  930:    }
+        -:  931:    if constexpr (std::is_same_v<T, QVariant>) {
+        -:  932:        // if the metatype doesn't match, but we want a QVariant, just return the current variant
+        -:  933:        return v;
+        -:  934:    } if constexpr (std::is_same_v<T,std::remove_const_t<std::remove_pointer_t<T>> const *>) {
+        -:  935:        // moving a pointer is pointless, just do the same as the const & overload
+        -:  936:        using nonConstT = std::remove_const_t<std::remove_pointer_t<T>> *;
+        -:  937:        QMetaType nonConstTargetType = QMetaType::fromType<nonConstT>();
+        -:  938:        if (v.d.type() == nonConstTargetType)
+        -:  939:            return v.d.get<nonConstT>();
+        -:  940:    }
+        -:  941:
+    #####:  942:    T t{};
+    #####:  943:    QMetaType::convert(v.metaType(), v.constData(), targetType, &t);
+    #####:  944:    return t;
+        -:  945:}
+        -:  946:
+        -:  947:#  ifndef QT_NO_VARIANT
+        -:  948:template<> inline QVariant qvariant_cast<QVariant>(const QVariant &v)
+        -:  949:{
+        -:  950:    if (v.metaType().id() == QMetaType::QVariant)
+        -:  951:        return *reinterpret_cast<const QVariant *>(v.constData());
+        -:  952:    return v;
+        -:  953:}
+        -:  954:#  endif
+        -:  955:
+        -:  956:#endif // QT_MOC
+        -:  957:
+        -:  958:#ifndef QT_NO_DEBUG_STREAM
+        -:  959:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  960:QT_WARNING_PUSH
+        -:  961:QT_WARNING_DISABLE_DEPRECATED
+        -:  962:QT_DEPRECATED_VERSION_6_0
+        -:  963:Q_CORE_EXPORT QDebug operator<<(QDebug, const QVariant::Type);
+        -:  964:QT_WARNING_POP
+        -:  965:#endif
+        -:  966:#endif
+        -:  967:
+        -:  968:namespace QtPrivate {
+        -:  969:class Q_CORE_EXPORT QVariantTypeCoercer
+        -:  970:{
+        -:  971:public:
+        -:  972:    // ### Qt7: Pass QMetaType as value rather than const ref.
+        -:  973:    const void *convert(const QVariant &value, const QMetaType &type);
+        -:  974:    const void *coerce(const QVariant &value, const QMetaType &type);
+        -:  975:
+        -:  976:private:
+        -:  977:    QVariant converted;
+        -:  978:};
+        -:  979:}
+        -:  980:
+        -:  981:template<typename Pointer>
+        -:  982:class QVariantRef
+        -:  983:{
+        -:  984:private:
+        -:  985:    const Pointer *m_pointer = nullptr;
+        -:  986:
+        -:  987:public:
+        -:  988:    explicit QVariantRef(const Pointer *reference) : m_pointer(reference) {}
+        -:  989:    QVariantRef(const QVariantRef &) = default;
+        -:  990:    QVariantRef(QVariantRef &&) = default;
+        -:  991:    ~QVariantRef() = default;
+        -:  992:
+        -:  993:    operator QVariant() const;
+        -:  994:    QVariantRef &operator=(const QVariant &value);
+        -:  995:    QVariantRef &operator=(const QVariantRef &value) { return operator=(QVariant(value)); }
+        -:  996:    QVariantRef &operator=(QVariantRef &&value) { return operator=(QVariant(value)); }
+        -:  997:
+        -:  998:    friend void swap(QVariantRef a, QVariantRef b)
+        -:  999:    {
+        -: 1000:        QVariant tmp = a;
+        -: 1001:        a = b;
+        -: 1002:        b = std::move(tmp);
+        -: 1003:    }
+        -: 1004:};
+        -: 1005:
+        -: 1006:class Q_CORE_EXPORT QVariantConstPointer
+        -: 1007:{
+        -: 1008:private:
+        -: 1009:    QVariant m_variant;
+        -: 1010:
+        -: 1011:public:
+        -: 1012:    explicit QVariantConstPointer(QVariant variant);
+        -: 1013:
+        -: 1014:    QVariant operator*() const;
+        -: 1015:    const QVariant *operator->() const;
+        -: 1016:};
+        -: 1017:
+        -: 1018:template<typename Pointer>
+        -: 1019:class QVariantPointer
+        -: 1020:{
+        -: 1021:private:
+        -: 1022:    const Pointer *m_pointer = nullptr;
+        -: 1023:
+        -: 1024:public:
+        -: 1025:    explicit QVariantPointer(const Pointer *pointer) : m_pointer(pointer) {}
+        -: 1026:    QVariantRef<Pointer> operator*() const { return QVariantRef<Pointer>(m_pointer); }
+        -: 1027:    Pointer operator->() const { return *m_pointer; }
+        -: 1028:};
+        -: 1029:
+        -: 1030:QT_END_NAMESPACE
+        -: 1031:
+        -: 1032:#endif // QVARIANT_H

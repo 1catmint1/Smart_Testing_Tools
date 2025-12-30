@@ -1,0 +1,92 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtWidgets/qtoolbox.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2016 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:// Qt-Security score:significant reason:default
+        -:    4:
+        -:    5:#ifndef QTOOLBOX_H
+        -:    6:#define QTOOLBOX_H
+        -:    7:
+        -:    8:#include <QtWidgets/qtwidgetsglobal.h>
+        -:    9:#include <QtWidgets/qframe.h>
+        -:   10:#include <QtGui/qicon.h>
+        -:   11:
+        -:   12:QT_REQUIRE_CONFIG(toolbox);
+        -:   13:
+        -:   14:QT_BEGIN_NAMESPACE
+        -:   15:
+        -:   16:class QToolBoxPrivate;
+        -:   17:
+        -:   18:class Q_WIDGETS_EXPORT QToolBox : public QFrame
+        -:   19:{
+        -:   20:    Q_OBJECT
+        -:   21:    Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentChanged)
+        -:   22:    Q_PROPERTY(int count READ count)
+        -:   23:
+        -:   24:public:
+        -:   25:    explicit QToolBox(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+        -:   26:    ~QToolBox();
+        -:   27:
+        -:   28:    int addItem(QWidget *widget, const QString &text);
+        -:   29:    int addItem(QWidget *widget, const QIcon &icon, const QString &text);
+        -:   30:    int insertItem(int index, QWidget *widget, const QString &text);
+        -:   31:    int insertItem(int index, QWidget *widget, const QIcon &icon, const QString &text);
+        -:   32:
+        -:   33:    void removeItem(int index);
+        -:   34:
+        -:   35:    void setItemEnabled(int index, bool enabled);
+        -:   36:    bool isItemEnabled(int index) const;
+        -:   37:
+        -:   38:    void setItemText(int index, const QString &text);
+        -:   39:    QString itemText(int index) const;
+        -:   40:
+        -:   41:    void setItemIcon(int index, const QIcon &icon);
+        -:   42:    QIcon itemIcon(int index) const;
+        -:   43:
+        -:   44:#if QT_CONFIG(tooltip)
+        -:   45:    void setItemToolTip(int index, const QString &toolTip);
+        -:   46:    QString itemToolTip(int index) const;
+        -:   47:#endif
+        -:   48:
+        -:   49:    int currentIndex() const;
+        -:   50:    QWidget *currentWidget() const;
+        -:   51:    QWidget *widget(int index) const;
+        -:   52:    int indexOf(const QWidget *widget) const;
+        -:   53:    int count() const;
+        -:   54:
+        -:   55:public Q_SLOTS:
+        -:   56:    void setCurrentIndex(int index);
+        -:   57:    void setCurrentWidget(QWidget *widget);
+        -:   58:
+        -:   59:Q_SIGNALS:
+        -:   60:    void currentChanged(int index);
+        -:   61:
+        -:   62:protected:
+        -:   63:    bool event(QEvent *e) override;
+        -:   64:    virtual void itemInserted(int index);
+        -:   65:    virtual void itemRemoved(int index);
+        -:   66:    void showEvent(QShowEvent *e) override;
+        -:   67:    void changeEvent(QEvent *) override;
+        -:   68:
+        -:   69:
+        -:   70:private:
+        -:   71:    Q_DECLARE_PRIVATE(QToolBox)
+        -:   72:    Q_DISABLE_COPY(QToolBox)
+        -:   73:    Q_PRIVATE_SLOT(d_func(), void _q_buttonClicked())
+        -:   74:    Q_PRIVATE_SLOT(d_func(), void _q_widgetDestroyed(QObject*))
+        -:   75:};
+        -:   76:
+        -:   77:
+        1:   78:inline int QToolBox::addItem(QWidget *item, const QString &text)
+        1:   79:{ return insertItem(-1, item, QIcon(), text); }
+        -:   80:inline int QToolBox::addItem(QWidget *item, const QIcon &iconSet,
+        -:   81:                              const QString &text)
+        -:   82:{ return insertItem(-1, item, iconSet, text); }
+        -:   83:inline int QToolBox::insertItem(int index, QWidget *item, const QString &text)
+        -:   84:{ return insertItem(index, item, QIcon(), text); }
+        -:   85:
+        -:   86:QT_END_NAMESPACE
+        -:   87:
+        -:   88:#endif // QTOOLBOX_H

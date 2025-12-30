@@ -1,0 +1,45 @@
+{
+  "exe_path": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main\\build\\Desktop_Qt_6_7_2_MinGW_64_bit-Debug\\debug\\diagramscene.exe",
+  "timestamp": "2025-12-23T20:56:58.027991",
+  "smoke_test": {
+    "exe": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main\\build\\Desktop_Qt_6_7_2_MinGW_64_bit-Debug\\debug\\diagramscene.exe",
+    "timeout_sec": 15,
+    "alive": true,
+    "cpu_samples": [],
+    "memory_samples_mb": [],
+    "returncode": 3221225785,
+    "startup_time_s": 0,
+    "duration_s": 0.2,
+    "summary": {
+      "status": "passed",
+      "warnings": 0,
+      "errors": 0
+    }
+  },
+  "ui_probe": {
+    "exe": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main\\build\\Desktop_Qt_6_7_2_MinGW_64_bit-Debug\\debug\\diagramscene.exe",
+    "timeout_sec": 15
+  },
+  "findings": [
+    {
+      "title": "已自动选择候选 exe",
+      "severity": "info",
+      "details": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main\\build\\Desktop_Qt_6_7_2_MinGW_64_bit-Debug\\debug\\diagramscene.exe"
+    },
+    {
+      "title": "进程启动成功",
+      "severity": "info",
+      "details": "pid=42208"
+    },
+    {
+      "title": "启动响应时间 0 秒",
+      "severity": "info",
+      "details": "应用成功启动并保持运行"
+    },
+    {
+      "title": "UI 探测失败",
+      "severity": "warning",
+      "details": "No windows for that process could be found"
+    }
+  ]
+}

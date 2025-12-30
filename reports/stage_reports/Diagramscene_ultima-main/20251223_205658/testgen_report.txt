@@ -1,0 +1,6 @@
+[stage] testgen
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-main
+[time] 20251223_205658
+
+== findings ==
+- testgen | info | 已生成 QtTest：25 个文件，共约 198 个用例

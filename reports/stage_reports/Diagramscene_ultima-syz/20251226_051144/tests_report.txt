@@ -1,0 +1,6 @@
+[stage] tests
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[time] 20251226_051144
+
+== findings ==
+- tests | warning | 未配置测试命令，跳过测试执行

@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_064953",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\arrow.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_arrow.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_arrow.cpp",
+          "content": "#include <QtTest>\n#include <QStyleOptionGraphicsItem>\n#include <QPixmap>\n#include <QPainter>\n// Enable access to protected members\n#define protected public\n#define private public\n#include \"../../arrow.h\"\n#include \"../../diagramitem.h\"\n\nclass TestArrow : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void testConstructor();\n    void testBoundingRect();\n    void testShape();\n    void testUpdatePosition();\n    void testPaint();\n};\n\nvoid TestArrow::testConstructor()\n{\n    // 创建两个 DiagramItem 作为起点和终点\n    DiagramItem startItem(DiagramItem::Step, nullptr);\n    DiagramItem endItem(DiagramItem::Step, nullptr);\n    startItem.setPos(0, 0);\n    endItem.setPos(100, 100);\n    \n    // 测试构造函数\n    Arrow arrow(&startItem, &endItem);\n    QVERIFY(arrow.boundingRect().isValid());\n    QCOMPARE(arrow.startItem(), &startItem);\n    QCOMPARE(arrow.endItem(), &endItem);\n}\n\nvoid TestArrow::testBoundingRect()\n{\n    DiagramItem startItem(DiagramItem::Step, nullptr);\n    DiagramItem endItem(DiagramItem::Step, nullptr);\n    startItem.setPos(10, 20);\n    endItem.setPos(110, 120);\n    \n    Arrow arrow(&startItem, &endItem);\n    arrow.updatePosition();\n    QRectF rect = arrow.boundingRect();\n    \n    // 验证边界矩形包含线段端点\n    QVERIFY(rect.contains(arrow.line().p1()));\n    QVERIFY(rect.contains(arrow.line().p2()));\n    QVERIFY(rect.width() >= 0);\n    QVERIFY(rect.height() >= 0);\n}\n\nvoid TestArrow::testShape()\n{\n    DiagramItem startItem(DiagramItem::Step, nullptr);\n    DiagramItem endItem(DiagramItem::Step, nullptr);\n    startItem.setPos(0, 0);\n    endItem.setPos(50, 0);\n    \n    Arrow arrow(&startItem, &endItem);\n    arrow.updatePosition();\n    \n    QPainterPath path = arrow.shape();\n    QVERIFY(!path.isEmpty());\n    // 形状应包含线段起点\n    QVERIFY(path.contains(arrow.line().p1()));\n}\n\nvoid TestArrow::testUpdatePosition()\n{\n    DiagramItem startItem(DiagramItem::Step, nullptr);\n    DiagramItem endItem(DiagramItem::Step, nullptr);\n    startItem.setPos(0, 0);\n    endItem.setPos(100, 100);\n    \n    Arrow arrow(&startItem, &endItem);\n    QLineF initialLine = arrow.line();\n    \n    // 移动终点项\n    endItem.setPos(200, 200);\n    arrow.updatePosition();\n    \n    QLineF updatedLine = arrow.line();\n    QVERIFY(updatedLine != initialLine);\n    // 更新后应指向新位置\n    QCOMPARE(updatedLine.p2(), arrow.mapFromItem(&endItem, 0, 0));\n}\n\nvoid TestArrow::testPaint()\n{\n    DiagramItem startItem(DiagramItem::Step, nullptr);\n    DiagramItem endItem(DiagramItem::Step, nullptr);\n    startItem.setPos(0, 0);\n    endItem.setPos(100, 100);\n    \n    Arrow arrow(&startItem, &endItem);\n    arrow.updatePosition();\n    \n    // 创建绘制表面\n    QPixmap pixmap(200, 200);\n    pixmap.fill(Qt::white);\n    QPainter painter(&pixmap);\n    \n    // 创建样式选项\n    QStyleOptionGraphicsItem option;\n    option.state = QStyle::State_None;\n    \n    // 测试绘制不崩溃\n//     QVERIFY_EXCEPTION_THROWN(arrow.paint(&painter, &option, nullptr), std::exception); // Protected method call disabled\n    \n    // 验证有内容被绘制（非全白）\n    QImage image = pixmap.toImage();\n    bool hasContent = false;\n    for (int y = 0; y < image.height(); ++y) {\n        for (int x = 0; x < image.width(); ++x) {\n            if (image.pixelColor(x, y) != Qt::white) {\n                hasContent = true;\n                break;\n            }\n        }\n        if (hasContent) break;\n    }\n    QVERIFY(hasContent);\n}\n\nQTEST_MAIN(TestArrow)\n#include \"test_arrow.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = test_arrow\nQT += testlib svg\nQT += widgets\n\nCONFIG += qt warn_on depend_includepath testcase\nCONFIG -= app_bundle\n\nSOURCES += test_arrow.cpp \\\nSOURCES += ../../diagramitemgroup.cpp \\\n    ../../diagrampath.cpp \\\n    ../../diagramscene.cpp \\\n    ../../diagramtextitem.cpp \\\n    ../../findreplacedialog.cpp \\\n    ../../mainwindow.cpp\n           ../../arrow.cpp \\\n           ../../diagramitem.cpp\n\nHEADERS += ../../arrow.h \\\n           ../../diagramitem.h\n\nINCLUDEPATH += ../..\n\n# 确保测试可找到头文件\nDEPENDPATH += ../..\nQMAKE_CXXFLAGS += --coverage\nQMAKE_LFLAGS += --coverage\nHEADERS += ../../diagramitemgroup.h \\\n    ../../diagrampath.h \\\n    ../../diagramscene.h \\\n    ../../diagramtextitem.h \\\n    ../../findreplacedialog.h \\\n    ../../mainwindow.h"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 5
+      }
+    },
+    "applied": [
+      "tests/generated/test_arrow.cpp (5 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 5
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 5 个用例",
+      "details": "生成文件明细：\ntests/generated/test_arrow.cpp (5 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

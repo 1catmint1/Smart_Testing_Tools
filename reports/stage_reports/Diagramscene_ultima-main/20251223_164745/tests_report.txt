@@ -1,0 +1,93 @@
+[stage] tests
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-main
+[time] 20251223_164745
+[meta] cmd: cmd /c "set PATH=D:/Qt/6.10.1/mingw_64/bin;D:/Qt/Tools/mingw1310_64/bin;%PATH% && cd /d C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug && D:/Qt/6.10.1/mingw_64/bin/qmake.exe C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/tests.pro -r QMAKE_CXXFLAGS+=-O0 QMAKE_CXXFLAGS+=-g QMAKE_CXXFLAGS+=--coverage QMAKE_LFLAGS+=--coverage && D:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe clean && D:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe -j && .\test_diagramitems.exe"
+[meta] cwd: C:\Users\lenovo\Desktop\Diagramscene_ultima-main
+[meta] returncode: 0
+[meta] timed_out: False
+[meta] timeout_s: 600.0
+
+== findings ==
+- tests | info | 测试命令执行完成
+
+== stdout (truncated) ==
+D:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe -f Makefile.Debug clean
+mingw32-make.exe[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug'
+del debug\qrc_diagramscene.cpp
+del debug\moc_predefs.h
+del debug\moc_mainwindow.cpp debug\moc_diagramscene.cpp debug\moc_diagramtextitem.cpp debug\moc_findreplacedialog.cpp
+del debug\test_arrow_straight_connection.moc debug\test_component_signal_integrate.moc debug\test_connectionline_style.moc debug\test_dataflow_integrity.moc debug\test_diagramitem_properties.moc debug\test_diagramitem_transform.moc debug\test_diagramitem_types_full.moc debug\test_diagramitems_create.moc debug\test_diagrampath_connection.moc debug\test_diagrampath_path_dev.moc debug\test_diagramtextitem_edit.moc debug\test_findreplacedialog.moc debug\test_performance_stress.moc debug\test_performance_workflow.moc debug\test_scene_management.moc debug\test_file_io.moc debug\test_shortcuts.moc debug\test_undo_redo.moc
+del debug\test_arrow_connection_system.o debug\test_arrow_straight_connection.o debug\test_component_signal_integrate.o debug\test_connectionline_style.o debug\test_dataflow_integrity.o debug\test_diagramitem_properties.o debug\test_diagramitem_transform.o debug\test_diagramitem_types_full.o debug\test_diagramitems_create.o debug\test_diagrampath_connection.o debug\test_diagrampath_path_dev.o debug\test_diagramtextitem_edit.o debug\test_findreplacedialog.o debug\test_main.o debug\test_performance_stress.o debug\test_performance_workflow.o debug\test_scene_management.o debug\test_file_io.o debug\test_shortcuts.o debug\test_undo_redo.o debug\mainwindow.o debug\deletecommand.o debug\diagramitem.o debug\diagramitemgroup.o debug\diagrampath.o debug\findreplacedialog.o debug\arrow.o debug\diagramtextitem.o debug\diagramscene.o debug\qrc_diagramscene.o debug\moc_mainwindow.o debug\moc_diagramscene.o debug\moc_diagramtextitem.o debug\moc_findreplacedialog.o
+mingw32-make.exe[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug'
+D:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe -f Makefile.Release clean
+mingw32-make.exe[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug'
+del release\qrc_diagramscene.cpp
+del release\moc_predefs.h
+del release\moc_mainwindow.cpp release\moc_diagramscene.cpp release\moc_diagramtextitem.cpp release\moc_findreplacedialog.cpp
+del release\test_arrow_straight_connection.moc release\test_component_signal_integrate.moc release\test_connectionline_style.moc release\test_dataflow_integrity.moc release\test_diagramitem_properties.moc release\test_diagramitem_transform.moc release\test_diagramitem_types_full.moc release\test_diagramitems_create.moc release\test_diagrampath_connection.moc release\test_diagrampath_path_dev.moc release\test_diagramtextitem_edit.moc release\test_findreplacedialog.moc release\test_performance_stress.moc release\test_performance_workflow.moc release\test_scene_management.moc release\test_file_io.moc release\test_shortcuts.moc release\test_undo_redo.moc
+del release\test_arrow_connection_system.o release\test_arrow_straight_connection.o release\test_component_signal_integrate.o release\test_connectionline_style.o release\test_dataflow_integrity.o release\test_diagramitem_properties.o release\test_diagramitem_transform.o release\test_diagramitem_types_full.o release\test_diagramitems_create.o release\test_diagrampath_connection.o release\test_diagrampath_path_dev.o release\test_diagramtextitem_edit.o release\test_findreplacedialog.o release\test_main.o release\test_performance_stress.o release\test_performance_workflow.o release\test_scene_management.o release\test_file_io.o release\test_shortcuts.o release\test_undo_redo.o release\mainwindow.o release\deletecommand.o release\diagramitem.o release\diagramitemgroup.o release\diagrampath.o release\findreplacedialog.o release\arrow.o release\diagramtextitem.o release\diagramscene.o release\qrc_diagramscene.o release\moc_mainwindow.o release\moc_diagramscene.o release\moc_diagramtextitem.o release\moc_findreplacedialog.o
+mingw32-make.exe[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug'
+D:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe -f Makefile.Debug
+mingw32-make.exe[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug'
+g++ -c -fno-keep-inline-dllexport -O0 -g --coverage -fprofile-arcs -ftest-coverage -fprofile-arcs -ftest-coverage -O0 -g -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR="\"C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug\"" -I../../../../tests -I. -IC:/Users/lenovo/Desktop/Diagramscene_ultima-main -IC:/Users/lenovo/Desktop/googletest-main/googletest/include -IC:/Users/lenovo/Desktop/googletest-main/googlemock/include -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -Idebug -I/include -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++  -o debug\test_arrow_connection_system.o ..\..\..\test_arrow_connection_system.cpp
+g++ -c -fno-keep-inline-dllexport -O0 -g --coverage -fprofile-arcs -ftest-coverage -fprofile-arcs -ftest-coverage -O0 -g -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR="\"C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_
+...(truncated)...
+
+== stderr (truncated) ==
+Cannot read C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/googletest-master/gtest_dependency.pri: No such file or directory
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\debug\qrc_diagramscene.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\debug\moc_predefs.h
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\debug\moc_mainwindow.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\debug\test_arrow_straight_connection.moc
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\debug\test_arrow_connection_system.o
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\release\qrc_diagramscene.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\release\moc_predefs.h
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\release\moc_mainwindow.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\release\test_arrow_straight_connection.moc
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-main\tests\build\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\debug\release\test_arrow_connection_system.o
+..\..\..\..\diagramitemgroup.cpp: In member function 'virtual void DiagramItemGroup::paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)':
+..\..\..\..\diagramitemgroup.cpp:60:81: warning: unused parameter 'option' [-Wunused-parameter]
+   60 | void DiagramItemGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+      |                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+..\..\..\..\diagramitem.cpp: In member function 'virtual void DiagramItem::paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*)':
+..\..\..\..\diagramitem.cpp:62:76: warning: unused parameter 'option' [-Wunused-parameter]
+   62 | void DiagramItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+      |                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+..\..\..\..\diagramscene.cpp: In member function 'virtual void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent*)':
+..\..\..\..\diagramscene.cpp:253:25: warning: variable 'newPosition' set but not used [-Wunused-but-set-variable]
+  253 |                 QPointF newPosition = movedItem->pos();
+      |                         ^~~~~~~~~~~
+..\..\..\..\diagramscene.cpp: In member function 'virtual void DiagramScene::drawForeground(QPainter*, const QRectF&)':
+..\..\..\..\diagramscene.cpp:347:68: warning: unused parameter 'rect' [-Wunused-parameter]
+  347 | void DiagramScene::drawForeground(QPainter *painter, const QRectF &rect)
+      |                                                      ~~~~~~~~~~~~~~^~~~
+..\..\..\test_main.cpp: In function 'void testMessageHandler(QtMsgType, const QMessageLogContext&, const QString&)':
+..\..\..\test_main.cpp:7:74: warning: unused parameter 'context' [-Wunused-parameter]
+    7 | static void testMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+      |                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+In file included from D:/Qt/6.10.1/mingw_64/include/QtTest/qtesteventloop.h:8,
+                 from D:/Qt/6.10.1/mingw_64/include/QtTest/qsignalspy.h:10,
+                 from D:/Qt/6.10.1/mingw_64/include/QtTest/QtTest:10,
+                 from ..\..\..\test_diagramitems_create.cpp:1:
+..\..\..\test_diagramitems_create.cpp: In member function 'void TestDiagramItemCreation::creation()':
+..\..\..\test_diagramitems_create.cpp:48:22: warning: unused variable 'expectCreated' [-Wunused-variable]
+   48 |         QFETCH(bool, expectCreated);
+      |                      ^~~~~~~~~~~~~
+D:/Qt/6.10.1/mingw_64/include/QtTest/qtestcase.h:297:10: note: in definition of macro 'QFETCH'
+  297 |     Type name = *static_cast<Type *>(QTest::qData(#name, ::qMetaTypeId<typename std::remove_cv<Type >::type>()))
+      |          ^~~~
+..\..\..\test_main.cpp: At global scope:
+..\..\..\test_main.cpp:41:12: warning: 'int qExecSilent(QObject*, int, char**)' defined but not used [-Wunused-function]
+   41 | static int qExecSilent(QObject* testObject, int argc, char** argv)
+      |            ^~~~~~~~~~~
+..\..\..\test_diagrampath_path_dev.cpp: In member function 'void TestDiagramPathPathDev::path_dev()':
+..\..\..\test_diagrampath_path_dev.cpp:83:17: warning: 'void QTest::qWarn(const char*, const char*, int)' is deprecated: Use qWarning() instead [-Wdeprecated-declarations]
+   83 |     QTest::qWarn(qPrintable(QString("瑙嗚�夊亸绉绘�ｅ父锛氳捣鐐�%1 缁堢偣%2").arg(startError).arg(endError)));
+      |     ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from D:/Qt/6.10.1/mingw_64/include/QtTest/qtesteventloop.h:8,
+                 from D:/Qt/6.10.1/mingw_64/include/QtTest/qsignalspy.h:10,
+                 from D:/Qt/6.10.1/mingw_64/include/QtTest/QtTest:10,
+                 from ..\..\..\test_diagrampath_path_dev.cpp:1:
+D:/Qt/6.10.1/mingw_64/include/QtTest/qtestcase.h:474:27: note: declared here
+  474 |     Q_TESTLIB_EXPORT void qWarn(const char *message, const char *file = nullptr, int line = 0);
+      |                           ^~~~~

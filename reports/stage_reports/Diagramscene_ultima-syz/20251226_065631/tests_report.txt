@@ -1,0 +1,41 @@
+[stage] tests
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[time] 20251226_065631
+[meta] cmd: cmd /c "set PATH=D:\Qt\6.10.1\mingw_64\bin;D:\Qt\Tools\mingw1310_64\bin;%PATH% && cd /d C:\Users\lenovo\Desktop\Diagramscene_ultima-syz && cd tests\generated && qmake tests.pro && mingw32-make clean && mingw32-make -f Makefile.Debug && debug\tests.exe && move debug\*.gc* ."
+[meta] cwd: C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[meta] returncode: 2
+[meta] timed_out: False
+[meta] timeout_s: 600.0
+
+== findings ==
+- tests | error | 测试命令执行失败
+
+== stdout (truncated) ==
+mingw32-make -f Makefile.Release clean
+mingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+del moc\moc_predefs.h
+del moc\moc_diagramscene.cpp moc\moc_diagramtextitem.cpp moc\moc_findreplacedialog.cpp moc\moc_mainwindow.cpp
+del obj\*.o obj\arrow.o obj\diagramitem.o obj\diagramitemgroup.o obj\diagrampath.o obj\diagramscene.o obj\diagramtextitem.o obj\findreplacedialog.o obj\mainwindow.o obj\moc_diagramscene.o obj\moc_diagramtextitem.o obj\moc_findreplacedialog.o obj\moc_mainwindow.o
+mingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+mingw32-make -f Makefile.Debug clean
+mingw32-make[1]: Entering directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+del moc\moc_predefs.h
+del moc\moc_diagramscene.cpp moc\moc_diagramtextitem.cpp moc\moc_findreplacedialog.cpp moc\moc_mainwindow.cpp
+del obj\*.o obj\arrow.o obj\diagramitem.o obj\diagramitemgroup.o obj\diagrampath.o obj\diagramscene.o obj\diagramtextitem.o obj\findreplacedialog.o obj\mainwindow.o obj\moc_diagramscene.o obj\moc_diagramtextitem.o obj\moc_findreplacedialog.o obj\moc_mainwindow.o
+mingw32-make[1]: Leaving directory 'C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated'
+g++ -c -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR="\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\"" -I. -I../../../Diagramscene_ultima-syz -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -Imoc -I/include -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++  -o obj\*.o C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/*.cpp
+
+== stderr (truncated) ==
+WARNING: Failure to find: C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/*.h
+WARNING: Failure to find: C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/*.cpp
+WARNING: Failure to find: C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/*.h
+WARNING: Failure to find: C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/*.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\moc_predefs.h
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\moc_diagramscene.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\obj\*.o
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\moc_predefs.h
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\moc\moc_diagramscene.cpp
+找不到 C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\tests\generated\obj\*.o
+g++: fatal error: cannot specify '-o' with '-c', '-S' or '-E' with multiple files
+compilation terminated.
+mingw32-make: *** [Makefile.Debug:1073: obj/*.o] Error 1

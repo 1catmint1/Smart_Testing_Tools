@@ -1,0 +1,13 @@
+
+============================================================
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\Smart_Testing_Tools-syz\main.py", line 244, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "C:\Users\lenovo\Desktop\Smart_Testing_Tools-syz\main.py", line 194, in main
+    return args.func(args)
+           ~~~~~~~~~^^^^^^
+  File "C:\Users\lenovo\Desktop\Smart_Testing_Tools-syz\main.py", line 115, in cmd_full_cycle
+    print("\U0001f680 完整测试生成周期")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'gbk' codec can't encode character '\U0001f680' in position 0: illegal multibyte sequence

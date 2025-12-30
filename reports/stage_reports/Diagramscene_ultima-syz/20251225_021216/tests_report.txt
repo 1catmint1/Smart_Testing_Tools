@@ -1,0 +1,14 @@
+[stage] tests
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[time] 20251225_021216
+[meta] cmd: cmd /c "set PATH=D:/Qt/6.10.1/mingw_64/bin;D:/Qt/Tools/mingw1310_64/bin;%PATH% && cd /d C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug && D:/Qt/6.10.1/mingw_64/bin/qmake.exe C:/Users/lenovo/Desktop/Diagramscene_ultima-main/tests/tests.pro -r QMAKE_CXXFLAGS+=-O0 QMAKE_CXXFLAGS+=-g QMAKE_CXXFLAGS+=--coverage QMAKE_LFLAGS+=--coverage && D:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe clean && D:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe -j && .\test_diagramitems.exe"
+[meta] cwd: C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[meta] returncode: 1
+[meta] timed_out: False
+[meta] timeout_s: 600.0
+
+== findings ==
+- tests | error | 测试命令执行失败
+
+== stderr (truncated) ==
+系统找不到指定的路径。

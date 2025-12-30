@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_062004",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\arrow.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_arrow.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_arrow.cpp",
+          "content": "#include <QtTest>\n#include <QStyleOptionGraphicsItem>\n#include <QPixmap>\n#include <QPainter>\n#include \"arrow.h\"\n#include \"diagramitem.h\"\n\nclass TestArrow : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testConstructor();\n    void testUpdatePosition();\n    void testBoundingRect();\n    void testShape();\n    void testPaint_data();\n    void testPaint();\n\nprivate:\n    DiagramItem *startItem = nullptr;\n    DiagramItem *endItem = nullptr;\n    Arrow *arrow = nullptr;\n};\n\nvoid TestArrow::initTestCase()\n{\n    // 创建两个 DiagramItem 作为箭头的起点和终点\n    startItem = new DiagramItem(DiagramItem::Step, nullptr);\n    endItem = new DiagramItem(DiagramItem::Step, nullptr);\n    startItem->setPos(0, 0);\n    endItem->setPos(100, 100);\n    arrow = new Arrow(startItem, endItem);\n}\n\nvoid TestArrow::cleanupTestCase()\n{\n    delete arrow;\n    delete startItem;\n    delete endItem;\n}\n\nvoid TestArrow::testConstructor()\n{\n    QVERIFY(arrow != nullptr);\n    QCOMPARE(arrow->startItem(), startItem);\n    QCOMPARE(arrow->endItem(), endItem);\n    QVERIFY(arrow->flags() & QGraphicsItem::ItemIsSelectable);\n}\n\nvoid TestArrow::testUpdatePosition()\n{\n    // 移动终点项，然后更新箭头位置\n    QPointF newEndPos(200, 50);\n    endItem->setPos(newEndPos);\n    arrow->updatePosition();\n    // 检查箭头线是否大致指向新的终点方向（由于箭头计算，线可能不直接连接中心）\n    // 我们主要验证 updatePosition 被调用后没有崩溃，且 line() 被设置\n    QVERIFY(!arrow->line().isNull());\n}\n\nvoid TestArrow::testBoundingRect()\n{\n    QRectF bRect = arrow->boundingRect();\n    QVERIFY(bRect.isValid());\n    // 边界矩形应包含箭头线\n    QLineF l = arrow->line();\n    QVERIFY(bRect.contains(l.p1()));\n    QVERIFY(bRect.contains(l.p2()));\n    // 由于额外的边距，边界矩形应比单纯线矩形大\n    QRectF lineRect(l.p1(), l.p2());\n    lineRect = lineRect.normalized();\n    QVERIFY(bRect.width() > lineRect.width() || bRect.height() > lineRect.height());\n}\n\nvoid TestArrow::testShape()\n{\n    QPainterPath shape = arrow->shape();\n    QVERIFY(!shape.isEmpty());\n    // 形状应包含箭头线（来自基类）和箭头头\n    QVERIFY(shape.elementCount() > 0);\n}\n\nvoid TestArrow::testPaint_data()\n{\n    QTest::addColumn<bool>(\"selected\");\n    QTest::newRow(\"not selected\") << false;\n    QTest::newRow(\"selected\") << true;\n}\n\nvoid TestArrow::testPaint()\n{\n    QFETCH(bool, selected);\n    arrow->setSelected(selected);\n    // 创建一个像素图和一个画家，尝试绘制箭头\n    // 这主要验证 paint 函数不会在给定条件下崩溃\n    QPixmap pixmap(300, 300);\n    pixmap.fill(Qt::transparent);\n    QPainter painter(&pixmap);\n    QStyleOptionGraphicsItem option;\n    arrow->paint(&painter, &option, nullptr);\n    // 如果没有崩溃，测试通过\n    QVERIFY(true);\n}\n\nQTEST_MAIN(TestArrow)\n#include \"test_arrow.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = tests\nCONFIG += console testcase\nQT += testlib widgets svg\n\n# 假设项目根目录为 C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\n# 我们需要包含被测文件 arrow.cpp 及其依赖的头文件\n\n# 包含项目根目录下的源文件和头文件\nINCLUDEPATH += $$PWD/..\n\n# 源文件：测试文件和被测文件\nSOURCES += \\\n    test_arrow.cpp \\\n    ../arrow.cpp\n\n# 头文件\nHEADERS += \\\n    ../arrow.h \\\n    ../diagramitem.h\n\n# 对于 Windows，可能需要定义 _USE_MATH_DEFINES 来使用 M_PI\nwin32 {\n    DEFINES += _USE_MATH_DEFINES\n}\n\n# 输出目录\nDESTDIR = $$PWD/bin\nOBJECTS_DIR = $$PWD/obj\nMOC_DIR = $$PWD/moc\nRCC_DIR = $$PWD/rcc\nUI_DIR = $$PWD/ui\nQMAKE_CXXFLAGS += --coverage\nQMAKE_LFLAGS += --coverage"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 6
+      }
+    },
+    "applied": [
+      "tests/generated/test_arrow.cpp (6 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 6
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 6 个用例",
+      "details": "生成文件明细：\ntests/generated/test_arrow.cpp (6 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

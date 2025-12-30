@@ -1,0 +1,406 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtGui/qfont.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2016 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QFONT_H
+        -:    5:#define QFONT_H
+        -:    6:
+        -:    7:#include <QtCore/qcompare.h>
+        -:    8:#include <QtCore/qendian.h>
+        -:    9:#include <QtCore/qshareddata.h>
+        -:   10:#include <QtGui/qtguiglobal.h>
+        -:   11:#include <QtGui/qwindowdefs.h>
+        -:   12:#include <QtCore/qstring.h>
+        -:   13:
+        -:   14:
+        -:   15:QT_BEGIN_NAMESPACE
+        -:   16:
+        -:   17:
+        -:   18:class QFontPrivate;                                     /* don't touch */
+        -:   19:class QVariant;
+        -:   20:
+        -:   21:class Q_GUI_EXPORT QFont
+        -:   22:{
+        -:   23:    Q_GADGET
+        -:   24:public:
+        -:   25:    enum StyleHint {
+        -:   26:        Helvetica,  SansSerif = Helvetica,
+        -:   27:        Times,      Serif = Times,
+        -:   28:        Courier,    TypeWriter = Courier,
+        -:   29:        OldEnglish, Decorative = OldEnglish,
+        -:   30:        System,
+        -:   31:        AnyStyle,
+        -:   32:        Cursive,
+        -:   33:        Monospace,
+        -:   34:        Fantasy
+        -:   35:    };
+        -:   36:    Q_ENUM(StyleHint)
+        -:   37:
+        -:   38:    enum StyleStrategy {
+        -:   39:        PreferDefault           = 0x0001,
+        -:   40:        PreferBitmap            = 0x0002,
+        -:   41:        PreferDevice            = 0x0004,
+        -:   42:        PreferOutline           = 0x0008,
+        -:   43:        ForceOutline            = 0x0010,
+        -:   44:        PreferMatch             = 0x0020,
+        -:   45:        PreferQuality           = 0x0040,
+        -:   46:        PreferAntialias         = 0x0080,
+        -:   47:        NoAntialias             = 0x0100,
+        -:   48:        NoSubpixelAntialias     = 0x0800,
+        -:   49:        PreferNoShaping         = 0x1000,
+        -:   50:        ContextFontMerging      = 0x2000,
+        -:   51:        PreferTypoLineMetrics   = 0x4000,
+        -:   52:        NoFontMerging           = 0x8000
+        -:   53:    };
+        -:   54:    Q_ENUM(StyleStrategy)
+        -:   55:
+        -:   56:    enum HintingPreference {
+        -:   57:        PreferDefaultHinting        = 0,
+        -:   58:        PreferNoHinting             = 1,
+        -:   59:        PreferVerticalHinting       = 2,
+        -:   60:        PreferFullHinting           = 3
+        -:   61:    };
+        -:   62:    Q_ENUM(HintingPreference)
+        -:   63:
+        -:   64:    enum Weight {
+        -:   65:        Thin = 100,
+        -:   66:        ExtraLight = 200,
+        -:   67:        Light = 300,
+        -:   68:        Normal = 400,
+        -:   69:        Medium = 500,
+        -:   70:        DemiBold = 600,
+        -:   71:        Bold = 700,
+        -:   72:        ExtraBold = 800,
+        -:   73:        Black = 900
+        -:   74:    };
+        -:   75:    Q_ENUM(Weight)
+        -:   76:
+        -:   77:    enum Style {
+        -:   78:        StyleNormal,
+        -:   79:        StyleItalic,
+        -:   80:        StyleOblique
+        -:   81:    };
+        -:   82:    Q_ENUM(Style)
+        -:   83:
+        -:   84:    enum Stretch {
+        -:   85:        AnyStretch     =   0,
+        -:   86:        UltraCondensed =  50,
+        -:   87:        ExtraCondensed =  62,
+        -:   88:        Condensed      =  75,
+        -:   89:        SemiCondensed  =  87,
+        -:   90:        Unstretched    = 100,
+        -:   91:        SemiExpanded   = 112,
+        -:   92:        Expanded       = 125,
+        -:   93:        ExtraExpanded  = 150,
+        -:   94:        UltraExpanded  = 200
+        -:   95:    };
+        -:   96:    Q_ENUM(Stretch)
+        -:   97:
+        -:   98:    enum Capitalization {
+        -:   99:        MixedCase,
+        -:  100:        AllUppercase,
+        -:  101:        AllLowercase,
+        -:  102:        SmallCaps,
+        -:  103:        Capitalize
+        -:  104:    };
+        -:  105:    Q_ENUM(Capitalization)
+        -:  106:
+        -:  107:    enum SpacingType {
+        -:  108:        PercentageSpacing,
+        -:  109:        AbsoluteSpacing
+        -:  110:    };
+        -:  111:    Q_ENUM(SpacingType)
+        -:  112:
+        -:  113:    enum ResolveProperties {
+        -:  114:        NoPropertiesResolved        = 0x0000,
+        -:  115:        FamilyResolved              = 0x0001,
+        -:  116:        SizeResolved                = 0x0002,
+        -:  117:        StyleHintResolved           = 0x0004,
+        -:  118:        StyleStrategyResolved       = 0x0008,
+        -:  119:        WeightResolved              = 0x0010,
+        -:  120:        StyleResolved               = 0x0020,
+        -:  121:        UnderlineResolved           = 0x0040,
+        -:  122:        OverlineResolved            = 0x0080,
+        -:  123:        StrikeOutResolved           = 0x0100,
+        -:  124:        FixedPitchResolved          = 0x0200,
+        -:  125:        StretchResolved             = 0x0400,
+        -:  126:        KerningResolved             = 0x0800,
+        -:  127:        CapitalizationResolved      = 0x1000,
+        -:  128:        LetterSpacingResolved       = 0x2000,
+        -:  129:        WordSpacingResolved         = 0x4000,
+        -:  130:        HintingPreferenceResolved   = 0x8000,
+        -:  131:        StyleNameResolved           = 0x10000,
+        -:  132:        FamiliesResolved            = 0x20000,
+        -:  133:        FeaturesResolved            = 0x40000,
+        -:  134:        VariableAxesResolved        = 0x80000,
+        -:  135:        AllPropertiesResolved       = 0xfffff
+        -:  136:    };
+        -:  137:    Q_ENUM(ResolveProperties)
+        -:  138:
+        -:  139:    QFont();
+        -:  140:
+        -:  141:    QFont(const QString &family, int pointSize = -1, int weight = -1, bool italic = false);
+        -:  142:    explicit QFont(const QStringList &families, int pointSize = -1, int weight = -1, bool italic = false);
+        -:  143:    QFont(const QFont &font, const QPaintDevice *pd);
+        -:  144:    QFont(const QFont &font);
+        -:  145:    ~QFont();
+        -:  146:
+        -:  147:    void swap(QFont &other) noexcept
+        -:  148:    { d.swap(other.d); std::swap(resolve_mask, other.resolve_mask); }
+        -:  149:
+        -:  150:    QString family() const;
+        -:  151:    void setFamily(const QString &);
+        -:  152:
+        -:  153:    QStringList families() const;
+        -:  154:    void setFamilies(const QStringList &);
+        -:  155:
+        -:  156:    QString styleName() const;
+        -:  157:    void setStyleName(const QString &);
+        -:  158:
+        -:  159:    int pointSize() const;
+        -:  160:    void setPointSize(int);
+        -:  161:    qreal pointSizeF() const;
+        -:  162:    void setPointSizeF(qreal);
+        -:  163:
+        -:  164:    int pixelSize() const;
+        -:  165:    void setPixelSize(int);
+        -:  166:
+        -:  167:    Weight weight() const;
+        -:  168:    void setWeight(Weight weight);
+        -:  169:
+        -:  170:    inline bool bold() const;
+        -:  171:    inline void setBold(bool);
+        -:  172:
+        -:  173:    void setStyle(Style style);
+        -:  174:    Style style() const;
+        -:  175:
+        -:  176:    inline bool italic() const;
+        -:  177:    inline void setItalic(bool b);
+        -:  178:
+        -:  179:    bool underline() const;
+        -:  180:    void setUnderline(bool);
+        -:  181:
+        -:  182:    bool overline() const;
+        -:  183:    void setOverline(bool);
+        -:  184:
+        -:  185:    bool strikeOut() const;
+        -:  186:    void setStrikeOut(bool);
+        -:  187:
+        -:  188:    bool fixedPitch() const;
+        -:  189:    void setFixedPitch(bool);
+        -:  190:
+        -:  191:    bool kerning() const;
+        -:  192:    void setKerning(bool);
+        -:  193:
+        -:  194:    StyleHint styleHint() const;
+        -:  195:    StyleStrategy styleStrategy() const;
+        -:  196:    void setStyleHint(StyleHint, StyleStrategy = PreferDefault);
+        -:  197:    void setStyleStrategy(StyleStrategy s);
+        -:  198:
+        -:  199:    int stretch() const;
+        -:  200:    void setStretch(int);
+        -:  201:
+        -:  202:    qreal letterSpacing() const;
+        -:  203:    SpacingType letterSpacingType() const;
+        -:  204:    void setLetterSpacing(SpacingType type, qreal spacing);
+        -:  205:
+        -:  206:    qreal wordSpacing() const;
+        -:  207:    void setWordSpacing(qreal spacing);
+        -:  208:
+        -:  209:    void setCapitalization(Capitalization);
+        -:  210:    Capitalization capitalization() const;
+        -:  211:
+        -:  212:    void setHintingPreference(HintingPreference hintingPreference);
+        -:  213:    HintingPreference hintingPreference() const;
+        -:  214:
+        -:  215:    struct Tag
+        -:  216:    {
+        -:  217:        constexpr Tag() = default;
+        -:  218:
+        -:  219:        template <size_t N>
+        -:  220:        constexpr Q_IMPLICIT Tag(const char (&str)[N]) noexcept
+        -:  221:            :  m_value((quint32(str[0]) << 24) | (quint32(str[1]) << 16)
+        -:  222:                     | (quint32(str[2]) << 8) | quint32(str[3]))
+        -:  223:        {
+        -:  224:            static_assert(N == 5, "The tag name must be exactly 4 characters long!");
+        -:  225:        }
+        -:  226:
+        -:  227:        constexpr bool isValid() const noexcept { return m_value != 0; }
+        -:  228:        constexpr quint32 value() const noexcept { return m_value; }
+        -:  229:
+        -:  230:        QByteArray toString() const
+        -:  231:        {
+        -:  232:            const char data[] = {
+        -:  233:                char((m_value & 0xff000000) >> 24),
+        -:  234:                char((m_value & 0x00ff0000) >> 16),
+        -:  235:                char((m_value & 0x0000ff00) >> 8),
+        -:  236:                char((m_value & 0x000000ff)) };
+        -:  237:            return QByteArray(data, sizeof(data));
+        -:  238:        }
+        -:  239:
+        -:  240:        static constexpr std::optional<Tag> fromValue(quint32 value) noexcept
+        -:  241:        {
+        -:  242:            Tag maybeTag;
+        -:  243:            maybeTag.m_value = value;
+        -:  244:            return maybeTag.isValid() ? std::optional<Tag>(maybeTag) : std::nullopt;
+        -:  245:        }
+        -:  246:        Q_GUI_EXPORT static std::optional<Tag> fromString(QAnyStringView view) noexcept;
+        -:  247:
+        -:  248:#ifndef QT_NO_DATASTREAM
+        -:  249:        friend Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, Tag);
+        -:  250:        friend Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, Tag &);
+        -:  251:#endif
+        -:  252:
+        -:  253:#ifndef QT_NO_DEBUG_STREAM
+        -:  254:        friend Q_GUI_EXPORT QDebug operator<<(QDebug debug, Tag tag);
+        -:  255:#endif
+        -:  256:
+        -:  257:        friend constexpr size_t qHash(Tag key, size_t seed = 0) noexcept
+        -:  258:        { return qHash(key.value(), seed); }
+        -:  259:
+        -:  260:    private:
+        -:  261:        friend constexpr bool comparesEqual(const Tag &lhs, const Tag &rhs) noexcept
+        -:  262:        { return lhs.m_value == rhs.m_value; }
+        -:  263:        friend constexpr Qt::strong_ordering compareThreeWay(const Tag &lhs, const Tag &rhs) noexcept
+        -:  264:        { return Qt::compareThreeWay(lhs.m_value, rhs.m_value); }
+        -:  265:        Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(QFont::Tag)
+        -:  266:
+        -:  267:        quint32 m_value = 0;
+        -:  268:    };
+        -:  269:
+        -:  270:    void setFeature(Tag tag, quint32 value);
+        -:  271:    void unsetFeature(Tag tag);
+        -:  272:    quint32 featureValue(Tag tag) const;
+        -:  273:    bool isFeatureSet(Tag tag) const;
+        -:  274:    QList<Tag> featureTags() const;
+        -:  275:    void clearFeatures();
+        -:  276:
+        -:  277:    void setVariableAxis(Tag tag, float value);
+        -:  278:    void unsetVariableAxis(Tag tag);
+        -:  279:    bool isVariableAxisSet(Tag tag) const;
+        -:  280:    float variableAxisValue(Tag tag) const;
+        -:  281:    void clearVariableAxes();
+        -:  282:    QList<Tag> variableAxisTags() const;
+        -:  283:
+        -:  284:    // dupicated from QFontInfo
+        -:  285:    bool exactMatch() const;
+        -:  286:
+        -:  287:    QFont &operator=(const QFont &);
+        -:  288:    bool operator==(const QFont &) const;
+        -:  289:    bool operator!=(const QFont &) const;
+        -:  290:    bool operator<(const QFont &) const;
+        -:  291:    operator QVariant() const;
+        -:  292:    bool isCopyOf(const QFont &) const;
+        -:  293:    QT_MOVE_ASSIGNMENT_OPERATOR_IMPL_VIA_PURE_SWAP(QFont)
+        -:  294:
+        -:  295:    QString key() const;
+        -:  296:
+        -:  297:    QString toString() const;
+        -:  298:    bool fromString(const QString &);
+        -:  299:
+        -:  300:    static QString substitute(const QString &);
+        -:  301:    static QStringList substitutes(const QString &);
+        -:  302:    static QStringList substitutions();
+        -:  303:    static void insertSubstitution(const QString&, const QString &);
+        -:  304:    static void insertSubstitutions(const QString&, const QStringList &);
+        -:  305:    static void removeSubstitutions(const QString &);
+        -:  306:    static void initialize();
+        -:  307:    static void cleanup();
+        -:  308:    static void cacheStatistics();
+        -:  309:
+        -:  310:    QString defaultFamily() const;
+        -:  311:
+        -:  312:    QFont resolve(const QFont &) const;
+        -:  313:    inline uint resolveMask() const { return resolve_mask; }
+        -:  314:    inline void setResolveMask(uint mask) { resolve_mask = mask; }
+        -:  315:
+        -:  316:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  317:    QT_DEPRECATED_VERSION_X_6_0("Use setWeight() instead") void setLegacyWeight(int legacyWeight);
+        -:  318:    QT_DEPRECATED_VERSION_X_6_0("Use weight() instead") int legacyWeight() const;
+        -:  319:#endif
+        -:  320:
+        -:  321:private:
+        -:  322:    explicit QFont(QFontPrivate *);
+        -:  323:
+        -:  324:    void detach();
+        -:  325:
+        -:  326:
+        -:  327:    friend class QFontPrivate;
+        -:  328:    friend class QFontDialogPrivate;
+        -:  329:    friend class QFontMetrics;
+        -:  330:    friend class QFontMetricsF;
+        -:  331:    friend class QFontInfo;
+        -:  332:    friend class QPainter;
+        -:  333:    friend class QPainterPrivate;
+        -:  334:    friend class QApplication;
+        -:  335:    friend class QWidget;
+        -:  336:    friend class QWidgetPrivate;
+        -:  337:    friend class QTextLayout;
+        -:  338:    friend class QTextEngine;
+        -:  339:    friend class QStackTextEngine;
+        -:  340:    friend class QTextLine;
+        -:  341:    friend struct QScriptLine;
+        -:  342:    friend class QOpenGLContext;
+        -:  343:    friend class QWin32PaintEngine;
+        -:  344:    friend class QAlphaPaintEngine;
+        -:  345:    friend class QPainterPath;
+        -:  346:    friend class QTextItemInt;
+        -:  347:    friend class QPicturePaintEngine;
+        -:  348:    friend class QPainterReplayer;
+        -:  349:    friend class QPaintBufferEngine;
+        -:  350:    friend class QCommandLinkButtonPrivate;
+        -:  351:    friend class QFontEngine;
+        -:  352:
+        -:  353:#ifndef QT_NO_DATASTREAM
+        -:  354:    friend Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, const QFont &);
+        -:  355:    friend Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, QFont &);
+        -:  356:#endif
+        -:  357:
+        -:  358:#ifndef QT_NO_DEBUG_STREAM
+        -:  359:    friend Q_GUI_EXPORT QDebug operator<<(QDebug, const QFont &);
+        -:  360:#endif
+        -:  361:
+        -:  362:    QExplicitlySharedDataPointer<QFontPrivate> d;
+        -:  363:    uint resolve_mask;
+        -:  364:};
+        -:  365:
+        -:  366:Q_DECLARE_SHARED(QFont)
+        -:  367:
+        -:  368:Q_GUI_EXPORT size_t qHash(const QFont &font, size_t seed = 0) noexcept;
+        -:  369:
+    #####:  370:inline bool QFont::bold() const
+    #####:  371:{ return weight() > Medium; }
+        -:  372:
+        -:  373:
+    #####:  374:inline void QFont::setBold(bool enable)
+    #####:  375:{ setWeight(enable ? Bold : Normal); }
+        -:  376:
+    #####:  377:inline bool QFont::italic() const
+        -:  378:{
+    #####:  379:    return (style() != StyleNormal);
+        -:  380:}
+        -:  381:
+    #####:  382:inline void QFont::setItalic(bool b) {
+    #####:  383:    setStyle(b ? StyleItalic : StyleNormal);
+    #####:  384:}
+        -:  385:
+        -:  386:
+        -:  387:/*****************************************************************************
+        -:  388:  QFont stream functions
+        -:  389: *****************************************************************************/
+        -:  390:
+        -:  391:#ifndef QT_NO_DATASTREAM
+        -:  392:Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, const QFont &);
+        -:  393:Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, QFont &);
+        -:  394:#endif
+        -:  395:
+        -:  396:#ifndef QT_NO_DEBUG_STREAM
+        -:  397:Q_GUI_EXPORT QDebug operator<<(QDebug, const QFont &);
+        -:  398:#endif
+        -:  399:
+        -:  400:QT_END_NAMESPACE
+        -:  401:
+        -:  402:#endif // QFONT_H

@@ -1,0 +1,1709 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qmap.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+        -:    2:// Copyright (C) 2021 The Qt Company Ltd.
+        -:    3:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    4:
+        -:    5:#ifndef QMAP_H
+        -:    6:#define QMAP_H
+        -:    7:
+        -:    8:#include <QtCore/qcompare.h>
+        -:    9:#include <QtCore/qhashfunctions.h>
+        -:   10:#include <QtCore/qiterator.h>
+        -:   11:#include <QtCore/qlist.h>
+        -:   12:#include <QtCore/qrefcount.h>
+        -:   13:#include <QtCore/qpair.h>
+        -:   14:#include <QtCore/qshareddata.h>
+        -:   15:#include <QtCore/qshareddata_impl.h>
+        -:   16:#include <QtCore/qttypetraits.h>
+        -:   17:
+        -:   18:#include <functional>
+        -:   19:#include <initializer_list>
+        -:   20:#include <map>
+        -:   21:#include <algorithm>
+        -:   22:
+        -:   23:QT_BEGIN_NAMESPACE
+        -:   24:
+        -:   25:// common code shared between QMap and QMultimap
+        -:   26:template <typename AMap>
+        -:   27:class QMapData : public QSharedData
+        -:   28:{
+        -:   29:public:
+        -:   30:    using Map = AMap;
+        -:   31:    using Key = typename Map::key_type;
+        -:   32:    using T = typename Map::mapped_type;
+        -:   33:    using value_type = typename Map::value_type;
+        -:   34:    using size_type = typename Map::size_type;
+        -:   35:    using iterator = typename Map::iterator;
+        -:   36:    using const_iterator = typename Map::const_iterator;
+        -:   37:
+        -:   38:    static_assert(std::is_nothrow_destructible_v<Key>, "Types with throwing destructors are not supported in Qt containers.");
+        -:   39:    static_assert(std::is_nothrow_destructible_v<T>, "Types with throwing destructors are not supported in Qt containers.");
+        -:   40:
+        -:   41:    Map m;
+        -:   42:
+    #####:   43:    QMapData() = default;
+------------------
+_ZN8QMapDataISt3mapIiP11DiagramItemSt4lessIiESaISt4pairIKiS2_EEEEC1Ev:
+    #####:   43:    QMapData() = default;
+------------------
+_ZN8QMapDataISt3mapIP11DiagramItemiSt4lessIS2_ESaISt4pairIKS2_iEEEEC1Ev:
+    #####:   43:    QMapData() = default;
+------------------
+_ZN8QMapDataISt3mapIP11DiagramPath7QStringSt4lessIS2_ESaISt4pairIKS2_S3_EEEEC1Ev:
+    #####:   43:    QMapData() = default;
+------------------
+        -:   44:    explicit QMapData(const Map &other)
+        -:   45:        : m(other)
+        -:   46:    {}
+        -:   47:
+        -:   48:    explicit QMapData(Map &&other)
+        -:   49:        : m(std::move(other))
+        -:   50:    {}
+        -:   51:
+        -:   52:    // used in remove(); copies from source all the values not matching key.
+        -:   53:    // returns how many were NOT copied (removed).
+        -:   54:    size_type copyIfNotEquivalentTo(const Map &source, const Key &key)
+        -:   55:    {
+        -:   56:        Q_ASSERT(m.empty());
+        -:   57:
+        -:   58:        size_type result = 0;
+        -:   59:        const auto &keyCompare = source.key_comp();
+        -:   60:        const auto filter = [&result, &key, &keyCompare](const auto &v)
+        -:   61:        {
+        -:   62:            if (!keyCompare(key, v.first) && !keyCompare(v.first, key)) {
+        -:   63:                // keys are equivalent (neither a<b nor b<a) => found it
+        -:   64:                ++result;
+        -:   65:                return true;
+        -:   66:            }
+        -:   67:            return false;
+        -:   68:        };
+        -:   69:
+        -:   70:        std::remove_copy_if(source.cbegin(), source.cend(),
+        -:   71:                            std::inserter(m, m.end()),
+        -:   72:                            filter);
+        -:   73:        return result;
+        -:   74:    }
+        -:   75:
+        -:   76:    // used in key(T), count(Key, T), find(key, T), etc; returns a
+        -:   77:    // comparator object suitable for algorithms with std::(multi)map
+        -:   78:    // iterators.
+        -:   79:    static auto valueIsEqualTo(const T &value)
+        -:   80:    {
+        -:   81:        return [&value](const auto &v) { return v.second == value; };
+        -:   82:    }
+        -:   83:
+        -:   84:    Key key(const T &value, const Key &defaultKey) const
+        -:   85:    {
+        -:   86:        auto i = std::find_if(m.cbegin(),
+        -:   87:                              m.cend(),
+        -:   88:                              valueIsEqualTo(value));
+        -:   89:        if (i != m.cend())
+        -:   90:            return i->first;
+        -:   91:
+        -:   92:        return defaultKey;
+        -:   93:    }
+        -:   94:
+        -:   95:    QList<Key> keys() const
+        -:   96:    {
+        -:   97:        QList<Key> result;
+        -:   98:        result.reserve(m.size());
+        -:   99:
+        -:  100:        const auto extractKey = [](const auto &v) { return v.first; };
+        -:  101:
+        -:  102:        std::transform(m.cbegin(),
+        -:  103:                       m.cend(),
+        -:  104:                       std::back_inserter(result),
+        -:  105:                       extractKey);
+        -:  106:        return result;
+        -:  107:    }
+        -:  108:
+        -:  109:    QList<Key> keys(const T &value) const
+        -:  110:    {
+        -:  111:        QList<Key> result;
+        -:  112:        result.reserve(m.size());
+        -:  113:        // no std::transform_if...
+        -:  114:        for (const auto &v : m) {
+        -:  115:            if (v.second == value)
+        -:  116:                result.append(v.first);
+        -:  117:        }
+        -:  118:        result.shrink_to_fit();
+        -:  119:        return result;
+        -:  120:    }
+        -:  121:
+        -:  122:    QList<T> values() const
+        -:  123:    {
+        -:  124:        QList<T> result;
+        -:  125:        result.reserve(m.size());
+        -:  126:
+        -:  127:        const auto extractValue = [](const auto &v) { return v.second; };
+        -:  128:
+        -:  129:        std::transform(m.cbegin(),
+        -:  130:                       m.cend(),
+        -:  131:                       std::back_inserter(result),
+        -:  132:                       extractValue);
+        -:  133:        return result;
+        -:  134:    }
+        -:  135:
+        -:  136:    size_type count(const Key &key) const
+        -:  137:    {
+        -:  138:        return m.count(key);
+        -:  139:    }
+        -:  140:
+        -:  141:    // Used in erase. Allocates a new QMapData and copies, from this->m,
+        -:  142:    // the elements not in the [first, last) range. The return contains
+        -:  143:    // the new QMapData and an iterator in its map pointing at the first
+        -:  144:    // element after the erase.
+        -:  145:    struct EraseResult {
+        -:  146:        QMapData *data;
+        -:  147:        iterator it;
+        -:  148:    };
+        -:  149:
+        -:  150:    EraseResult erase(const_iterator first, const_iterator last) const
+        -:  151:    {
+        -:  152:        EraseResult result;
+        -:  153:        result.data = new QMapData;
+        -:  154:        result.it = result.data->m.end();
+        -:  155:        const auto newDataEnd = result.it;
+        -:  156:
+        -:  157:        auto i = m.begin();
+        -:  158:        const auto e = m.end();
+        -:  159:
+        -:  160:        // copy over all the elements before first
+        -:  161:        while (i != first) {
+        -:  162:            result.it = result.data->m.insert(newDataEnd, *i);
+        -:  163:            ++i;
+        -:  164:        }
+        -:  165:
+        -:  166:        // skip until last
+        -:  167:        while (i != last)
+        -:  168:            ++i;
+        -:  169:
+        -:  170:        // copy from last to the end
+        -:  171:        while (i != e) {
+        -:  172:            result.data->m.insert(newDataEnd, *i);
+        -:  173:            ++i;
+        -:  174:        }
+        -:  175:
+        -:  176:        if (result.it != newDataEnd)
+        -:  177:            ++result.it;
+        -:  178:
+        -:  179:        return result;
+        -:  180:    }
+        -:  181:};
+        -:  182:
+        -:  183://
+        -:  184:// QMap
+        -:  185://
+        -:  186:
+        -:  187:template <class Key, class T>
+        -:  188:class QMap
+        -:  189:{
+        -:  190:    using Map = std::map<Key, T>;
+        -:  191:    using MapData = QMapData<Map>;
+        -:  192:    QtPrivate::QExplicitlySharedDataPointerV2<MapData> d;
+        -:  193:
+        -:  194:    friend class QMultiMap<Key, T>;
+        -:  195:
+        -:  196:public:
+        -:  197:    using key_type = Key;
+        -:  198:    using mapped_type = T;
+        -:  199:    using difference_type = qptrdiff;
+        -:  200:    using size_type = qsizetype;
+        -:  201:
+      20*:  202:    QMap() = default;
+------------------
+_ZN4QMapIP11DiagramPath7QStringEC1Ev:
+       20:  202:    QMap() = default;
+------------------
+_ZN4QMapIiP11DiagramItemEC1Ev:
+    #####:  202:    QMap() = default;
+------------------
+_ZN4QMapIP11DiagramItemiEC1Ev:
+    #####:  202:    QMap() = default;
+------------------
+        -:  203:
+        -:  204:    // implicitly generated special member functions are OK!
+        -:  205:
+        -:  206:    void swap(QMap<Key, T> &other) noexcept
+        -:  207:    {
+        -:  208:        d.swap(other.d);
+        -:  209:    }
+        -:  210:
+        -:  211:    QMap(std::initializer_list<std::pair<Key, T>> list)
+        -:  212:    {
+        -:  213:        for (auto &p : list)
+        -:  214:            insert(p.first, p.second);
+        -:  215:    }
+        -:  216:
+        -:  217:    explicit QMap(const std::map<Key, T> &other)
+        -:  218:        : d(other.empty() ? nullptr : new MapData(other))
+        -:  219:    {
+        -:  220:    }
+        -:  221:
+        -:  222:    explicit QMap(std::map<Key, T> &&other)
+        -:  223:        : d(other.empty() ? nullptr : new MapData(std::move(other)))
+        -:  224:    {
+        -:  225:    }
+        -:  226:
+        -:  227:    std::map<Key, T> toStdMap() const &
+        -:  228:    {
+        -:  229:        if (d)
+        -:  230:            return d->m;
+        -:  231:        return {};
+        -:  232:    }
+        -:  233:
+        -:  234:    std::map<Key, T> toStdMap() &&
+        -:  235:    {
+        -:  236:        if (d) {
+        -:  237:            if (d.isShared())
+        -:  238:                return d->m;
+        -:  239:            else
+        -:  240:                return std::move(d->m);
+        -:  241:        }
+        -:  242:
+        -:  243:        return {};
+        -:  244:    }
+        -:  245:
+        -:  246:#ifndef Q_QDOC
+        -:  247:private:
+        -:  248:    template <typename AKey = Key, typename AT = T,
+        -:  249:              QTypeTraits::compare_eq_result_container<QMap, AKey, AT> = true>
+        -:  250:    friend bool comparesEqual(const QMap &lhs, const QMap &rhs)
+        -:  251:    {
+        -:  252:        if (lhs.d == rhs.d)
+        -:  253:            return true;
+        -:  254:        if (!lhs.d)
+        -:  255:            return rhs == lhs;
+        -:  256:        Q_ASSERT(lhs.d);
+        -:  257:        return rhs.d ? (lhs.d->m == rhs.d->m) : lhs.d->m.empty();
+        -:  258:    }
+        -:  259:    QT_DECLARE_EQUALITY_OPERATORS_HELPER(QMap, QMap, /* non-constexpr */, noexcept(false),
+        -:  260:                        template <typename AKey = Key, typename AT = T,
+        -:  261:                                  QTypeTraits::compare_eq_result_container<QMap, AKey, AT> = true>)
+        -:  262:    // TODO: add the other comparison operators; std::map has them.
+        -:  263:public:
+        -:  264:#else
+        -:  265:    friend bool operator==(const QMap &lhs, const QMap &rhs);
+        -:  266:    friend bool operator!=(const QMap &lhs, const QMap &rhs);
+        -:  267:#endif // Q_QDOC
+        -:  268:
+        -:  269:    size_type size() const { return d ? size_type(d->m.size()) : size_type(0); }
+        -:  270:
+        -:  271:    [[nodiscard]]
+        -:  272:    bool isEmpty() const { return d ? d->m.empty() : true; }
+        -:  273:
+    #####:  274:    void detach()
+        -:  275:    {
+    #####:  276:        if (d)
+    #####:  277:            d.detach();
+        -:  278:        else
+    #####:  279:            d.reset(new MapData);
+    #####:  280:    }
+------------------
+_ZN4QMapIiP11DiagramItemE6detachEv:
+    #####:  274:    void detach()
+        -:  275:    {
+    #####:  276:        if (d)
+    #####:  277:            d.detach();
+        -:  278:        else
+    #####:  279:            d.reset(new MapData);
+    #####:  280:    }
+------------------
+_ZN4QMapIP11DiagramItemiE6detachEv:
+    #####:  274:    void detach()
+        -:  275:    {
+    #####:  276:        if (d)
+    #####:  277:            d.detach();
+        -:  278:        else
+    #####:  279:            d.reset(new MapData);
+    #####:  280:    }
+------------------
+_ZN4QMapIP11DiagramPath7QStringE6detachEv:
+    #####:  274:    void detach()
+        -:  275:    {
+    #####:  276:        if (d)
+    #####:  277:            d.detach();
+        -:  278:        else
+    #####:  279:            d.reset(new MapData);
+    #####:  280:    }
+------------------
+        -:  281:
+        -:  282:    bool isDetached() const noexcept
+        -:  283:    {
+        -:  284:        return d ? !d.isShared() : false; // false makes little sense, but that's shared_null's behavior...
+        -:  285:    }
+        -:  286:
+        -:  287:    bool isSharedWith(const QMap<Key, T> &other) const noexcept
+        -:  288:    {
+        -:  289:        return d == other.d; // also this makes little sense?
+        -:  290:    }
+        -:  291:
+        -:  292:    void clear()
+        -:  293:    {
+        -:  294:        if (!d)
+        -:  295:            return;
+        -:  296:
+        -:  297:        if (!d.isShared())
+        -:  298:            d->m.clear();
+        -:  299:        else
+        -:  300:            d.reset();
+        -:  301:    }
+        -:  302:
+        -:  303:    size_type remove(const Key &key)
+        -:  304:    {
+        -:  305:        if (!d)
+        -:  306:            return 0;
+        -:  307:
+        -:  308:        if (!d.isShared())
+        -:  309:            return size_type(d->m.erase(key));
+        -:  310:
+        -:  311:        MapData *newData = new MapData;
+        -:  312:        size_type result = newData->copyIfNotEquivalentTo(d->m, key);
+        -:  313:
+        -:  314:        d.reset(newData);
+        -:  315:
+        -:  316:        return result;
+        -:  317:    }
+        -:  318:
+        -:  319:    template <typename Predicate>
+        -:  320:    size_type removeIf(Predicate pred)
+        -:  321:    {
+        -:  322:        return QtPrivate::associative_erase_if(*this, pred);
+        -:  323:    }
+        -:  324:
+        -:  325:    T take(const Key &key)
+        -:  326:    {
+        -:  327:        if (!d)
+        -:  328:            return T();
+        -:  329:
+        -:  330:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+        -:  331:        // TODO: improve. There is no need of copying all the
+        -:  332:        // elements (the one to be removed can be skipped).
+        -:  333:        detach();
+        -:  334:
+        -:  335:#ifdef __cpp_lib_node_extract
+        -:  336:        if (const auto node = d->m.extract(key))
+        -:  337:            return std::move(node.mapped());
+        -:  338:#else
+        -:  339:        auto i = d->m.find(key);
+        -:  340:        if (i != d->m.end()) {
+        -:  341:            // ### breaks RVO on most compilers (but only on old-fashioned ones, so who cares?)
+        -:  342:            T result(std::move(i->second));
+        -:  343:            d->m.erase(i);
+        -:  344:            return result;
+        -:  345:        }
+        -:  346:#endif
+        -:  347:        return T();
+        -:  348:    }
+        -:  349:
+        -:  350:    bool contains(const Key &key) const
+        -:  351:    {
+        -:  352:        if (!d)
+        -:  353:            return false;
+        -:  354:        auto i = d->m.find(key);
+        -:  355:        return i != d->m.end();
+        -:  356:    }
+        -:  357:
+        -:  358:    Key key(const T &value, const Key &defaultKey = Key()) const
+        -:  359:    {
+        -:  360:        if (!d)
+        -:  361:            return defaultKey;
+        -:  362:
+        -:  363:        return d->key(value, defaultKey);
+        -:  364:    }
+        -:  365:
+        -:  366:    T value(const Key &key, const T &defaultValue = T()) const
+        -:  367:    {
+        -:  368:        if (!d)
+        -:  369:            return defaultValue;
+        -:  370:        const auto i = d->m.find(key);
+        -:  371:        if (i != d->m.cend())
+        -:  372:            return i->second;
+        -:  373:        return defaultValue;
+        -:  374:    }
+        -:  375:
+    #####:  376:    T &operator[](const Key &key)
+        -:  377:    {
+    #####:  378:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+    #####:  379:        detach();
+    #####:  380:        auto i = d->m.find(key);
+    #####:  381:        if (i == d->m.end())
+    #####:  382:            i = d->m.insert({key, T()}).first;
+    #####:  383:        return i->second;
+    #####:  384:    }
+------------------
+_ZN4QMapIiP11DiagramItemEixERKi:
+    #####:  376:    T &operator[](const Key &key)
+        -:  377:    {
+    #####:  378:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+    #####:  379:        detach();
+    #####:  380:        auto i = d->m.find(key);
+    #####:  381:        if (i == d->m.end())
+    #####:  382:            i = d->m.insert({key, T()}).first;
+    #####:  383:        return i->second;
+    #####:  384:    }
+------------------
+_ZN4QMapIP11DiagramItemiEixERKS1_:
+    #####:  376:    T &operator[](const Key &key)
+        -:  377:    {
+    #####:  378:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+    #####:  379:        detach();
+    #####:  380:        auto i = d->m.find(key);
+    #####:  381:        if (i == d->m.end())
+    #####:  382:            i = d->m.insert({key, T()}).first;
+    #####:  383:        return i->second;
+    #####:  384:    }
+------------------
+_ZN4QMapIP11DiagramPath7QStringEixERKS1_:
+    #####:  376:    T &operator[](const Key &key)
+        -:  377:    {
+    #####:  378:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+    #####:  379:        detach();
+    #####:  380:        auto i = d->m.find(key);
+    #####:  381:        if (i == d->m.end())
+    #####:  382:            i = d->m.insert({key, T()}).first;
+    #####:  383:        return i->second;
+    #####:  384:    }
+------------------
+        -:  385:
+        -:  386:    // CHANGE: return T, not const T!
+        -:  387:    T operator[](const Key &key) const
+        -:  388:    {
+        -:  389:        return value(key);
+        -:  390:    }
+        -:  391:
+        -:  392:    QList<Key> keys() const
+        -:  393:    {
+        -:  394:        if (!d)
+        -:  395:            return {};
+        -:  396:        return d->keys();
+        -:  397:    }
+        -:  398:
+        -:  399:    QList<Key> keys(const T &value) const
+        -:  400:    {
+        -:  401:        if (!d)
+        -:  402:            return {};
+        -:  403:        return d->keys(value);
+        -:  404:    }
+        -:  405:
+        -:  406:    QList<T> values() const
+        -:  407:    {
+        -:  408:        if (!d)
+        -:  409:            return {};
+        -:  410:        return d->values();
+        -:  411:    }
+        -:  412:
+        -:  413:    size_type count(const Key &key) const
+        -:  414:    {
+        -:  415:        if (!d)
+        -:  416:            return 0;
+        -:  417:        return d->count(key);
+        -:  418:    }
+        -:  419:
+        -:  420:    size_type count() const
+        -:  421:    {
+        -:  422:        return size();
+        -:  423:    }
+        -:  424:
+        -:  425:    inline const Key &firstKey() const { Q_ASSERT(!isEmpty()); return constBegin().key(); }
+        -:  426:    inline const Key &lastKey() const { Q_ASSERT(!isEmpty()); return (--constEnd()).key(); }
+        -:  427:
+        -:  428:    inline T &first() { Q_ASSERT(!isEmpty()); return *begin(); }
+        -:  429:    inline const T &first() const { Q_ASSERT(!isEmpty()); return *constBegin(); }
+        -:  430:    inline T &last() { Q_ASSERT(!isEmpty()); return *(--end()); }
+        -:  431:    inline const T &last() const { Q_ASSERT(!isEmpty()); return *(--constEnd()); }
+        -:  432:
+        -:  433:    class const_iterator;
+        -:  434:
+        -:  435:    class iterator
+        -:  436:    {
+        -:  437:        friend class QMap<Key, T>;
+        -:  438:        friend class const_iterator;
+        -:  439:
+        -:  440:        typename Map::iterator i;
+        -:  441:        explicit iterator(typename Map::iterator it) : i(it) {}
+        -:  442:    public:
+        -:  443:        using iterator_category = std::bidirectional_iterator_tag;
+        -:  444:        using difference_type = qptrdiff;
+        -:  445:        using value_type = T;
+        -:  446:        using pointer = T *;
+        -:  447:        using reference = T &;
+        -:  448:
+        -:  449:        iterator() = default;
+        -:  450:
+        -:  451:        const Key &key() const { return i->first; }
+        -:  452:        T &value() const { return i->second; }
+        -:  453:        T &operator*() const { return i->second; }
+        -:  454:        T *operator->() const { return &i->second; }
+        -:  455:        friend bool operator==(const iterator &lhs, const iterator &rhs) { return lhs.i == rhs.i; }
+        -:  456:        friend bool operator!=(const iterator &lhs, const iterator &rhs) { return lhs.i != rhs.i; }
+        -:  457:
+        -:  458:        iterator &operator++()
+        -:  459:        {
+        -:  460:            ++i;
+        -:  461:            return *this;
+        -:  462:        }
+        -:  463:        iterator operator++(int)
+        -:  464:        {
+        -:  465:            iterator r = *this;
+        -:  466:            ++i;
+        -:  467:            return r;
+        -:  468:        }
+        -:  469:        iterator &operator--()
+        -:  470:        {
+        -:  471:            --i;
+        -:  472:            return *this;
+        -:  473:        }
+        -:  474:        iterator operator--(int)
+        -:  475:        {
+        -:  476:            iterator r = *this;
+        -:  477:            --i;
+        -:  478:            return r;
+        -:  479:        }
+        -:  480:
+        -:  481:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  482:        QT_DEPRECATED_VERSION_X_6_0("Use std::next; QMap iterators are not random access")
+        -:  483:        //! [qmap-op-it-plus-step]
+        -:  484:        friend iterator operator+(iterator it, difference_type j) { return std::next(it, j); }
+        -:  485:
+        -:  486:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev; QMap iterators are not random access")
+        -:  487:        //! [qmap-op-it-minus-step]
+        -:  488:        friend iterator operator-(iterator it, difference_type j) { return std::prev(it, j); }
+        -:  489:
+        -:  490:        QT_DEPRECATED_VERSION_X_6_0("Use std::next or std::advance; QMap iterators are not random access")
+        -:  491:        iterator &operator+=(difference_type j) { std::advance(*this, j); return *this; }
+        -:  492:
+        -:  493:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev or std::advance; QMap iterators are not random access")
+        -:  494:        iterator &operator-=(difference_type j) { std::advance(*this, -j); return *this; }
+        -:  495:
+        -:  496:        QT_DEPRECATED_VERSION_X_6_0("Use std::next; QMap iterators are not random access")
+        -:  497:        //! [qmap-op-step-plus-it]
+        -:  498:        friend iterator operator+(difference_type j, iterator it) { return std::next(it, j); }
+        -:  499:
+        -:  500:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev; QMap iterators are not random access")
+        -:  501:        //! [qmap-op-step-minus-it]
+        -:  502:        friend iterator operator-(difference_type j, iterator it) { return std::prev(it, j); }
+        -:  503:#endif
+        -:  504:    };
+        -:  505:
+        -:  506:    class const_iterator
+        -:  507:    {
+        -:  508:        friend class QMap<Key, T>;
+        -:  509:        typename Map::const_iterator i;
+    #####:  510:        explicit const_iterator(typename Map::const_iterator it) : i(it) {}
+        -:  511:
+        -:  512:    public:
+        -:  513:        using iterator_category = std::bidirectional_iterator_tag;
+        -:  514:        using difference_type = qptrdiff;
+        -:  515:        using value_type = T;
+        -:  516:        using pointer = const T *;
+        -:  517:        using reference = const T &;
+        -:  518:
+    #####:  519:        const_iterator() = default;
+        -:  520:        Q_IMPLICIT const_iterator(const iterator &o) : i(o.i) {}
+        -:  521:
+    #####:  522:        const Key &key() const { return i->first; }
+    #####:  523:        const T &value() const { return i->second; }
+        -:  524:        const T &operator*() const { return i->second; }
+        -:  525:        const T *operator->() const { return &i->second; }
+        -:  526:        friend bool operator==(const const_iterator &lhs, const const_iterator &rhs) { return lhs.i == rhs.i; }
+    #####:  527:        friend bool operator!=(const const_iterator &lhs, const const_iterator &rhs) { return lhs.i != rhs.i; }
+        -:  528:
+    #####:  529:        const_iterator &operator++()
+        -:  530:        {
+    #####:  531:            ++i;
+    #####:  532:            return *this;
+        -:  533:        }
+        -:  534:        const_iterator operator++(int)
+        -:  535:        {
+        -:  536:            const_iterator r = *this;
+        -:  537:            ++i;
+        -:  538:            return r;
+        -:  539:        }
+        -:  540:        const_iterator &operator--()
+        -:  541:        {
+        -:  542:            --i;
+        -:  543:            return *this;
+        -:  544:        }
+        -:  545:        const_iterator operator--(int)
+        -:  546:        {
+        -:  547:            const_iterator r = *this;
+        -:  548:            --i;
+        -:  549:            return r;
+        -:  550:        }
+        -:  551:
+        -:  552:#if QT_DEPRECATED_SINCE(6, 0)
+        -:  553:        QT_DEPRECATED_VERSION_X_6_0("Use std::next; QMap iterators are not random access")
+        -:  554:        //! [qmap-op-it-plus-step-const]
+        -:  555:        friend const_iterator operator+(const_iterator it, difference_type j) { return std::next(it, j); }
+        -:  556:
+        -:  557:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev; QMap iterators are not random access")
+        -:  558:        //! [qmap-op-it-minus-step-const]
+        -:  559:        friend const_iterator operator-(const_iterator it, difference_type j) { return std::prev(it, j); }
+        -:  560:
+        -:  561:        QT_DEPRECATED_VERSION_X_6_0("Use std::next or std::advance; QMap iterators are not random access")
+        -:  562:        const_iterator &operator+=(difference_type j) { std::advance(*this, j); return *this; }
+        -:  563:
+        -:  564:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev or std::advance; QMap iterators are not random access")
+        -:  565:        const_iterator &operator-=(difference_type j) { std::advance(*this, -j); return *this; }
+        -:  566:
+        -:  567:        QT_DEPRECATED_VERSION_X_6_0("Use std::next; QMap iterators are not random access")
+        -:  568:        //! [qmap-op-step-plus-it-const]
+        -:  569:        friend const_iterator operator+(difference_type j, const_iterator it) { return std::next(it, j); }
+        -:  570:
+        -:  571:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev; QMap iterators are not random access")
+        -:  572:        //! [qmap-op-step-minus-it-const]
+        -:  573:        friend const_iterator operator-(difference_type j, const_iterator it) { return std::prev(it, j); }
+        -:  574:#endif
+        -:  575:    };
+        -:  576:
+        -:  577:    class key_iterator
+        -:  578:    {
+        -:  579:        const_iterator i;
+        -:  580:
+        -:  581:    public:
+        -:  582:        typedef typename const_iterator::iterator_category iterator_category;
+        -:  583:        typedef typename const_iterator::difference_type difference_type;
+        -:  584:        typedef Key value_type;
+        -:  585:        typedef const Key *pointer;
+        -:  586:        typedef const Key &reference;
+        -:  587:
+        -:  588:        key_iterator() = default;
+        -:  589:        explicit key_iterator(const_iterator o) : i(o) { }
+        -:  590:
+        -:  591:        const Key &operator*() const { return i.key(); }
+        -:  592:        const Key *operator->() const { return &i.key(); }
+        -:  593:        bool operator==(key_iterator o) const { return i == o.i; }
+        -:  594:        bool operator!=(key_iterator o) const { return i != o.i; }
+        -:  595:
+        -:  596:        inline key_iterator &operator++() { ++i; return *this; }
+        -:  597:        inline key_iterator operator++(int) { return key_iterator(i++);}
+        -:  598:        inline key_iterator &operator--() { --i; return *this; }
+        -:  599:        inline key_iterator operator--(int) { return key_iterator(i--); }
+        -:  600:        const_iterator base() const { return i; }
+        -:  601:    };
+        -:  602:
+        -:  603:    typedef QKeyValueIterator<const Key&, const T&, const_iterator> const_key_value_iterator;
+        -:  604:    typedef QKeyValueIterator<const Key&, T&, iterator> key_value_iterator;
+        -:  605:
+        -:  606:    // STL style
+        -:  607:    iterator begin() { detach(); return iterator(d->m.begin()); }
+    #####:  608:    const_iterator begin() const { if (!d) return const_iterator(); return const_iterator(d->m.cbegin()); }
+    #####:  609:    const_iterator constBegin() const { return begin(); }
+        -:  610:    const_iterator cbegin() const { return begin(); }
+        -:  611:    iterator end() { detach(); return iterator(d->m.end()); }
+    #####:  612:    const_iterator end() const { if (!d) return const_iterator(); return const_iterator(d->m.end()); }
+    #####:  613:    const_iterator constEnd() const { return end(); }
+        -:  614:    const_iterator cend() const { return end(); }
+        -:  615:    key_iterator keyBegin() const { return key_iterator(begin()); }
+        -:  616:    key_iterator keyEnd() const { return key_iterator(end()); }
+        -:  617:    key_value_iterator keyValueBegin() { return key_value_iterator(begin()); }
+        -:  618:    key_value_iterator keyValueEnd() { return key_value_iterator(end()); }
+        -:  619:    const_key_value_iterator keyValueBegin() const { return const_key_value_iterator(begin()); }
+        -:  620:    const_key_value_iterator constKeyValueBegin() const { return const_key_value_iterator(begin()); }
+        -:  621:    const_key_value_iterator keyValueEnd() const { return const_key_value_iterator(end()); }
+        -:  622:    const_key_value_iterator constKeyValueEnd() const { return const_key_value_iterator(end()); }
+        -:  623:    auto asKeyValueRange() & { return QtPrivate::QKeyValueRange<QMap &>(*this); }
+        -:  624:    auto asKeyValueRange() const & { return QtPrivate::QKeyValueRange<const QMap &>(*this); }
+        -:  625:    auto asKeyValueRange() && { return QtPrivate::QKeyValueRange<QMap>(std::move(*this)); }
+        -:  626:    auto asKeyValueRange() const && { return QtPrivate::QKeyValueRange<QMap>(std::move(*this)); }
+        -:  627:
+        -:  628:    iterator erase(const_iterator it)
+        -:  629:    {
+        -:  630:        return erase(it, std::next(it));
+        -:  631:    }
+        -:  632:
+        -:  633:    iterator erase(const_iterator afirst, const_iterator alast)
+        -:  634:    {
+        -:  635:        if (!d)
+        -:  636:            return iterator();
+        -:  637:
+        -:  638:        if (!d.isShared())
+        -:  639:            return iterator(d->m.erase(afirst.i, alast.i));
+        -:  640:
+        -:  641:        auto result = d->erase(afirst.i, alast.i);
+        -:  642:        d.reset(result.data);
+        -:  643:        return iterator(result.it);
+        -:  644:    }
+        -:  645:
+        -:  646:    // more Qt
+        -:  647:    typedef iterator Iterator;
+        -:  648:    typedef const_iterator ConstIterator;
+        -:  649:
+        -:  650:    iterator find(const Key &key)
+        -:  651:    {
+        -:  652:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+        -:  653:        detach();
+        -:  654:        return iterator(d->m.find(key));
+        -:  655:    }
+        -:  656:
+        -:  657:    const_iterator find(const Key &key) const
+        -:  658:    {
+        -:  659:        if (!d)
+        -:  660:            return const_iterator();
+        -:  661:        return const_iterator(d->m.find(key));
+        -:  662:    }
+        -:  663:
+        -:  664:    const_iterator constFind(const Key &key) const
+        -:  665:    {
+        -:  666:        return find(key);
+        -:  667:    }
+        -:  668:
+        -:  669:    iterator lowerBound(const Key &key)
+        -:  670:    {
+        -:  671:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+        -:  672:        detach();
+        -:  673:        return iterator(d->m.lower_bound(key));
+        -:  674:    }
+        -:  675:
+        -:  676:    const_iterator lowerBound(const Key &key) const
+        -:  677:    {
+        -:  678:        if (!d)
+        -:  679:            return const_iterator();
+        -:  680:        return const_iterator(d->m.lower_bound(key));
+        -:  681:    }
+        -:  682:
+        -:  683:    iterator upperBound(const Key &key)
+        -:  684:    {
+        -:  685:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+        -:  686:        detach();
+        -:  687:        return iterator(d->m.upper_bound(key));
+        -:  688:    }
+        -:  689:
+        -:  690:    const_iterator upperBound(const Key &key) const
+        -:  691:    {
+        -:  692:        if (!d)
+        -:  693:            return const_iterator();
+        -:  694:        return const_iterator(d->m.upper_bound(key));
+        -:  695:    }
+        -:  696:
+        -:  697:    iterator insert(const Key &key, const T &value)
+        -:  698:    {
+        -:  699:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+        -:  700:        // TODO: improve. In case of assignment, why copying first?
+        -:  701:        detach();
+        -:  702:        return iterator(d->m.insert_or_assign(key, value).first);
+        -:  703:    }
+        -:  704:
+        -:  705:    iterator insert(const_iterator pos, const Key &key, const T &value)
+        -:  706:    {
+        -:  707:        // TODO: improve. In case of assignment, why copying first?
+        -:  708:        typename Map::const_iterator dpos;
+        -:  709:        const auto copy = d.isShared() ? *this : QMap(); // keep `key`/`value` alive across the detach
+        -:  710:        if (!d || d.isShared()) {
+        -:  711:            auto posDistance = d ? std::distance(d->m.cbegin(), pos.i) : 0;
+        -:  712:            detach();
+        -:  713:            dpos = std::next(d->m.cbegin(), posDistance);
+        -:  714:        } else {
+        -:  715:            dpos = pos.i;
+        -:  716:        }
+        -:  717:        return iterator(d->m.insert_or_assign(dpos, key, value));
+        -:  718:    }
+        -:  719:
+        -:  720:    void insert(const QMap<Key, T> &map)
+        -:  721:    {
+        -:  722:        // TODO: improve. In case of assignment, why copying first?
+        -:  723:        if (map.isEmpty())
+        -:  724:            return;
+        -:  725:
+        -:  726:        detach();
+        -:  727:
+        -:  728:#ifdef __cpp_lib_node_extract
+        -:  729:        auto copy = map.d->m;
+        -:  730:        copy.merge(std::move(d->m));
+        -:  731:        d->m = std::move(copy);
+        -:  732:#else
+        -:  733:        // this is a std::copy, but we can't use std::inserter (need insert_or_assign...).
+        -:  734:        // copy in reverse order, trying to make effective use of insertionHint.
+        -:  735:        auto insertionHint = d->m.end();
+        -:  736:        auto mapIt = map.d->m.crbegin();
+        -:  737:        auto end = map.d->m.crend();
+        -:  738:        for (; mapIt != end; ++mapIt)
+        -:  739:            insertionHint = d->m.insert_or_assign(insertionHint, mapIt->first, mapIt->second);
+        -:  740:#endif
+        -:  741:    }
+        -:  742:
+        -:  743:    void insert(QMap<Key, T> &&map)
+        -:  744:    {
+        -:  745:        if (!map.d || map.d->m.empty())
+        -:  746:            return;
+        -:  747:
+        -:  748:        if (map.d.isShared()) {
+        -:  749:            // fall back to a regular copy
+        -:  750:            insert(map);
+        -:  751:            return;
+        -:  752:        }
+        -:  753:
+        -:  754:        detach();
+        -:  755:
+        -:  756:#ifdef __cpp_lib_node_extract
+        -:  757:        map.d->m.merge(std::move(d->m));
+        -:  758:        *this = std::move(map);
+        -:  759:#else
+        -:  760:        // same as above
+        -:  761:        auto insertionHint = d->m.end();
+        -:  762:        auto mapIt = map.d->m.crbegin();
+        -:  763:        auto end = map.d->m.crend();
+        -:  764:        for (; mapIt != end; ++mapIt)
+        -:  765:            insertionHint = d->m.insert_or_assign(insertionHint, std::move(mapIt->first), std::move(mapIt->second));
+        -:  766:#endif
+        -:  767:    }
+        -:  768:
+        -:  769:    // STL compatibility
+        -:  770:    [[nodiscard]]
+        -:  771:    inline bool empty() const
+        -:  772:    {
+        -:  773:        return isEmpty();
+        -:  774:    }
+        -:  775:
+        -:  776:    std::pair<iterator, iterator> equal_range(const Key &akey)
+        -:  777:    {
+        -:  778:        const auto copy = d.isShared() ? *this : QMap(); // keep `key` alive across the detach
+        -:  779:        detach();
+        -:  780:        auto result = d->m.equal_range(akey);
+        -:  781:        return {iterator(result.first), iterator(result.second)};
+        -:  782:    }
+        -:  783:
+        -:  784:    std::pair<const_iterator, const_iterator> equal_range(const Key &akey) const
+        -:  785:    {
+        -:  786:        if (!d)
+        -:  787:            return {};
+        -:  788:        auto result = d->m.equal_range(akey);
+        -:  789:        return {const_iterator(result.first), const_iterator(result.second)};
+        -:  790:    }
+        -:  791:
+        -:  792:private:
+        -:  793:#ifdef Q_QDOC
+        -:  794:    friend size_t qHash(const QMap &key, size_t seed = 0);
+        -:  795:#else
+        -:  796:# if defined(Q_CC_GHS) || defined (Q_CC_MSVC)
+        -:  797:    // GHS and MSVC tries to intantiate qHash() for the noexcept running into a
+        -:  798:    // non-SFINAE'ed hard error... Create an artificial SFINAE context as a
+        -:  799:    // work-around:
+        -:  800:    template <typename M, std::enable_if_t<std::is_same_v<M, QMap>, bool> = true>
+        -:  801:    friend QtPrivate::QHashMultiReturnType<typename M::key_type, typename M::mapped_type>
+        -:  802:# else
+        -:  803:    using M = QMap;
+        -:  804:    friend size_t
+        -:  805:# endif
+        -:  806:    qHash(const M &key, size_t seed = 0)
+        -:  807:        noexcept(QHashPrivate::noexceptPairHash<typename M::key_type, typename M::mapped_type>())
+        -:  808:    {
+        -:  809:        if (!key.d)
+        -:  810:            return seed;
+        -:  811:        // don't use qHashRange to avoid its compile-time overhead:
+        -:  812:        return std::accumulate(key.d->m.begin(), key.d->m.end(), seed,
+        -:  813:                               QtPrivate::QHashCombine{seed});
+        -:  814:    }
+        -:  815:#endif // !Q_QDOC
+        -:  816:};
+        -:  817:
+        -:  818:Q_DECLARE_ASSOCIATIVE_ITERATOR(Map)
+        -:  819:Q_DECLARE_MUTABLE_ASSOCIATIVE_ITERATOR(Map)
+        -:  820:
+        -:  821:template <typename Key, typename T, typename Predicate>
+        -:  822:qsizetype erase_if(QMap<Key, T> &map, Predicate pred)
+        -:  823:{
+        -:  824:    return QtPrivate::associative_erase_if(map, pred);
+        -:  825:}
+        -:  826:
+        -:  827:
+        -:  828://
+        -:  829:// QMultiMap
+        -:  830://
+        -:  831:
+        -:  832:template <class Key, class T>
+        -:  833:class QMultiMap
+        -:  834:{
+        -:  835:    using Map = std::multimap<Key, T>;
+        -:  836:    using MapData = QMapData<Map>;
+        -:  837:    QtPrivate::QExplicitlySharedDataPointerV2<MapData> d;
+        -:  838:
+        -:  839:public:
+        -:  840:    using key_type = Key;
+        -:  841:    using mapped_type = T;
+        -:  842:    using difference_type = qptrdiff;
+        -:  843:    using size_type = qsizetype;
+        -:  844:
+        -:  845:    QMultiMap() = default;
+        -:  846:
+        -:  847:    // implicitly generated special member functions are OK!
+        -:  848:
+        -:  849:    QMultiMap(std::initializer_list<std::pair<Key,T>> list)
+        -:  850:    {
+        -:  851:        for (auto &p : list)
+        -:  852:            insert(p.first, p.second);
+        -:  853:    }
+        -:  854:
+        -:  855:    void swap(QMultiMap<Key, T> &other) noexcept
+        -:  856:    {
+        -:  857:        d.swap(other.d);
+        -:  858:    }
+        -:  859:
+        -:  860:    explicit QMultiMap(const QMap<Key, T> &other)
+        -:  861:        : d(other.isEmpty() ? nullptr : new MapData)
+        -:  862:    {
+        -:  863:        if (d) {
+        -:  864:            Q_ASSERT(other.d);
+        -:  865:            d->m.insert(other.d->m.begin(),
+        -:  866:                        other.d->m.end());
+        -:  867:        }
+        -:  868:    }
+        -:  869:
+        -:  870:    explicit QMultiMap(QMap<Key, T> &&other)
+        -:  871:        : d(other.isEmpty() ? nullptr : new MapData)
+        -:  872:    {
+        -:  873:        if (d) {
+        -:  874:            Q_ASSERT(other.d);
+        -:  875:            if (other.d.isShared()) {
+        -:  876:                d->m.insert(other.d->m.begin(),
+        -:  877:                            other.d->m.end());
+        -:  878:            } else {
+        -:  879:#ifdef __cpp_lib_node_extract
+        -:  880:                d->m.merge(std::move(other.d->m));
+        -:  881:#else
+        -:  882:                d->m.insert(std::make_move_iterator(other.d->m.begin()),
+        -:  883:                            std::make_move_iterator(other.d->m.end()));
+        -:  884:#endif
+        -:  885:            }
+        -:  886:        }
+        -:  887:    }
+        -:  888:
+        -:  889:    explicit QMultiMap(const std::multimap<Key, T> &other)
+        -:  890:        : d(other.empty() ? nullptr : new MapData(other))
+        -:  891:    {
+        -:  892:    }
+        -:  893:
+        -:  894:    explicit QMultiMap(std::multimap<Key, T> &&other)
+        -:  895:        : d(other.empty() ? nullptr : new MapData(std::move(other)))
+        -:  896:    {
+        -:  897:    }
+        -:  898:
+        -:  899:    // CHANGE: return type
+        -:  900:    Q_DECL_DEPRECATED_X("Use toStdMultiMap instead")
+        -:  901:    std::multimap<Key, T> toStdMap() const
+        -:  902:    {
+        -:  903:        return toStdMultiMap();
+        -:  904:    }
+        -:  905:
+        -:  906:    std::multimap<Key, T> toStdMultiMap() const &
+        -:  907:    {
+        -:  908:        if (d)
+        -:  909:            return d->m;
+        -:  910:        return {};
+        -:  911:    }
+        -:  912:
+        -:  913:    std::multimap<Key, T> toStdMultiMap() &&
+        -:  914:    {
+        -:  915:        if (d) {
+        -:  916:            if (d.isShared())
+        -:  917:                return d->m;
+        -:  918:            else
+        -:  919:                return std::move(d->m);
+        -:  920:        }
+        -:  921:
+        -:  922:        return {};
+        -:  923:    }
+        -:  924:
+        -:  925:#ifndef Q_QDOC
+        -:  926:private:
+        -:  927:    template <typename AKey = Key, typename AT = T,
+        -:  928:              QTypeTraits::compare_eq_result_container<QMultiMap, AKey, AT> = true>
+        -:  929:    friend bool comparesEqual(const QMultiMap &lhs, const QMultiMap &rhs)
+        -:  930:    {
+        -:  931:        if (lhs.d == rhs.d)
+        -:  932:            return true;
+        -:  933:        if (!lhs.d)
+        -:  934:            return rhs == lhs;
+        -:  935:        Q_ASSERT(lhs.d);
+        -:  936:        return rhs.d ? (lhs.d->m == rhs.d->m) : lhs.d->m.empty();
+        -:  937:    }
+        -:  938:    QT_DECLARE_EQUALITY_OPERATORS_HELPER(QMultiMap, QMultiMap, /* non-constexpr */, noexcept(false),
+        -:  939:                 template <typename AKey = Key, typename AT = T,
+        -:  940:                           QTypeTraits::compare_eq_result_container<QMultiMap, AKey, AT> = true>)
+        -:  941:    // TODO: add the other comparison operators; std::multimap has them.
+        -:  942:public:
+        -:  943:#else
+        -:  944:    friend bool operator==(const QMultiMap &lhs, const QMultiMap &rhs);
+        -:  945:    friend bool operator!=(const QMultiMap &lhs, const QMultiMap &rhs);
+        -:  946:#endif // Q_QDOC
+        -:  947:
+        -:  948:    size_type size() const { return d ? size_type(d->m.size()) : size_type(0); }
+        -:  949:
+        -:  950:    [[nodiscard]]
+        -:  951:    bool isEmpty() const { return d ? d->m.empty() : true; }
+        -:  952:
+        -:  953:    void detach()
+        -:  954:    {
+        -:  955:        if (d)
+        -:  956:            d.detach();
+        -:  957:        else
+        -:  958:            d.reset(new MapData);
+        -:  959:    }
+        -:  960:
+        -:  961:    bool isDetached() const noexcept
+        -:  962:    {
+        -:  963:        return d ? !d.isShared() : false; // false makes little sense, but that's shared_null's behavior...
+        -:  964:    }
+        -:  965:
+        -:  966:    bool isSharedWith(const QMultiMap<Key, T> &other) const noexcept
+        -:  967:    {
+        -:  968:        return d == other.d; // also this makes little sense?
+        -:  969:    }
+        -:  970:
+        -:  971:    void clear()
+        -:  972:    {
+        -:  973:        if (!d)
+        -:  974:            return;
+        -:  975:
+        -:  976:        if (!d.isShared())
+        -:  977:            d->m.clear();
+        -:  978:        else
+        -:  979:            d.reset();
+        -:  980:    }
+        -:  981:
+        -:  982:    size_type remove(const Key &key)
+        -:  983:    {
+        -:  984:        if (!d)
+        -:  985:            return 0;
+        -:  986:
+        -:  987:        if (!d.isShared())
+        -:  988:            return size_type(d->m.erase(key));
+        -:  989:
+        -:  990:        MapData *newData = new MapData;
+        -:  991:        size_type result = newData->copyIfNotEquivalentTo(d->m, key);
+        -:  992:
+        -:  993:        d.reset(newData);
+        -:  994:
+        -:  995:        return result;
+        -:  996:    }
+        -:  997:
+        -:  998:    size_type remove(const Key &key, const T &value)
+        -:  999:    {
+        -: 1000:        if (!d)
+        -: 1001:            return 0;
+        -: 1002:
+        -: 1003:        // key and value may belong to this map. As such, we need to copy
+        -: 1004:        // them to ensure they stay valid throughout the iteration below
+        -: 1005:        // (which may destroy them)
+        -: 1006:        const Key keyCopy = key;
+        -: 1007:        const T valueCopy = value;
+        -: 1008:
+        -: 1009:        // TODO: improve. Copy over only the elements not to be removed.
+        -: 1010:        detach();
+        -: 1011:
+        -: 1012:        size_type result = 0;
+        -: 1013:        const auto &keyCompare = d->m.key_comp();
+        -: 1014:
+        -: 1015:        auto i = d->m.find(keyCopy);
+        -: 1016:        const auto e = d->m.end();
+        -: 1017:
+        -: 1018:        while (i != e && !keyCompare(keyCopy, i->first)) {
+        -: 1019:            if (i->second == valueCopy) {
+        -: 1020:                i = d->m.erase(i);
+        -: 1021:                ++result;
+        -: 1022:            } else {
+        -: 1023:                ++i;
+        -: 1024:            }
+        -: 1025:        }
+        -: 1026:
+        -: 1027:        return result;
+        -: 1028:    }
+        -: 1029:
+        -: 1030:    template <typename Predicate>
+        -: 1031:    size_type removeIf(Predicate pred)
+        -: 1032:    {
+        -: 1033:        return QtPrivate::associative_erase_if(*this, pred);
+        -: 1034:    }
+        -: 1035:
+        -: 1036:    T take(const Key &key)
+        -: 1037:    {
+        -: 1038:        if (!d)
+        -: 1039:            return T();
+        -: 1040:
+        -: 1041:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key` alive across the detach
+        -: 1042:
+        -: 1043:        // TODO: improve. There is no need of copying all the
+        -: 1044:        // elements (the one to be removed can be skipped).
+        -: 1045:        detach();
+        -: 1046:
+        -: 1047:#ifdef __cpp_lib_node_extract
+        -: 1048:        if (const auto node = d->m.extract(key))
+        -: 1049:            return std::move(node.mapped());
+        -: 1050:#else
+        -: 1051:        auto i = d->m.find(key);
+        -: 1052:        if (i != d->m.end()) {
+        -: 1053:            // ### breaks RVO on most compilers (but only on old-fashioned ones, so who cares?)
+        -: 1054:            T result(std::move(i->second));
+        -: 1055:            d->m.erase(i);
+        -: 1056:            return result;
+        -: 1057:        }
+        -: 1058:#endif
+        -: 1059:        return T();
+        -: 1060:    }
+        -: 1061:
+        -: 1062:    bool contains(const Key &key) const
+        -: 1063:    {
+        -: 1064:        if (!d)
+        -: 1065:            return false;
+        -: 1066:        auto i = d->m.find(key);
+        -: 1067:        return i != d->m.end();
+        -: 1068:    }
+        -: 1069:
+        -: 1070:    bool contains(const Key &key, const T &value) const
+        -: 1071:    {
+        -: 1072:        return find(key, value) != end();
+        -: 1073:    }
+        -: 1074:
+        -: 1075:    Key key(const T &value, const Key &defaultKey = Key()) const
+        -: 1076:    {
+        -: 1077:        if (!d)
+        -: 1078:            return defaultKey;
+        -: 1079:
+        -: 1080:        return d->key(value, defaultKey);
+        -: 1081:    }
+        -: 1082:
+        -: 1083:    T value(const Key &key, const T &defaultValue = T()) const
+        -: 1084:    {
+        -: 1085:        if (!d)
+        -: 1086:            return defaultValue;
+        -: 1087:        const auto i = d->m.find(key);
+        -: 1088:        if (i != d->m.cend())
+        -: 1089:            return i->second;
+        -: 1090:        return defaultValue;
+        -: 1091:    }
+        -: 1092:
+        -: 1093:    QList<Key> keys() const
+        -: 1094:    {
+        -: 1095:        if (!d)
+        -: 1096:            return {};
+        -: 1097:        return d->keys();
+        -: 1098:    }
+        -: 1099:
+        -: 1100:    QList<Key> keys(const T &value) const
+        -: 1101:    {
+        -: 1102:        if (!d)
+        -: 1103:            return {};
+        -: 1104:        return d->keys(value);
+        -: 1105:    }
+        -: 1106:
+        -: 1107:    QList<Key> uniqueKeys() const
+        -: 1108:    {
+        -: 1109:        QList<Key> result;
+        -: 1110:        if (!d)
+        -: 1111:            return result;
+        -: 1112:
+        -: 1113:        result.reserve(size());
+        -: 1114:
+        -: 1115:        std::unique_copy(keyBegin(), keyEnd(),
+        -: 1116:                         std::back_inserter(result));
+        -: 1117:
+        -: 1118:        result.shrink_to_fit();
+        -: 1119:        return result;
+        -: 1120:    }
+        -: 1121:
+        -: 1122:    QList<T> values() const
+        -: 1123:    {
+        -: 1124:        if (!d)
+        -: 1125:            return {};
+        -: 1126:        return d->values();
+        -: 1127:    }
+        -: 1128:
+        -: 1129:    QList<T> values(const Key &key) const
+        -: 1130:    {
+        -: 1131:        QList<T> result;
+        -: 1132:        const auto range = equal_range(key);
+        -: 1133:        result.reserve(std::distance(range.first, range.second));
+        -: 1134:        std::copy(range.first, range.second, std::back_inserter(result));
+        -: 1135:        return result;
+        -: 1136:    }
+        -: 1137:
+        -: 1138:    size_type count(const Key &key) const
+        -: 1139:    {
+        -: 1140:        if (!d)
+        -: 1141:            return 0;
+        -: 1142:        return d->count(key);
+        -: 1143:    }
+        -: 1144:
+        -: 1145:    size_type count(const Key &key, const T &value) const
+        -: 1146:    {
+        -: 1147:        if (!d)
+        -: 1148:            return 0;
+        -: 1149:
+        -: 1150:        // TODO: improve; no need of scanning the equal_range twice.
+        -: 1151:        auto range = d->m.equal_range(key);
+        -: 1152:
+        -: 1153:        return size_type(std::count_if(range.first,
+        -: 1154:                                       range.second,
+        -: 1155:                                       MapData::valueIsEqualTo(value)));
+        -: 1156:    }
+        -: 1157:
+        -: 1158:    inline const Key &firstKey() const { Q_ASSERT(!isEmpty()); return constBegin().key(); }
+        -: 1159:    inline const Key &lastKey() const { Q_ASSERT(!isEmpty()); return std::next(constEnd(), -1).key(); }
+        -: 1160:
+        -: 1161:    inline T &first() { Q_ASSERT(!isEmpty()); return *begin(); }
+        -: 1162:    inline const T &first() const { Q_ASSERT(!isEmpty()); return *constBegin(); }
+        -: 1163:    inline T &last() { Q_ASSERT(!isEmpty()); return *std::next(end(), -1); }
+        -: 1164:    inline const T &last() const { Q_ASSERT(!isEmpty()); return *std::next(constEnd(), -1); }
+        -: 1165:
+        -: 1166:    class const_iterator;
+        -: 1167:
+        -: 1168:    class iterator
+        -: 1169:    {
+        -: 1170:        friend class QMultiMap<Key, T>;
+        -: 1171:        friend class const_iterator;
+        -: 1172:
+        -: 1173:        typename Map::iterator i;
+        -: 1174:        explicit iterator(typename Map::iterator it) : i(it) {}
+        -: 1175:    public:
+        -: 1176:        using iterator_category = std::bidirectional_iterator_tag;
+        -: 1177:        using difference_type = qptrdiff;
+        -: 1178:        using value_type = T;
+        -: 1179:        using pointer = T *;
+        -: 1180:        using reference = T &;
+        -: 1181:
+        -: 1182:        iterator() = default;
+        -: 1183:
+        -: 1184:        const Key &key() const { return i->first; }
+        -: 1185:        T &value() const { return i->second; }
+        -: 1186:        T &operator*() const { return i->second; }
+        -: 1187:        T *operator->() const { return &i->second; }
+        -: 1188:        friend bool operator==(const iterator &lhs, const iterator &rhs) { return lhs.i == rhs.i; }
+        -: 1189:        friend bool operator!=(const iterator &lhs, const iterator &rhs) { return lhs.i != rhs.i; }
+        -: 1190:
+        -: 1191:        iterator &operator++()
+        -: 1192:        {
+        -: 1193:            ++i;
+        -: 1194:            return *this;
+        -: 1195:        }
+        -: 1196:        iterator operator++(int)
+        -: 1197:        {
+        -: 1198:            iterator r = *this;
+        -: 1199:            ++i;
+        -: 1200:            return r;
+        -: 1201:        }
+        -: 1202:        iterator &operator--()
+        -: 1203:        {
+        -: 1204:            --i;
+        -: 1205:            return *this;
+        -: 1206:        }
+        -: 1207:        iterator operator--(int)
+        -: 1208:        {
+        -: 1209:            iterator r = *this;
+        -: 1210:            --i;
+        -: 1211:            return r;
+        -: 1212:        }
+        -: 1213:
+        -: 1214:#if QT_DEPRECATED_SINCE(6, 0)
+        -: 1215:        QT_DEPRECATED_VERSION_X_6_0("Use std::next; QMultiMap iterators are not random access")
+        -: 1216:        //! [qmultimap-op-it-plus-step]
+        -: 1217:        friend iterator operator+(iterator it, difference_type j) { return std::next(it, j); }
+        -: 1218:
+        -: 1219:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev; QMultiMap iterators are not random access")
+        -: 1220:        //! [qmultimap-op-it-minus-step]
+        -: 1221:        friend iterator operator-(iterator it, difference_type j) { return std::prev(it, j); }
+        -: 1222:
+        -: 1223:        QT_DEPRECATED_VERSION_X_6_0("Use std::next or std::advance; QMultiMap iterators are not random access")
+        -: 1224:        iterator &operator+=(difference_type j) { std::advance(*this, j); return *this; }
+        -: 1225:
+        -: 1226:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev or std::advance; QMultiMap iterators are not random access")
+        -: 1227:        iterator &operator-=(difference_type j) { std::advance(*this, -j); return *this; }
+        -: 1228:
+        -: 1229:        QT_DEPRECATED_VERSION_X_6_0("Use std::next; QMultiMap iterators are not random access")
+        -: 1230:        //! [qmultimap-op-step-plus-it]
+        -: 1231:        friend iterator operator+(difference_type j, iterator it) { return std::next(it, j); }
+        -: 1232:
+        -: 1233:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev; QMultiMap iterators are not random access")
+        -: 1234:        //! [qmultimap-op-step-minus-it]
+        -: 1235:        friend iterator operator-(difference_type j, iterator it) { return std::prev(it, j); }
+        -: 1236:#endif
+        -: 1237:    };
+        -: 1238:
+        -: 1239:    class const_iterator
+        -: 1240:    {
+        -: 1241:        friend class QMultiMap<Key, T>;
+        -: 1242:        typename Map::const_iterator i;
+        -: 1243:        explicit const_iterator(typename Map::const_iterator it) : i(it) {}
+        -: 1244:
+        -: 1245:    public:
+        -: 1246:        using iterator_category = std::bidirectional_iterator_tag;
+        -: 1247:        using difference_type = qptrdiff;
+        -: 1248:        using value_type = T;
+        -: 1249:        using pointer = const T *;
+        -: 1250:        using reference = const T &;
+        -: 1251:
+        -: 1252:        const_iterator() = default;
+        -: 1253:        Q_IMPLICIT const_iterator(const iterator &o) : i(o.i) {}
+        -: 1254:
+        -: 1255:        const Key &key() const { return i->first; }
+        -: 1256:        const T &value() const { return i->second; }
+        -: 1257:        const T &operator*() const { return i->second; }
+        -: 1258:        const T *operator->() const { return &i->second; }
+        -: 1259:        friend bool operator==(const const_iterator &lhs, const const_iterator &rhs) { return lhs.i == rhs.i; }
+        -: 1260:        friend bool operator!=(const const_iterator &lhs, const const_iterator &rhs) { return lhs.i != rhs.i; }
+        -: 1261:
+        -: 1262:        const_iterator &operator++()
+        -: 1263:        {
+        -: 1264:            ++i;
+        -: 1265:            return *this;
+        -: 1266:        }
+        -: 1267:        const_iterator operator++(int)
+        -: 1268:        {
+        -: 1269:            const_iterator r = *this;
+        -: 1270:            ++i;
+        -: 1271:            return r;
+        -: 1272:        }
+        -: 1273:        const_iterator &operator--()
+        -: 1274:        {
+        -: 1275:            --i;
+        -: 1276:            return *this;
+        -: 1277:        }
+        -: 1278:        const_iterator operator--(int)
+        -: 1279:        {
+        -: 1280:            const_iterator r = *this;
+        -: 1281:            --i;
+        -: 1282:            return r;
+        -: 1283:        }
+        -: 1284:
+        -: 1285:#if QT_DEPRECATED_SINCE(6, 0)
+        -: 1286:        QT_DEPRECATED_VERSION_X_6_0("Use std::next; QMultiMap iterators are not random access")
+        -: 1287:        //! [qmultimap-op-it-plus-step-const]
+        -: 1288:        friend const_iterator operator+(const_iterator it, difference_type j) { return std::next(it, j); }
+        -: 1289:
+        -: 1290:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev; QMultiMap iterators are not random access")
+        -: 1291:        //! [qmultimap-op-it-minus-step-const]
+        -: 1292:        friend const_iterator operator-(const_iterator it, difference_type j) { return std::prev(it, j); }
+        -: 1293:
+        -: 1294:        QT_DEPRECATED_VERSION_X_6_0("Use std::next or std::advance; QMultiMap iterators are not random access")
+        -: 1295:        const_iterator &operator+=(difference_type j) { std::advance(*this, j); return *this; }
+        -: 1296:
+        -: 1297:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev or std::advance; QMultiMap iterators are not random access")
+        -: 1298:        const_iterator &operator-=(difference_type j) { std::advance(*this, -j); return *this; }
+        -: 1299:
+        -: 1300:        QT_DEPRECATED_VERSION_X_6_0("Use std::next; QMultiMap iterators are not random access")
+        -: 1301:        //! [qmultimap-op-step-plus-it-const]
+        -: 1302:        friend const_iterator operator+(difference_type j, const_iterator it) { return std::next(it, j); }
+        -: 1303:
+        -: 1304:        QT_DEPRECATED_VERSION_X_6_0("Use std::prev; QMultiMap iterators are not random access")
+        -: 1305:        //! [qmultimap-op-step-minus-it-const]
+        -: 1306:        friend const_iterator operator-(difference_type j, const_iterator it) { return std::prev(it, j); }
+        -: 1307:#endif
+        -: 1308:    };
+        -: 1309:
+        -: 1310:    class key_iterator
+        -: 1311:    {
+        -: 1312:        const_iterator i;
+        -: 1313:
+        -: 1314:    public:
+        -: 1315:        typedef typename const_iterator::iterator_category iterator_category;
+        -: 1316:        typedef typename const_iterator::difference_type difference_type;
+        -: 1317:        typedef Key value_type;
+        -: 1318:        typedef const Key *pointer;
+        -: 1319:        typedef const Key &reference;
+        -: 1320:
+        -: 1321:        key_iterator() = default;
+        -: 1322:        explicit key_iterator(const_iterator o) : i(o) { }
+        -: 1323:
+        -: 1324:        const Key &operator*() const { return i.key(); }
+        -: 1325:        const Key *operator->() const { return &i.key(); }
+        -: 1326:        bool operator==(key_iterator o) const { return i == o.i; }
+        -: 1327:        bool operator!=(key_iterator o) const { return i != o.i; }
+        -: 1328:
+        -: 1329:        inline key_iterator &operator++() { ++i; return *this; }
+        -: 1330:        inline key_iterator operator++(int) { return key_iterator(i++);}
+        -: 1331:        inline key_iterator &operator--() { --i; return *this; }
+        -: 1332:        inline key_iterator operator--(int) { return key_iterator(i--); }
+        -: 1333:        const_iterator base() const { return i; }
+        -: 1334:    };
+        -: 1335:
+        -: 1336:    typedef QKeyValueIterator<const Key&, const T&, const_iterator> const_key_value_iterator;
+        -: 1337:    typedef QKeyValueIterator<const Key&, T&, iterator> key_value_iterator;
+        -: 1338:
+        -: 1339:    // STL style
+        -: 1340:    iterator begin() { detach(); return iterator(d->m.begin()); }
+        -: 1341:    const_iterator begin() const { if (!d) return const_iterator(); return const_iterator(d->m.cbegin()); }
+        -: 1342:    const_iterator constBegin() const { return begin(); }
+        -: 1343:    const_iterator cbegin() const { return begin(); }
+        -: 1344:    iterator end() { detach(); return iterator(d->m.end()); }
+        -: 1345:    const_iterator end() const { if (!d) return const_iterator(); return const_iterator(d->m.end()); }
+        -: 1346:    const_iterator constEnd() const { return end(); }
+        -: 1347:    const_iterator cend() const { return end(); }
+        -: 1348:    key_iterator keyBegin() const { return key_iterator(begin()); }
+        -: 1349:    key_iterator keyEnd() const { return key_iterator(end()); }
+        -: 1350:    key_value_iterator keyValueBegin() { return key_value_iterator(begin()); }
+        -: 1351:    key_value_iterator keyValueEnd() { return key_value_iterator(end()); }
+        -: 1352:    const_key_value_iterator keyValueBegin() const { return const_key_value_iterator(begin()); }
+        -: 1353:    const_key_value_iterator constKeyValueBegin() const { return const_key_value_iterator(begin()); }
+        -: 1354:    const_key_value_iterator keyValueEnd() const { return const_key_value_iterator(end()); }
+        -: 1355:    const_key_value_iterator constKeyValueEnd() const { return const_key_value_iterator(end()); }
+        -: 1356:    auto asKeyValueRange() & { return QtPrivate::QKeyValueRange<QMultiMap &>(*this); }
+        -: 1357:    auto asKeyValueRange() const & { return QtPrivate::QKeyValueRange<const QMultiMap &>(*this); }
+        -: 1358:    auto asKeyValueRange() && { return QtPrivate::QKeyValueRange<QMultiMap>(std::move(*this)); }
+        -: 1359:    auto asKeyValueRange() const && { return QtPrivate::QKeyValueRange<QMultiMap>(std::move(*this)); }
+        -: 1360:
+        -: 1361:    iterator erase(const_iterator it)
+        -: 1362:    {
+        -: 1363:        return erase(it, std::next(it));
+        -: 1364:    }
+        -: 1365:
+        -: 1366:    iterator erase(const_iterator afirst, const_iterator alast)
+        -: 1367:    {
+        -: 1368:        if (!d)
+        -: 1369:            return iterator();
+        -: 1370:
+        -: 1371:        if (!d.isShared())
+        -: 1372:            return iterator(d->m.erase(afirst.i, alast.i));
+        -: 1373:
+        -: 1374:        auto result = d->erase(afirst.i, alast.i);
+        -: 1375:        d.reset(result.data);
+        -: 1376:        return iterator(result.it);
+        -: 1377:    }
+        -: 1378:
+        -: 1379:    // more Qt
+        -: 1380:    typedef iterator Iterator;
+        -: 1381:    typedef const_iterator ConstIterator;
+        -: 1382:
+        -: 1383:    size_type count() const
+        -: 1384:    {
+        -: 1385:        return size();
+        -: 1386:    }
+        -: 1387:
+        -: 1388:    iterator find(const Key &key)
+        -: 1389:    {
+        -: 1390:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key` alive across the detach
+        -: 1391:        detach();
+        -: 1392:        return iterator(d->m.find(key));
+        -: 1393:    }
+        -: 1394:
+        -: 1395:    const_iterator find(const Key &key) const
+        -: 1396:    {
+        -: 1397:        if (!d)
+        -: 1398:            return const_iterator();
+        -: 1399:        return const_iterator(d->m.find(key));
+        -: 1400:    }
+        -: 1401:
+        -: 1402:    const_iterator constFind(const Key &key) const
+        -: 1403:    {
+        -: 1404:        return find(key);
+        -: 1405:    }
+        -: 1406:
+        -: 1407:    iterator find(const Key &key, const T &value)
+        -: 1408:    {
+        -: 1409:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key`/`value` alive across the detach
+        -: 1410:
+        -: 1411:        detach();
+        -: 1412:
+        -: 1413:        auto range = d->m.equal_range(key);
+        -: 1414:        auto i = std::find_if(range.first, range.second,
+        -: 1415:                              MapData::valueIsEqualTo(value));
+        -: 1416:
+        -: 1417:        if (i != range.second)
+        -: 1418:            return iterator(i);
+        -: 1419:        return iterator(d->m.end());
+        -: 1420:    }
+        -: 1421:
+        -: 1422:    const_iterator find(const Key &key, const T &value) const
+        -: 1423:    {
+        -: 1424:        if (!d)
+        -: 1425:            return const_iterator();
+        -: 1426:
+        -: 1427:        auto range = d->m.equal_range(key);
+        -: 1428:        auto i = std::find_if(range.first, range.second,
+        -: 1429:                              MapData::valueIsEqualTo(value));
+        -: 1430:
+        -: 1431:        if (i != range.second)
+        -: 1432:            return const_iterator(i);
+        -: 1433:        return const_iterator(d->m.end());
+        -: 1434:    }
+        -: 1435:
+        -: 1436:    const_iterator constFind(const Key &key, const T &value) const
+        -: 1437:    {
+        -: 1438:        return find(key, value);
+        -: 1439:    }
+        -: 1440:
+        -: 1441:    iterator lowerBound(const Key &key)
+        -: 1442:    {
+        -: 1443:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key` alive across the detach
+        -: 1444:        detach();
+        -: 1445:        return iterator(d->m.lower_bound(key));
+        -: 1446:    }
+        -: 1447:
+        -: 1448:    const_iterator lowerBound(const Key &key) const
+        -: 1449:    {
+        -: 1450:        if (!d)
+        -: 1451:            return const_iterator();
+        -: 1452:        return const_iterator(d->m.lower_bound(key));
+        -: 1453:    }
+        -: 1454:
+        -: 1455:    iterator upperBound(const Key &key)
+        -: 1456:    {
+        -: 1457:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key` alive across the detach
+        -: 1458:        detach();
+        -: 1459:        return iterator(d->m.upper_bound(key));
+        -: 1460:    }
+        -: 1461:
+        -: 1462:    const_iterator upperBound(const Key &key) const
+        -: 1463:    {
+        -: 1464:        if (!d)
+        -: 1465:            return const_iterator();
+        -: 1466:        return const_iterator(d->m.upper_bound(key));
+        -: 1467:    }
+        -: 1468:
+        -: 1469:    iterator insert(const Key &key, const T &value)
+        -: 1470:    {
+        -: 1471:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key`/`value` alive across the detach
+        -: 1472:        detach();
+        -: 1473:        // note that std::multimap inserts at the end of an equal_range for a key,
+        -: 1474:        // QMultiMap at the beginning.
+        -: 1475:        auto i = d->m.lower_bound(key);
+        -: 1476:        return iterator(d->m.insert(i, {key, value}));
+        -: 1477:    }
+        -: 1478:
+        -: 1479:    iterator insert(const_iterator pos, const Key &key, const T &value)
+        -: 1480:    {
+        -: 1481:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key`/`value` alive across the detach
+        -: 1482:        typename Map::const_iterator dpos;
+        -: 1483:        if (!d || d.isShared()) {
+        -: 1484:            auto posDistance = d ? std::distance(d->m.cbegin(), pos.i) : 0;
+        -: 1485:            detach();
+        -: 1486:            dpos = std::next(d->m.cbegin(), posDistance);
+        -: 1487:        } else {
+        -: 1488:            dpos = pos.i;
+        -: 1489:        }
+        -: 1490:        return iterator(d->m.insert(dpos, {key, value}));
+        -: 1491:    }
+        -: 1492:
+        -: 1493:#if QT_DEPRECATED_SINCE(6, 0)
+        -: 1494:    QT_DEPRECATED_VERSION_X_6_0("Use insert() instead")
+        -: 1495:    iterator insertMulti(const Key &key, const T &value)
+        -: 1496:    {
+        -: 1497:        return insert(key, value);
+        -: 1498:    }
+        -: 1499:    QT_DEPRECATED_VERSION_X_6_0("Use insert() instead")
+        -: 1500:    iterator insertMulti(const_iterator pos, const Key &key, const T &value)
+        -: 1501:    {
+        -: 1502:        return insert(pos, key, value);
+        -: 1503:    }
+        -: 1504:
+        -: 1505:    QT_DEPRECATED_VERSION_X_6_0("Use unite() instead")
+        -: 1506:    void insert(const QMultiMap<Key, T> &map)
+        -: 1507:    {
+        -: 1508:        unite(map);
+        -: 1509:    }
+        -: 1510:
+        -: 1511:    QT_DEPRECATED_VERSION_X_6_0("Use unite() instead")
+        -: 1512:    void insert(QMultiMap<Key, T> &&map)
+        -: 1513:    {
+        -: 1514:        unite(std::move(map));
+        -: 1515:    }
+        -: 1516:#endif
+        -: 1517:
+        -: 1518:    iterator replace(const Key &key, const T &value)
+        -: 1519:    {
+        -: 1520:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key`/`value` alive across the detach
+        -: 1521:
+        -: 1522:        // TODO: improve. No need of copying and then overwriting.
+        -: 1523:        detach();
+        -: 1524:
+        -: 1525:        // Similarly, improve here (e.g. lower_bound and hinted insert);
+        -: 1526:        // there's no insert_or_assign on multimaps
+        -: 1527:        auto i = d->m.find(key);
+        -: 1528:        if (i != d->m.end())
+        -: 1529:            i->second = value;
+        -: 1530:        else
+        -: 1531:            i = d->m.insert({key, value});
+        -: 1532:
+        -: 1533:        return iterator(i);
+        -: 1534:    }
+        -: 1535:
+        -: 1536:    // STL compatibility
+        -: 1537:    [[nodiscard]]
+        -: 1538:    inline bool empty() const { return isEmpty(); }
+        -: 1539:
+        -: 1540:    std::pair<iterator, iterator> equal_range(const Key &akey)
+        -: 1541:    {
+        -: 1542:        const auto copy = d.isShared() ? *this : QMultiMap(); // keep `key` alive across the detach
+        -: 1543:        detach();
+        -: 1544:        auto result = d->m.equal_range(akey);
+        -: 1545:        return {iterator(result.first), iterator(result.second)};
+        -: 1546:    }
+        -: 1547:
+        -: 1548:    std::pair<const_iterator, const_iterator> equal_range(const Key &akey) const
+        -: 1549:    {
+        -: 1550:        if (!d)
+        -: 1551:            return {};
+        -: 1552:        auto result = d->m.equal_range(akey);
+        -: 1553:        return {const_iterator(result.first), const_iterator(result.second)};
+        -: 1554:    }
+        -: 1555:
+        -: 1556:    QMultiMap &unite(const QMultiMap &other)
+        -: 1557:    {
+        -: 1558:        if (other.isEmpty())
+        -: 1559:            return *this;
+        -: 1560:
+        -: 1561:        detach();
+        -: 1562:
+        -: 1563:        auto copy = other.d->m;
+        -: 1564:#ifdef __cpp_lib_node_extract
+        -: 1565:        copy.merge(std::move(d->m));
+        -: 1566:#else
+        -: 1567:        copy.insert(std::make_move_iterator(d->m.begin()),
+        -: 1568:                    std::make_move_iterator(d->m.end()));
+        -: 1569:#endif
+        -: 1570:        d->m = std::move(copy);
+        -: 1571:        return *this;
+        -: 1572:    }
+        -: 1573:
+        -: 1574:    QMultiMap &unite(QMultiMap<Key, T> &&other)
+        -: 1575:    {
+        -: 1576:        if (!other.d || other.d->m.empty())
+        -: 1577:            return *this;
+        -: 1578:
+        -: 1579:        if (other.d.isShared()) {
+        -: 1580:            // fall back to a regular copy
+        -: 1581:            unite(other);
+        -: 1582:            return *this;
+        -: 1583:        }
+        -: 1584:
+        -: 1585:        detach();
+        -: 1586:
+        -: 1587:#ifdef __cpp_lib_node_extract
+        -: 1588:        other.d->m.merge(std::move(d->m));
+        -: 1589:#else
+        -: 1590:        other.d->m.insert(std::make_move_iterator(d->m.begin()),
+        -: 1591:                          std::make_move_iterator(d->m.end()));
+        -: 1592:#endif
+        -: 1593:        *this = std::move(other);
+        -: 1594:        return *this;
+        -: 1595:    }
+        -: 1596:};
+        -: 1597:
+        -: 1598:Q_DECLARE_ASSOCIATIVE_ITERATOR(MultiMap)
+        -: 1599:Q_DECLARE_MUTABLE_ASSOCIATIVE_ITERATOR(MultiMap)
+        -: 1600:
+        -: 1601:template <typename Key, typename T>
+        -: 1602:QMultiMap<Key, T> operator+(const QMultiMap<Key, T> &lhs, const QMultiMap<Key, T> &rhs)
+        -: 1603:{
+        -: 1604:    auto result = lhs;
+        -: 1605:    result += rhs;
+        -: 1606:    return result;
+        -: 1607:}
+        -: 1608:
+        -: 1609:template <typename Key, typename T>
+        -: 1610:QMultiMap<Key, T> operator+=(QMultiMap<Key, T> &lhs, const QMultiMap<Key, T> &rhs)
+        -: 1611:{
+        -: 1612:    return lhs.unite(rhs);
+        -: 1613:}
+        -: 1614:
+        -: 1615:template <typename Key, typename T, typename Predicate>
+        -: 1616:qsizetype erase_if(QMultiMap<Key, T> &map, Predicate pred)
+        -: 1617:{
+        -: 1618:    return QtPrivate::associative_erase_if(map, pred);
+        -: 1619:}
+        -: 1620:
+        -: 1621:QT_END_NAMESPACE
+        -: 1622:
+        -: 1623:#endif // QMAP_H

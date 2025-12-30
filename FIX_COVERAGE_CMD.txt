@@ -1,0 +1,46 @@
+====== SOLUTION: Smart_Testing_Tools Coverage Path Issue ======
+
+PROBLEM:
+  覆盖率命令执行失败，错误信息：
+  "(ERROR) Bad --gcov-object-directory option. The specified directory does not exist."
+  
+  原因：Smart_Testing_Tools 中配置的覆盖率命令使用了错误的对象目录路径
+  错误路径：tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug (不存在)
+  实际编译输出：debug/ (项目根目录下)
+
+SOLUTION:
+  在 Smart_Testing_Tools UI 中修改覆盖率命令
+
+STEPS:
+  1. 运行 main.py 启动 Smart_Testing_Tools
+  2. 点击导航栏最后一个页面 [Settings]
+  3. 找到 "Automation" 卡片
+  4. 在 "覆盖率命令" 输入框中，清空现有内容
+  5. 复制下面的完整命令，粘贴到输入框：
+
+═════════════════════════════════════════════════════════════════
+
+python -m gcovr -r . --object-directory debug --gcov-executable D:/Qt/Tools/mingw1310_64/bin/gcov.exe --exclude-directories .git --exclude-directories .venv --exclude-directories tools --exclude-directories generated_tests --print-summary --html-details -o coverage.html --json=coverage.json
+
+═════════════════════════════════════════════════════════════════
+
+  6. 点击 "💾 保存命令配置" 按钮保存
+  7. 返回项目，重新运行一键生成测试 & 覆盖率
+
+KEY CHANGES:
+  ✓ --object-directory tests/build/... → --object-directory debug
+  ✓ 使用相对路径 "debug" 指向项目根目录下的编译输出目录
+  ✓ 这个目录包含编译生成的 .gcda 和 .gcno 文件
+
+WHY IT WORKS:
+  • 当您在 Smart_Testing_Tools 中生成测试用例并编译时
+  • 编译输出（.o 文件、.gcda/.gcno 文件）都会放在 debug/ 目录
+  • gcovr 需要指向这个目录来读取覆盖率数据
+  • 相对路径 "debug" 会相对于项目根目录进行解析
+
+VERIFICATION:
+  编译完成后，应该在以下位置找到覆盖率数据：
+  C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug\*.gcda
+  C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug\*.gcno
+
+  如果这些文件存在，覆盖率命令就应该成功。

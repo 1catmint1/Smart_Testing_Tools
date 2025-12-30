@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_064526",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\arrow.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_arrow.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_arrow.cpp",
+          "content": "#include <QtTest>\n#include <QStyleOptionGraphicsItem>\n#include <QPainter>\n#include \"../../arrow.h\"\n#include \"../../diagramitem.h\"\n\nclass TestArrow : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void testConstructor();\n    void testBoundingRect();\n    void testUpdatePosition();\n    void testPaintDoesNotCrash();\n};\n\nvoid TestArrow::testConstructor()\n{\n    // 由于 DiagramItem 构造可能需要场景，我们创建一个简单的测试项作为替代\n    // 这是一个冒烟测试，确保构造函数不会崩溃\n    QGraphicsRectItem startItem;\n    QGraphicsRectItem endItem;\n    // 注意：Arrow 构造函数期望 DiagramItem*，但为了测试编译，我们进行强制转换。\n    // 在实际项目中，应使用真实的 DiagramItem 对象或 Mock。\n    // 这里我们假设 DiagramItem 继承自 QGraphicsRectItem 以进行编译。\n    Arrow arrow((DiagramItem*)&startItem, (DiagramItem*)&endItem);\n    QVERIFY(arrow.startItem() != nullptr);\n    QVERIFY(arrow.endItem() != nullptr);\n    QVERIFY(arrow.pen().width() == 2);\n}\n\nvoid TestArrow::testBoundingRect()\n{\n    QGraphicsRectItem startItem;\n    QGraphicsRectItem endItem;\n    Arrow arrow((DiagramItem*)&startItem, (DiagramItem*)&endItem);\n    // 初始线可能是默认的，边界矩形应包含额外边距\n    QRectF rect = arrow.boundingRect();\n    QVERIFY(rect.isValid());\n    // 设置一条线并检查边界矩形是否包含它\n    arrow.setLine(0, 0, 100, 100);\n    rect = arrow.boundingRect();\n    QLineF line = arrow.line();\n    QVERIFY(rect.contains(line.p1()));\n    QVERIFY(rect.contains(line.p2()));\n    // 检查额外边距（pen width + 20）/2.0，对于宽度2的笔，extra = 11\n    qreal extra = (2 + 20) / 2.0;\n    QVERIFY(rect.width() >= line.dx() && rect.width() <= line.dx() + 2*extra);\n}\n\nvoid TestArrow::testUpdatePosition()\n{\n    QGraphicsRectItem startItem;\n    QGraphicsRectItem endItem;\n    startItem.setPos(10, 20);\n    endItem.setPos(50, 60);\n    Arrow arrow((DiagramItem*)&startItem, (DiagramItem*)&endItem);\n    arrow.updatePosition();\n    QLineF line = arrow.line();\n    // updatePosition 使用 mapFromItem，但这里我们简化检查\n    // 实际中，线应连接两个项的原点（在箭头坐标系中）\n    QVERIFY(line.x1() == 0 && line.y1() == 0); // mapFromItem(myStartItem, 0,0) 应为 (0,0)\n    // mapFromItem(myEndItem, 0,0) 应为 endItem.pos() - startItem.pos() 在箭头坐标系中？\n    // 由于箭头父项未指定，我们只确保线已更新（非默认）\n    QVERIFY(line != QLineF());\n}\n\nvoid TestArrow::testPaintDoesNotCrash()\n{\n    QGraphicsRectItem startItem;\n    QGraphicsRectItem endItem;\n    Arrow arrow((DiagramItem*)&startItem, (DiagramItem*)&endItem);\n    // 创建一个 QPainter 到 QImage 以测试 paint 方法不崩溃\n    QImage image(200, 200, QImage::Format_ARGB32);\n    QPainter painter(&image);\n    QStyleOptionGraphicsItem option;\n    arrow.paint(&painter, &option, nullptr);\n    // 如果没有崩溃，测试通过\n    QVERIFY(true);\n}\n\nQTEST_MAIN(TestArrow)\n#include \"test_arrow.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = tests\nCONFIG += testcase warn_on depend_includepath\nQT += testlib widgets svg\n\n# 假设项目根目录为 Diagramscene_ultima-syz\n# 包含被测文件的目录\nINCLUDEPATH += ../..\\../..\n\n# 源文件\nSOURCES += test_arrow.cpp\n\n# 注意：为了成功编译，需要将 arrow.cpp 和 diagramitem.cpp 添加到 SOURCES 中，\n# 或者将它们编译为库并链接。这里我们假设它们在同一目录下并直接添加。\nSOURCES += ..\\..\\arrow.cpp\n# 如果 diagramitem.cpp 存在，也需要添加\n# SOURCES += ..\\..\\diagramitem.cpp\nSOURCES += ../../arrow.cpp \\\n    ../../diagramitem.cpp \\\n    ../../diagramitemgroup.cpp \\\n    ../../diagrampath.cpp \\\n    ../../diagramscene.cpp \\\n    ../../diagramtextitem.cpp \\\n    ../../findreplacedialog.cpp \\\n    ../../mainwindow.cpp\n\n# 头文件\nHEADERS += ..\\..\\arrow.h \\\n           ..\\..\\diagramitem.h\n\n# 输出目录\nDESTDIR = .\nQMAKE_CXXFLAGS += --coverage\nQMAKE_LFLAGS += --coverage\nHEADERS += ../../arrow.h \\\n    ../../diagramitem.h \\\n    ../../diagramitemgroup.h \\\n    ../../diagrampath.h \\\n    ../../diagramscene.h \\\n    ../../diagramtextitem.h \\\n    ../../findreplacedialog.h \\\n    ../../mainwindow.h"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 4
+      }
+    },
+    "applied": [
+      "tests/generated/test_arrow.cpp (4 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 4
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 4 个用例",
+      "details": "生成文件明细：\ntests/generated/test_arrow.cpp (4 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

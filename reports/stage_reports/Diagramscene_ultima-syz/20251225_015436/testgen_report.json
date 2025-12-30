@@ -1,0 +1,51 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251225_015436",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [],
+      "patches": [],
+      "stats": {
+        "files_generated": 0,
+        "cases_approx": 0
+      }
+    },
+    "applied": [],
+    "total_cases_count": 0
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: {\n    \"schema\": \"QtTest project with .pro file and test .cpp files\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/tests.pro\",\n            \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow\\n\\nCONFIG += ordered\\n\"\n        },\n        {\n            \"name\": \"tests/generated/test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include \\\"../diagramitem.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testConstructor();\\n    void testBoundingRect();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testRotationAngle();\\n    void testDiagramType();\\n    void testTextItem();\\n};\\n\\nvoid TestDiagramItem::initTestCase() {}\\nvoid TestDiagramItem::cleanupTestCase() {}\\n\\nvoid TestDiagramItem::testConstructor()\\n{\\n    DiagramItem item(DiagramItem::Step, nullptr);\\n    QVERIFY(item.boundingRect().isValid());\\n    QCOMPARE(item.rotationAngle(), 0);\\n}\\n\\nvoid TestDiagramItem::testBoundingRect()\\n{\\n    DiagramItem item(DiagramItem::Step, nullptr);\\n    QRectF rect = item.boundingRect();\\n    QVERIFY(rect.width() > 0);\\n    QVERIFY(rect.height() > 0);\\n}\\n\\nvoid TestDiagramItem::testSetBrush()\\n{\\n    DiagramItem item(DiagramItem::Step, nullptr);\\n    QColor color(Qt::red);\\n    item.setBrush(color);\\n    QVERIFY(true);\\n}\\n\\nvoid TestDiagramItem::testSetFixedSize()\\n{\\n    DiagramItem item(DiagramItem::Step, nullptr);\\n    QSizeF size(200, 150);\\n    item.setFixedSize(size);\\n    QVERIFY(true);\\n}\\n\\nvoid TestDiagramItem::testRotationAngle()\\n{\\n    DiagramItem item(DiagramItem::Step, nullptr);\\n    QCOMPARE(item.rotationAngle(), 0);\\n    item.setRotationAngle(45);\\n    QCOMPARE(item.rotationAngle(), 45);\\n}\\n\\nvoid",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: {\n  \"schema\": \"QtTest project with .pro file and test .cpp files\",\n  \"files\": [\n    {\n      \"name\": \"tests/generated/tests.pro\",\n      \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow\\n\\nCONFIG += ordered\\n\"\n    },\n    {\n      \"name\": \"tests/generated/test_diagramitem.cpp\",\n      \"content\": \"#include <QtTest>\\n#include \\\"../diagramitem.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testConstructor();\\n    void testBoundingRect();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testRotationAngle();\\n\\nprivate:\\n    DiagramItem *item;\\n    QMenu *dummyMenu;\\n};\\n\\nvoid TestDiagramItem::initTestCase()\\n{\\n    dummyMenu = new QMenu();\\n    item = new DiagramItem(DiagramItem::Step, dummyMenu);\\n}\\n\\nvoid TestDiagramItem::cleanupTestCase()\\n{\\n    delete item;\\n    delete dummyMenu;\\n}\\n\\nvoid TestDiagramItem::testConstructor()\\n{\\n    QVERIFY(item != nullptr);\\n    QCOMPARE(item->diagramType(), DiagramItem::Step);\\n    QVERIFY(item->flags() & QGraphicsItem::ItemIsSelectable);\\n    QVERIFY(item->flags() & QGraphicsItem::ItemIsMovable);\\n}\\n\\nvoid TestDiagramItem::testBoundingRect()\\n{\\n    QRectF rect = item->boundingRect();\\n    QVERIFY(rect.isValid());\\n    QVERIFY(rect.width() > 0);\\n    QVERIFY(rect.height() > 0);\\n}\\n\\nvoid TestDiagramItem::testSetBrush()\\n{\\n    QColor newColor(Qt::red);\\n    item->setBrush(newColor);\\n    QVERIFY(true);\\n}\\n\\nvoid TestDiagramItem::testSetFixedSize()\\n{\\n    QSizeF newSize(200, 150);\\n    item->setFixedSize(newSize);\\n    QVERIFY(true);\\n}\\n\\nvoid TestDiagramItem::testRotationAngle()\\n{\\n    qreal angle = 45.0;\\n    item->setRotationAngle(angle);\\n    QCOMPARE(item->rotationAngle(), angle);\\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "未写入任何 QtTest 文件（LLM 输出为空或不合法）",
+      "details": "",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

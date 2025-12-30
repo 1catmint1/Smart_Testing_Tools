@@ -1,0 +1,470 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtGui/qcolor.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QCOLOR_H
+        -:    5:#define QCOLOR_H
+        -:    6:
+        -:    7:#include <QtGui/qtguiglobal.h>
+        -:    8:#include <QtGui/qrgb.h>
+        -:    9:#include <QtCore/qnamespace.h>
+        -:   10:#include <QtCore/qstringlist.h>
+        -:   11:#include <QtGui/qrgba64.h>
+        -:   12:
+        -:   13:#include <limits.h>
+        -:   14:
+        -:   15:QT_BEGIN_NAMESPACE
+        -:   16:
+        -:   17:
+        -:   18:class QColor;
+        -:   19:class QColormap;
+        -:   20:class QVariant;
+        -:   21:
+        -:   22:#ifndef QT_NO_DEBUG_STREAM
+        -:   23:Q_GUI_EXPORT QDebug operator<<(QDebug, const QColor &);
+        -:   24:#endif
+        -:   25:#ifndef QT_NO_DATASTREAM
+        -:   26:Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, const QColor &);
+        -:   27:Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, QColor &);
+        -:   28:#endif
+        -:   29:
+        -:   30:class Q_GUI_EXPORT QColor
+        -:   31:{
+        -:   32:public:
+        -:   33:    // ### Qt7: make this "enum Spec: quint8 {...}" and reorder the members below for tighter
+        -:   34:    //          struct packing. QColor could fit into the inline storage of a QVariant on 32bit.
+        -:   35:    enum Spec { Invalid, Rgb, Hsv, Cmyk, Hsl, ExtendedRgb };
+        -:   36:    enum NameFormat { HexRgb, HexArgb };
+        -:   37:
+       63:   38:    constexpr QColor() noexcept
+       63:   39:        : cspec(Invalid), ct(USHRT_MAX, 0, 0, 0, 0) {}
+        -:   40:    QColor(Qt::GlobalColor color) noexcept;
+    #####:   41:    constexpr QColor(int r, int g, int b, int a = 255) noexcept
+    #####:   42:        : cspec(isRgbaValid(r, g, b, a) ? Rgb : Invalid),
+    #####:   43:          ct(ushort(cspec == Rgb ? a * 0x0101 : 0),
+    #####:   44:             ushort(cspec == Rgb ? r * 0x0101 : 0),
+    #####:   45:             ushort(cspec == Rgb ? g * 0x0101 : 0),
+    #####:   46:             ushort(cspec == Rgb ? b * 0x0101 : 0),
+    #####:   47:             0) {}
+        -:   48:    QColor(QRgb rgb) noexcept;
+        -:   49:    QColor(QRgba64 rgba64) noexcept;
+        -:   50:    inline QColor(const QString& name);
+        -:   51:    explicit inline QColor(QStringView name);
+        -:   52:    inline QColor(const char *aname);
+        -:   53:    inline QColor(QLatin1StringView name);
+        -:   54:    QColor(Spec spec) noexcept;
+        -:   55:
+        -:   56:    static QColor fromString(QAnyStringView name) noexcept;
+        -:   57:
+        -:   58:    QColor &operator=(Qt::GlobalColor color) noexcept;
+        -:   59:
+        -:   60:    bool isValid() const noexcept;
+        -:   61:
+        -:   62:    QString name(NameFormat format = HexRgb) const;
+        -:   63:
+        -:   64:#if QT_DEPRECATED_SINCE(6, 6)
+        -:   65:    QT_DEPRECATED_VERSION_X_6_6("Use fromString() instead.")
+        -:   66:    void setNamedColor(const QString& name);
+        -:   67:    QT_DEPRECATED_VERSION_X_6_6("Use fromString() instead.")
+        -:   68:    void setNamedColor(QStringView name);
+        -:   69:    QT_DEPRECATED_VERSION_X_6_6("Use fromString() instead.")
+        -:   70:    void setNamedColor(QLatin1StringView name);
+        -:   71:#endif
+        -:   72:
+        -:   73:    static QStringList colorNames();
+        -:   74:
+        -:   75:    inline Spec spec() const noexcept
+        -:   76:    { return cspec; }
+        -:   77:
+        -:   78:    int alpha() const noexcept;
+        -:   79:    void setAlpha(int alpha);
+        -:   80:
+        -:   81:    float alphaF() const noexcept;
+        -:   82:    void setAlphaF(float alpha);
+        -:   83:
+        -:   84:    int red() const noexcept;
+        -:   85:    int green() const noexcept;
+        -:   86:    int blue() const noexcept;
+        -:   87:    void setRed(int red);
+        -:   88:    void setGreen(int green);
+        -:   89:    void setBlue(int blue);
+        -:   90:
+        -:   91:    float redF() const noexcept;
+        -:   92:    float greenF() const noexcept;
+        -:   93:    float blueF() const noexcept;
+        -:   94:    void setRedF(float red);
+        -:   95:    void setGreenF(float green);
+        -:   96:    void setBlueF(float blue);
+        -:   97:
+        -:   98:    void getRgb(int *r, int *g, int *b, int *a = nullptr) const;
+        -:   99:    void setRgb(int r, int g, int b, int a = 255);
+        -:  100:
+        -:  101:    void getRgbF(float *r, float *g, float *b, float *a = nullptr) const;
+        -:  102:    void setRgbF(float r, float g, float b, float a = 1.0);
+        -:  103:
+        -:  104:    QRgba64 rgba64() const noexcept;
+        -:  105:    void setRgba64(QRgba64 rgba) noexcept;
+        -:  106:
+        -:  107:    QRgb rgba() const noexcept;
+        -:  108:    void setRgba(QRgb rgba) noexcept;
+        -:  109:
+        -:  110:    QRgb rgb() const noexcept;
+        -:  111:    void setRgb(QRgb rgb) noexcept;
+        -:  112:
+        -:  113:    int hue() const noexcept; // 0 <= hue < 360
+        -:  114:    int saturation() const noexcept;
+        -:  115:    int hsvHue() const noexcept; // 0 <= hue < 360
+        -:  116:    int hsvSaturation() const noexcept;
+        -:  117:    int value() const noexcept;
+        -:  118:
+        -:  119:    float hueF() const noexcept; // 0.0 <= hueF < 360.0
+        -:  120:    float saturationF() const noexcept;
+        -:  121:    float hsvHueF() const noexcept; // 0.0 <= hueF < 360.0
+        -:  122:    float hsvSaturationF() const noexcept;
+        -:  123:    float valueF() const noexcept;
+        -:  124:
+        -:  125:    void getHsv(int *h, int *s, int *v, int *a = nullptr) const;
+        -:  126:    void setHsv(int h, int s, int v, int a = 255);
+        -:  127:
+        -:  128:    void getHsvF(float *h, float *s, float *v, float *a = nullptr) const;
+        -:  129:    void setHsvF(float h, float s, float v, float a = 1.0);
+        -:  130:
+        -:  131:    int cyan() const noexcept;
+        -:  132:    int magenta() const noexcept;
+        -:  133:    int yellow() const noexcept;
+        -:  134:    int black() const noexcept;
+        -:  135:
+        -:  136:    float cyanF() const noexcept;
+        -:  137:    float magentaF() const noexcept;
+        -:  138:    float yellowF() const noexcept;
+        -:  139:    float blackF() const noexcept;
+        -:  140:
+        -:  141:    void getCmyk(int *c, int *m, int *y, int *k, int *a = nullptr) const;
+        -:  142:    void setCmyk(int c, int m, int y, int k, int a = 255);
+        -:  143:
+        -:  144:    void getCmykF(float *c, float *m, float *y, float *k, float *a = nullptr) const;
+        -:  145:    void setCmykF(float c, float m, float y, float k, float a = 1.0);
+        -:  146:
+        -:  147:    int hslHue() const noexcept; // 0 <= hue < 360
+        -:  148:    int hslSaturation() const noexcept;
+        -:  149:    int lightness() const noexcept;
+        -:  150:
+        -:  151:    float hslHueF() const noexcept; // 0.0 <= hueF < 360.0
+        -:  152:    float hslSaturationF() const noexcept;
+        -:  153:    float lightnessF() const noexcept;
+        -:  154:
+        -:  155:    void getHsl(int *h, int *s, int *l, int *a = nullptr) const;
+        -:  156:    void setHsl(int h, int s, int l, int a = 255);
+        -:  157:
+        -:  158:    void getHslF(float *h, float *s, float *l, float *a = nullptr) const;
+        -:  159:    void setHslF(float h, float s, float l, float a = 1.0);
+        -:  160:
+        -:  161:    QColor toRgb() const noexcept;
+        -:  162:    QColor toHsv() const noexcept;
+        -:  163:    QColor toCmyk() const noexcept;
+        -:  164:    QColor toHsl() const noexcept;
+        -:  165:    QColor toExtendedRgb() const noexcept;
+        -:  166:
+        -:  167:    [[nodiscard]] QColor convertTo(Spec colorSpec) const noexcept;
+        -:  168:
+        -:  169:    static QColor fromRgb(QRgb rgb) noexcept;
+        -:  170:    static QColor fromRgba(QRgb rgba) noexcept;
+        -:  171:
+        -:  172:    static QColor fromRgb(int r, int g, int b, int a = 255);
+        -:  173:    static QColor fromRgbF(float r, float g, float b, float a = 1.0);
+        -:  174:
+        -:  175:    static QColor fromRgba64(ushort r, ushort g, ushort b, ushort a = USHRT_MAX) noexcept;
+        -:  176:    static QColor fromRgba64(QRgba64 rgba) noexcept;
+        -:  177:
+        -:  178:    static QColor fromHsv(int h, int s, int v, int a = 255);
+        -:  179:    static QColor fromHsvF(float h, float s, float v, float a = 1.0);
+        -:  180:
+        -:  181:    static QColor fromCmyk(int c, int m, int y, int k, int a = 255);
+        -:  182:    static QColor fromCmykF(float c, float m, float y, float k, float a = 1.0);
+        -:  183:
+        -:  184:    static QColor fromHsl(int h, int s, int l, int a = 255);
+        -:  185:    static QColor fromHslF(float h, float s, float l, float a = 1.0);
+        -:  186:
+        -:  187:    [[nodiscard]] QColor lighter(int f = 150) const noexcept;
+        -:  188:    [[nodiscard]] QColor darker(int f = 200) const noexcept;
+        -:  189:
+        -:  190:    bool operator==(const QColor &c) const noexcept;
+        -:  191:    bool operator!=(const QColor &c) const noexcept;
+        -:  192:
+        -:  193:    operator QVariant() const;
+        -:  194:
+        -:  195:#if QT_DEPRECATED_SINCE(6, 6)
+        -:  196:    QT_DEPRECATED_VERSION_X_6_6("Use isValidColorName() instead.")
+        -:  197:    static bool isValidColor(const QString &name);
+        -:  198:    QT_DEPRECATED_VERSION_X_6_6("Use isValidColorName() instead.")
+        -:  199:    static bool isValidColor(QStringView) noexcept;
+        -:  200:    QT_DEPRECATED_VERSION_X_6_6("Use isValidColorName() instead.")
+        -:  201:    static bool isValidColor(QLatin1StringView) noexcept;
+        -:  202:#endif
+        -:  203:    static bool isValidColorName(QAnyStringView) noexcept;
+        -:  204:
+        -:  205:private:
+        -:  206:
+        -:  207:    void invalidate() noexcept;
+        -:  208:
+    #####:  209:    static constexpr bool isRgbaValid(int r, int g, int b, int a = 255) noexcept Q_DECL_CONST_FUNCTION
+        -:  210:    {
+    #####:  211:        return uint(r) <= 255 && uint(g) <= 255 && uint(b) <= 255 && uint(a) <= 255;
+        -:  212:    }
+        -:  213:
+        -:  214:    Spec cspec;
+        -:  215:    union CT {
+        -:  216:#ifdef Q_COMPILER_UNIFORM_INIT
+        -:  217:        CT() {} // doesn't init anything, thus can't be constexpr
+       63:  218:        constexpr explicit CT(ushort a1, ushort a2, ushort a3, ushort a4, ushort a5) noexcept
+       63:  219:            : array{a1, a2, a3, a4, a5} {}
+        -:  220:#endif
+        -:  221:        struct {
+        -:  222:            ushort alpha;
+        -:  223:            ushort red;
+        -:  224:            ushort green;
+        -:  225:            ushort blue;
+        -:  226:            ushort pad;
+        -:  227:        } argb;
+        -:  228:        struct {
+        -:  229:            ushort alpha;
+        -:  230:            ushort hue;
+        -:  231:            ushort saturation;
+        -:  232:            ushort value;
+        -:  233:            ushort pad;
+        -:  234:        } ahsv;
+        -:  235:        struct {
+        -:  236:            ushort alpha;
+        -:  237:            ushort cyan;
+        -:  238:            ushort magenta;
+        -:  239:            ushort yellow;
+        -:  240:            ushort black;
+        -:  241:        } acmyk;
+        -:  242:        struct {
+        -:  243:            ushort alpha;
+        -:  244:            ushort hue;
+        -:  245:            ushort saturation;
+        -:  246:            ushort lightness;
+        -:  247:            ushort pad;
+        -:  248:        } ahsl;
+        -:  249:        struct {
+        -:  250:            ushort alphaF16;
+        -:  251:            ushort redF16;
+        -:  252:            ushort greenF16;
+        -:  253:            ushort blueF16;
+        -:  254:            ushort pad;
+        -:  255:        } argbExtended;
+        -:  256:        ushort array[5];
+        -:  257:    } ct;
+        -:  258:
+        -:  259:    friend class QColormap;
+        -:  260:#ifndef QT_NO_DATASTREAM
+        -:  261:    friend Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, const QColor &);
+        -:  262:    friend Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, QColor &);
+        -:  263:#endif
+        -:  264:
+        -:  265:#ifdef Q_COMPILER_UNIFORM_INIT
+        -:  266:public: // can't give friendship to a namespace, so it needs to be public
+        -:  267:    constexpr explicit QColor(Spec spec, ushort a1, ushort a2, ushort a3, ushort a4, ushort a5=0) noexcept
+        -:  268:        : cspec(spec), ct(a1, a2, a3, a4, a5) {}
+        -:  269:#endif // Q_COMPILER_UNIFORM_INIT
+        -:  270:};
+        -:  271:Q_DECLARE_TYPEINFO(QColor, Q_RELOCATABLE_TYPE);
+        -:  272:
+        -:  273:inline QColor::QColor(QLatin1StringView aname)
+        -:  274:    : QColor(fromString(aname)) {}
+        -:  275:
+        -:  276:inline QColor::QColor(QStringView aname)
+        -:  277:    : QColor(fromString(aname)) {}
+        -:  278:
+        -:  279:inline QColor::QColor(const QString& aname)
+        -:  280:    : QColor(fromString(aname)) {}
+        -:  281:
+        -:  282:inline QColor::QColor(const char *aname)
+        -:  283:    : QColor(fromString(aname)) {}
+        -:  284:
+    #####:  285:inline bool QColor::isValid() const noexcept
+    #####:  286:{ return cspec != Invalid; }
+        -:  287:
+        -:  288:namespace QColorConstants
+        -:  289:{
+        -:  290:    // Qt::GlobalColor names
+        -:  291:    constexpr inline QColor Color0      {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  292:    constexpr inline QColor Color1      {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101};
+        -:  293:    constexpr inline QColor Black       {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  294:    constexpr inline QColor White       {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101};
+        -:  295:    constexpr inline QColor DarkGray    {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x80 * 0x101, 0x80 * 0x101};
+        -:  296:    constexpr inline QColor Gray        {QColor::Rgb, 0xff * 0x101, 0xa0 * 0x101, 0xa0 * 0x101, 0xa4 * 0x101};
+        -:  297:    constexpr inline QColor LightGray   {QColor::Rgb, 0xff * 0x101, 0xc0 * 0x101, 0xc0 * 0x101, 0xc0 * 0x101};
+        -:  298:    constexpr inline QColor Red         {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  299:    constexpr inline QColor Green       {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101, 0x00 * 0x101};
+        -:  300:    constexpr inline QColor Blue        {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0xff * 0x101};
+        -:  301:    constexpr inline QColor Cyan        {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101, 0xff * 0x101};
+        -:  302:    constexpr inline QColor Magenta     {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101};
+        -:  303:    constexpr inline QColor Yellow      {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101, 0x00 * 0x101};
+        -:  304:    constexpr inline QColor DarkRed     {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  305:    constexpr inline QColor DarkGreen   {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x80 * 0x101, 0x00 * 0x101};
+        -:  306:    constexpr inline QColor DarkBlue    {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0x80 * 0x101};
+        -:  307:    constexpr inline QColor DarkCyan    {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x80 * 0x101, 0x80 * 0x101};
+        -:  308:    constexpr inline QColor DarkMagenta {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x00 * 0x101, 0x80 * 0x101};
+        -:  309:    constexpr inline QColor DarkYellow  {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x80 * 0x101, 0x00 * 0x101};
+        -:  310:    constexpr inline QColor Transparent {QColor::Rgb, 0x00 * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  311:
+        -:  312:    // SVG names supported by QColor (see qcolor.cpp).
+        -:  313:namespace Svg {
+        -:  314:    constexpr inline QColor aliceblue                {QColor::Rgb, 0xff * 0x101, 0xf0 * 0x101, 0xf8 * 0x101, 0xff * 0x101};
+        -:  315:    constexpr inline QColor antiquewhite             {QColor::Rgb, 0xff * 0x101, 0xfa * 0x101, 0xeb * 0x101, 0xd7 * 0x101};
+        -:  316:    constexpr inline QColor aqua                     {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101, 0xff * 0x101};
+        -:  317:    constexpr inline QColor aquamarine               {QColor::Rgb, 0xff * 0x101, 0x7f * 0x101, 0xff * 0x101, 0xd4 * 0x101};
+        -:  318:    constexpr inline QColor azure                    {QColor::Rgb, 0xff * 0x101, 0xf0 * 0x101, 0xff * 0x101, 0xff * 0x101};
+        -:  319:    constexpr inline QColor beige                    {QColor::Rgb, 0xff * 0x101, 0xf5 * 0x101, 0xf5 * 0x101, 0xdc * 0x101};
+        -:  320:    constexpr inline QColor bisque                   {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xe4 * 0x101, 0xc4 * 0x101};
+        -:  321:    constexpr inline QColor black                    {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  322:    constexpr inline QColor blanchedalmond           {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xeb * 0x101, 0xcd * 0x101};
+        -:  323:    constexpr inline QColor blue                     {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0xff * 0x101};
+        -:  324:    constexpr inline QColor blueviolet               {QColor::Rgb, 0xff * 0x101, 0x8a * 0x101, 0x2b * 0x101, 0xe2 * 0x101};
+        -:  325:    constexpr inline QColor brown                    {QColor::Rgb, 0xff * 0x101, 0xa5 * 0x101, 0x2a * 0x101, 0x2a * 0x101};
+        -:  326:    constexpr inline QColor burlywood                {QColor::Rgb, 0xff * 0x101, 0xde * 0x101, 0xb8 * 0x101, 0x87 * 0x101};
+        -:  327:    constexpr inline QColor cadetblue                {QColor::Rgb, 0xff * 0x101, 0x5f * 0x101, 0x9e * 0x101, 0xa0 * 0x101};
+        -:  328:    constexpr inline QColor chartreuse               {QColor::Rgb, 0xff * 0x101, 0x7f * 0x101, 0xff * 0x101, 0x00 * 0x101};
+        -:  329:    constexpr inline QColor chocolate                {QColor::Rgb, 0xff * 0x101, 0xd2 * 0x101, 0x69 * 0x101, 0x1e * 0x101};
+        -:  330:    constexpr inline QColor coral                    {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x7f * 0x101, 0x50 * 0x101};
+        -:  331:    constexpr inline QColor cornflowerblue           {QColor::Rgb, 0xff * 0x101, 0x64 * 0x101, 0x95 * 0x101, 0xed * 0x101};
+        -:  332:    constexpr inline QColor cornsilk                 {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xf8 * 0x101, 0xdc * 0x101};
+        -:  333:    constexpr inline QColor crimson                  {QColor::Rgb, 0xff * 0x101, 0xdc * 0x101, 0x14 * 0x101, 0x3c * 0x101};
+        -:  334:    constexpr inline QColor cyan                     {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101, 0xff * 0x101};
+        -:  335:    constexpr inline QColor darkblue                 {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0x8b * 0x101};
+        -:  336:    constexpr inline QColor darkcyan                 {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x8b * 0x101, 0x8b * 0x101};
+        -:  337:    constexpr inline QColor darkgoldenrod            {QColor::Rgb, 0xff * 0x101, 0xb8 * 0x101, 0x86 * 0x101, 0x0b * 0x101};
+        -:  338:    constexpr inline QColor darkgray                 {QColor::Rgb, 0xff * 0x101, 0xa9 * 0x101, 0xa9 * 0x101, 0xa9 * 0x101};
+        -:  339:    constexpr inline QColor darkgreen                {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x64 * 0x101, 0x00 * 0x101};
+        -:  340:    constexpr inline QColor darkgrey                 {QColor::Rgb, 0xff * 0x101, 0xa9 * 0x101, 0xa9 * 0x101, 0xa9 * 0x101};
+        -:  341:    constexpr inline QColor darkkhaki                {QColor::Rgb, 0xff * 0x101, 0xbd * 0x101, 0xb7 * 0x101, 0x6b * 0x101};
+        -:  342:    constexpr inline QColor darkmagenta              {QColor::Rgb, 0xff * 0x101, 0x8b * 0x101, 0x00 * 0x101, 0x8b * 0x101};
+        -:  343:    constexpr inline QColor darkolivegreen           {QColor::Rgb, 0xff * 0x101, 0x55 * 0x101, 0x6b * 0x101, 0x2f * 0x101};
+        -:  344:    constexpr inline QColor darkorange               {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x8c * 0x101, 0x00 * 0x101};
+        -:  345:    constexpr inline QColor darkorchid               {QColor::Rgb, 0xff * 0x101, 0x99 * 0x101, 0x32 * 0x101, 0xcc * 0x101};
+        -:  346:    constexpr inline QColor darkred                  {QColor::Rgb, 0xff * 0x101, 0x8b * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  347:    constexpr inline QColor darksalmon               {QColor::Rgb, 0xff * 0x101, 0xe9 * 0x101, 0x96 * 0x101, 0x7a * 0x101};
+        -:  348:    constexpr inline QColor darkseagreen             {QColor::Rgb, 0xff * 0x101, 0x8f * 0x101, 0xbc * 0x101, 0x8f * 0x101};
+        -:  349:    constexpr inline QColor darkslateblue            {QColor::Rgb, 0xff * 0x101, 0x48 * 0x101, 0x3d * 0x101, 0x8b * 0x101};
+        -:  350:    constexpr inline QColor darkslategray            {QColor::Rgb, 0xff * 0x101, 0x2f * 0x101, 0x4f * 0x101, 0x4f * 0x101};
+        -:  351:    constexpr inline QColor darkslategrey            {QColor::Rgb, 0xff * 0x101, 0x2f * 0x101, 0x4f * 0x101, 0x4f * 0x101};
+        -:  352:    constexpr inline QColor darkturquoise            {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xce * 0x101, 0xd1 * 0x101};
+        -:  353:    constexpr inline QColor darkviolet               {QColor::Rgb, 0xff * 0x101, 0x94 * 0x101, 0x00 * 0x101, 0xd3 * 0x101};
+        -:  354:    constexpr inline QColor deeppink                 {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x14 * 0x101, 0x93 * 0x101};
+        -:  355:    constexpr inline QColor deepskyblue              {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xbf * 0x101, 0xff * 0x101};
+        -:  356:    constexpr inline QColor dimgray                  {QColor::Rgb, 0xff * 0x101, 0x69 * 0x101, 0x69 * 0x101, 0x69 * 0x101};
+        -:  357:    constexpr inline QColor dimgrey                  {QColor::Rgb, 0xff * 0x101, 0x69 * 0x101, 0x69 * 0x101, 0x69 * 0x101};
+        -:  358:    constexpr inline QColor dodgerblue               {QColor::Rgb, 0xff * 0x101, 0x1e * 0x101, 0x90 * 0x101, 0xff * 0x101};
+        -:  359:    constexpr inline QColor firebrick                {QColor::Rgb, 0xff * 0x101, 0xb2 * 0x101, 0x22 * 0x101, 0x22 * 0x101};
+        -:  360:    constexpr inline QColor floralwhite              {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xfa * 0x101, 0xf0 * 0x101};
+        -:  361:    constexpr inline QColor forestgreen              {QColor::Rgb, 0xff * 0x101, 0x22 * 0x101, 0x8b * 0x101, 0x22 * 0x101};
+        -:  362:    constexpr inline QColor fuchsia                  {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101};
+        -:  363:    constexpr inline QColor gainsboro                {QColor::Rgb, 0xff * 0x101, 0xdc * 0x101, 0xdc * 0x101, 0xdc * 0x101};
+        -:  364:    constexpr inline QColor ghostwhite               {QColor::Rgb, 0xff * 0x101, 0xf8 * 0x101, 0xf8 * 0x101, 0xff * 0x101};
+        -:  365:    constexpr inline QColor gold                     {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xd7 * 0x101, 0x00 * 0x101};
+        -:  366:    constexpr inline QColor goldenrod                {QColor::Rgb, 0xff * 0x101, 0xda * 0x101, 0xa5 * 0x101, 0x20 * 0x101};
+        -:  367:    constexpr inline QColor gray                     {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x80 * 0x101, 0x80 * 0x101};
+        -:  368:    constexpr inline QColor green                    {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x80 * 0x101, 0x00 * 0x101};
+        -:  369:    constexpr inline QColor greenyellow              {QColor::Rgb, 0xff * 0x101, 0xad * 0x101, 0xff * 0x101, 0x2f * 0x101};
+        -:  370:    constexpr inline QColor grey                     {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x80 * 0x101, 0x80 * 0x101};
+        -:  371:    constexpr inline QColor honeydew                 {QColor::Rgb, 0xff * 0x101, 0xf0 * 0x101, 0xff * 0x101, 0xf0 * 0x101};
+        -:  372:    constexpr inline QColor hotpink                  {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x69 * 0x101, 0xb4 * 0x101};
+        -:  373:    constexpr inline QColor indianred                {QColor::Rgb, 0xff * 0x101, 0xcd * 0x101, 0x5c * 0x101, 0x5c * 0x101};
+        -:  374:    constexpr inline QColor indigo                   {QColor::Rgb, 0xff * 0x101, 0x4b * 0x101, 0x00 * 0x101, 0x82 * 0x101};
+        -:  375:    constexpr inline QColor ivory                    {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101, 0xf0 * 0x101};
+        -:  376:    constexpr inline QColor khaki                    {QColor::Rgb, 0xff * 0x101, 0xf0 * 0x101, 0xe6 * 0x101, 0x8c * 0x101};
+        -:  377:    constexpr inline QColor lavender                 {QColor::Rgb, 0xff * 0x101, 0xe6 * 0x101, 0xe6 * 0x101, 0xfa * 0x101};
+        -:  378:    constexpr inline QColor lavenderblush            {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xf0 * 0x101, 0xf5 * 0x101};
+        -:  379:    constexpr inline QColor lawngreen                {QColor::Rgb, 0xff * 0x101, 0x7c * 0x101, 0xfc * 0x101, 0x00 * 0x101};
+        -:  380:    constexpr inline QColor lemonchiffon             {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xfa * 0x101, 0xcd * 0x101};
+        -:  381:    constexpr inline QColor lightblue                {QColor::Rgb, 0xff * 0x101, 0xad * 0x101, 0xd8 * 0x101, 0xe6 * 0x101};
+        -:  382:    constexpr inline QColor lightcoral               {QColor::Rgb, 0xff * 0x101, 0xf0 * 0x101, 0x80 * 0x101, 0x80 * 0x101};
+        -:  383:    constexpr inline QColor lightcyan                {QColor::Rgb, 0xff * 0x101, 0xe0 * 0x101, 0xff * 0x101, 0xff * 0x101};
+        -:  384:    constexpr inline QColor lightgoldenrodyellow     {QColor::Rgb, 0xff * 0x101, 0xfa * 0x101, 0xfa * 0x101, 0xd2 * 0x101};
+        -:  385:    constexpr inline QColor lightgray                {QColor::Rgb, 0xff * 0x101, 0xd3 * 0x101, 0xd3 * 0x101, 0xd3 * 0x101};
+        -:  386:    constexpr inline QColor lightgreen               {QColor::Rgb, 0xff * 0x101, 0x90 * 0x101, 0xee * 0x101, 0x90 * 0x101};
+        -:  387:    constexpr inline QColor lightgrey                {QColor::Rgb, 0xff * 0x101, 0xd3 * 0x101, 0xd3 * 0x101, 0xd3 * 0x101};
+        -:  388:    constexpr inline QColor lightpink                {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xb6 * 0x101, 0xc1 * 0x101};
+        -:  389:    constexpr inline QColor lightsalmon              {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xa0 * 0x101, 0x7a * 0x101};
+        -:  390:    constexpr inline QColor lightseagreen            {QColor::Rgb, 0xff * 0x101, 0x20 * 0x101, 0xb2 * 0x101, 0xaa * 0x101};
+        -:  391:    constexpr inline QColor lightskyblue             {QColor::Rgb, 0xff * 0x101, 0x87 * 0x101, 0xce * 0x101, 0xfa * 0x101};
+        -:  392:    constexpr inline QColor lightslategray           {QColor::Rgb, 0xff * 0x101, 0x77 * 0x101, 0x88 * 0x101, 0x99 * 0x101};
+        -:  393:    constexpr inline QColor lightslategrey           {QColor::Rgb, 0xff * 0x101, 0x77 * 0x101, 0x88 * 0x101, 0x99 * 0x101};
+        -:  394:    constexpr inline QColor lightsteelblue           {QColor::Rgb, 0xff * 0x101, 0xb0 * 0x101, 0xc4 * 0x101, 0xde * 0x101};
+        -:  395:    constexpr inline QColor lightyellow              {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101, 0xe0 * 0x101};
+        -:  396:    constexpr inline QColor lime                     {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101, 0x00 * 0x101};
+        -:  397:    constexpr inline QColor limegreen                {QColor::Rgb, 0xff * 0x101, 0x32 * 0x101, 0xcd * 0x101, 0x32 * 0x101};
+        -:  398:    constexpr inline QColor linen                    {QColor::Rgb, 0xff * 0x101, 0xfa * 0x101, 0xf0 * 0x101, 0xe6 * 0x101};
+        -:  399:    constexpr inline QColor magenta                  {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101};
+        -:  400:    constexpr inline QColor maroon                   {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  401:    constexpr inline QColor mediumaquamarine         {QColor::Rgb, 0xff * 0x101, 0x66 * 0x101, 0xcd * 0x101, 0xaa * 0x101};
+        -:  402:    constexpr inline QColor mediumblue               {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0xcd * 0x101};
+        -:  403:    constexpr inline QColor mediumorchid             {QColor::Rgb, 0xff * 0x101, 0xba * 0x101, 0x55 * 0x101, 0xd3 * 0x101};
+        -:  404:    constexpr inline QColor mediumpurple             {QColor::Rgb, 0xff * 0x101, 0x93 * 0x101, 0x70 * 0x101, 0xdb * 0x101};
+        -:  405:    constexpr inline QColor mediumseagreen           {QColor::Rgb, 0xff * 0x101, 0x3c * 0x101, 0xb3 * 0x101, 0x71 * 0x101};
+        -:  406:    constexpr inline QColor mediumslateblue          {QColor::Rgb, 0xff * 0x101, 0x7b * 0x101, 0x68 * 0x101, 0xee * 0x101};
+        -:  407:    constexpr inline QColor mediumspringgreen        {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xfa * 0x101, 0x9a * 0x101};
+        -:  408:    constexpr inline QColor mediumturquoise          {QColor::Rgb, 0xff * 0x101, 0x48 * 0x101, 0xd1 * 0x101, 0xcc * 0x101};
+        -:  409:    constexpr inline QColor mediumvioletred          {QColor::Rgb, 0xff * 0x101, 0xc7 * 0x101, 0x15 * 0x101, 0x85 * 0x101};
+        -:  410:    constexpr inline QColor midnightblue             {QColor::Rgb, 0xff * 0x101, 0x19 * 0x101, 0x19 * 0x101, 0x70 * 0x101};
+        -:  411:    constexpr inline QColor mintcream                {QColor::Rgb, 0xff * 0x101, 0xf5 * 0x101, 0xff * 0x101, 0xfa * 0x101};
+        -:  412:    constexpr inline QColor mistyrose                {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xe4 * 0x101, 0xe1 * 0x101};
+        -:  413:    constexpr inline QColor moccasin                 {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xe4 * 0x101, 0xb5 * 0x101};
+        -:  414:    constexpr inline QColor navajowhite              {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xde * 0x101, 0xad * 0x101};
+        -:  415:    constexpr inline QColor navy                     {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101, 0x80 * 0x101};
+        -:  416:    constexpr inline QColor oldlace                  {QColor::Rgb, 0xff * 0x101, 0xfd * 0x101, 0xf5 * 0x101, 0xe6 * 0x101};
+        -:  417:    constexpr inline QColor olive                    {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x80 * 0x101, 0x00 * 0x101};
+        -:  418:    constexpr inline QColor olivedrab                {QColor::Rgb, 0xff * 0x101, 0x6b * 0x101, 0x8e * 0x101, 0x23 * 0x101};
+        -:  419:    constexpr inline QColor orange                   {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xa5 * 0x101, 0x00 * 0x101};
+        -:  420:    constexpr inline QColor orangered                {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x45 * 0x101, 0x00 * 0x101};
+        -:  421:    constexpr inline QColor orchid                   {QColor::Rgb, 0xff * 0x101, 0xda * 0x101, 0x70 * 0x101, 0xd6 * 0x101};
+        -:  422:    constexpr inline QColor palegoldenrod            {QColor::Rgb, 0xff * 0x101, 0xee * 0x101, 0xe8 * 0x101, 0xaa * 0x101};
+        -:  423:    constexpr inline QColor palegreen                {QColor::Rgb, 0xff * 0x101, 0x98 * 0x101, 0xfb * 0x101, 0x98 * 0x101};
+        -:  424:    constexpr inline QColor paleturquoise            {QColor::Rgb, 0xff * 0x101, 0xaf * 0x101, 0xee * 0x101, 0xee * 0x101};
+        -:  425:    constexpr inline QColor palevioletred            {QColor::Rgb, 0xff * 0x101, 0xdb * 0x101, 0x70 * 0x101, 0x93 * 0x101};
+        -:  426:    constexpr inline QColor papayawhip               {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xef * 0x101, 0xd5 * 0x101};
+        -:  427:    constexpr inline QColor peachpuff                {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xda * 0x101, 0xb9 * 0x101};
+        -:  428:    constexpr inline QColor peru                     {QColor::Rgb, 0xff * 0x101, 0xcd * 0x101, 0x85 * 0x101, 0x3f * 0x101};
+        -:  429:    constexpr inline QColor pink                     {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xc0 * 0x101, 0xcb * 0x101};
+        -:  430:    constexpr inline QColor plum                     {QColor::Rgb, 0xff * 0x101, 0xdd * 0x101, 0xa0 * 0x101, 0xdd * 0x101};
+        -:  431:    constexpr inline QColor powderblue               {QColor::Rgb, 0xff * 0x101, 0xb0 * 0x101, 0xe0 * 0x101, 0xe6 * 0x101};
+        -:  432:    constexpr inline QColor purple                   {QColor::Rgb, 0xff * 0x101, 0x80 * 0x101, 0x00 * 0x101, 0x80 * 0x101};
+        -:  433:    constexpr inline QColor red                      {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x00 * 0x101, 0x00 * 0x101};
+        -:  434:    constexpr inline QColor rosybrown                {QColor::Rgb, 0xff * 0x101, 0xbc * 0x101, 0x8f * 0x101, 0x8f * 0x101};
+        -:  435:    constexpr inline QColor royalblue                {QColor::Rgb, 0xff * 0x101, 0x41 * 0x101, 0x69 * 0x101, 0xe1 * 0x101};
+        -:  436:    constexpr inline QColor saddlebrown              {QColor::Rgb, 0xff * 0x101, 0x8b * 0x101, 0x45 * 0x101, 0x13 * 0x101};
+        -:  437:    constexpr inline QColor salmon                   {QColor::Rgb, 0xff * 0x101, 0xfa * 0x101, 0x80 * 0x101, 0x72 * 0x101};
+        -:  438:    constexpr inline QColor sandybrown               {QColor::Rgb, 0xff * 0x101, 0xf4 * 0x101, 0xa4 * 0x101, 0x60 * 0x101};
+        -:  439:    constexpr inline QColor seagreen                 {QColor::Rgb, 0xff * 0x101, 0x2e * 0x101, 0x8b * 0x101, 0x57 * 0x101};
+        -:  440:    constexpr inline QColor seashell                 {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xf5 * 0x101, 0xee * 0x101};
+        -:  441:    constexpr inline QColor sienna                   {QColor::Rgb, 0xff * 0x101, 0xa0 * 0x101, 0x52 * 0x101, 0x2d * 0x101};
+        -:  442:    constexpr inline QColor silver                   {QColor::Rgb, 0xff * 0x101, 0xc0 * 0x101, 0xc0 * 0x101, 0xc0 * 0x101};
+        -:  443:    constexpr inline QColor skyblue                  {QColor::Rgb, 0xff * 0x101, 0x87 * 0x101, 0xce * 0x101, 0xeb * 0x101};
+        -:  444:    constexpr inline QColor slateblue                {QColor::Rgb, 0xff * 0x101, 0x6a * 0x101, 0x5a * 0x101, 0xcd * 0x101};
+        -:  445:    constexpr inline QColor slategray                {QColor::Rgb, 0xff * 0x101, 0x70 * 0x101, 0x80 * 0x101, 0x90 * 0x101};
+        -:  446:    constexpr inline QColor slategrey                {QColor::Rgb, 0xff * 0x101, 0x70 * 0x101, 0x80 * 0x101, 0x90 * 0x101};
+        -:  447:    constexpr inline QColor snow                     {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xfa * 0x101, 0xfa * 0x101};
+        -:  448:    constexpr inline QColor springgreen              {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0xff * 0x101, 0x7f * 0x101};
+        -:  449:    constexpr inline QColor steelblue                {QColor::Rgb, 0xff * 0x101, 0x46 * 0x101, 0x82 * 0x101, 0xb4 * 0x101};
+        -:  450:    constexpr inline QColor tan                      {QColor::Rgb, 0xff * 0x101, 0xd2 * 0x101, 0xb4 * 0x101, 0x8c * 0x101};
+        -:  451:    constexpr inline QColor teal                     {QColor::Rgb, 0xff * 0x101, 0x00 * 0x101, 0x80 * 0x101, 0x80 * 0x101};
+        -:  452:    constexpr inline QColor thistle                  {QColor::Rgb, 0xff * 0x101, 0xd8 * 0x101, 0xbf * 0x101, 0xd8 * 0x101};
+        -:  453:    constexpr inline QColor tomato                   {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0x63 * 0x101, 0x47 * 0x101};
+        -:  454:    constexpr inline QColor turquoise                {QColor::Rgb, 0xff * 0x101, 0x40 * 0x101, 0xe0 * 0x101, 0xd0 * 0x101};
+        -:  455:    constexpr inline QColor violet                   {QColor::Rgb, 0xff * 0x101, 0xee * 0x101, 0x82 * 0x101, 0xee * 0x101};
+        -:  456:    constexpr inline QColor wheat                    {QColor::Rgb, 0xff * 0x101, 0xf5 * 0x101, 0xde * 0x101, 0xb3 * 0x101};
+        -:  457:    constexpr inline QColor white                    {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101};
+        -:  458:    constexpr inline QColor whitesmoke               {QColor::Rgb, 0xff * 0x101, 0xf5 * 0x101, 0xf5 * 0x101, 0xf5 * 0x101};
+        -:  459:    constexpr inline QColor yellow                   {QColor::Rgb, 0xff * 0x101, 0xff * 0x101, 0xff * 0x101, 0x00 * 0x101};
+        -:  460:    constexpr inline QColor yellowgreen              {QColor::Rgb, 0xff * 0x101, 0x9a * 0x101, 0xcd * 0x101, 0x32 * 0x101};
+        -:  461:}  // namespace Svg
+        -:  462:}  // namespace QColorLiterals
+        -:  463:
+        -:  464:QT_END_NAMESPACE
+        -:  465:
+        -:  466:#endif // QCOLOR_H

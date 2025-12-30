@@ -1,0 +1,141 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251225_102833",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [],
+      "patches": [],
+      "stats": {
+        "files_generated": 0,
+        "cases_approx": 0
+      }
+    },
+    "applied": [],
+    "total_cases_count": 0
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON appears truncated (no closing bracket found). depth=2, partial content length=25713\nLast response preview: ```json\n{\n    \"schema\": \"QtTest project for DiagramScene_ultima-syz\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/tests.pro\",\n            \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow\\n\\nCONFIG += ordered\\n\"\n        },\n        {\n            \"name\": \"tests/generated/test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include \\\"diagramitem.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testConstructor();\\n    void testBoundingRect();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testRotationAngle();\\n    void testDiagramType();\\n    void testFlags();\\n    void testTextItem();\\n\\nprivate:\\n    DiagramItem *item;\\n    QMenu *dummyMenu;\\n};\\n\\nvoid TestDiagramItem::initTestCase()\\n{\\n    dummyMenu = new QMenu();\\n    item = new DiagramItem(DiagramItem::Step, dummyMenu);\\n}\\n\\nvoid TestDiagramItem::cleanupTestCase()\\n{\\n    delete item;\\n    delete dummyMenu;\\n}\\n\\nvoid TestDiagramItem::testConstructor()\\n{\\n    QVERIFY(item != nullptr);\\n    QCOMPARE(item->diagramType(), DiagramItem::Step);\\n}\\n\\nvoid TestDiagramItem::testBoundingRect()\\n{\\n    QRectF rect = item->boundingRect();\\n    QVERIFY(rect.isValid());\\n    QVERIFY(rect.width() > 0);\\n    QVERIFY(rect.height() > 0);\\n}\\n\\nvoid TestDiagramItem::testSetBrush()\\n{\\n    QColor newColor(Qt::red);\\n    item->setBrush(newColor);\\n    QVERIFY(true);\\n}\\n\\nvoid TestDiagramItem::testSetFixedSize()\\n{\\n    QSizeF newSize(200, 150);\\n    item->setFixedSize(newSize);\\n    QRectF rect = item->boundingRect();\\n    QVERIFY(rect.width() >= 200);\\n    QVERIFY(rect.height() >= 150);\\n}\\n\\nvoid TestDiagramItem::testRotationAngle()\\n{\\n    qreal initialAngl",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 1/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 2/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 3/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 4/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 5/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 6/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 7/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 8/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 9/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 10/10 批量生成失败",
+      "details": "LLM请求失败: url=https://api.deepseek.com/v1/chat/completions HTTP 400 {\"error\":{\"message\":\"Invalid max_tokens value, the valid range of max_tokens is [1, 8192]\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "未写入任何 QtTest 文件（LLM 输出为空或不合法）",
+      "details": "",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

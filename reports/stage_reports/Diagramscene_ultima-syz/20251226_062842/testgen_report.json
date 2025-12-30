@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_062842",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\arrow.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_arrow.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_arrow.cpp",
+          "content": "#include <QtTest>\n#include <QPainter>\n#include \"../../arrow.h\"\n#include \"../../diagramitem.h\"\n\nclass TestArrow : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testConstructor();\n    void testBoundingRect();\n    void testUpdatePosition();\n    void testPaint();\n\nprivate:\n    DiagramItem *startItem = nullptr;\n    DiagramItem *endItem = nullptr;\n    Arrow *arrow = nullptr;\n};\n\nvoid TestArrow::initTestCase()\n{\n    // 创建两个 DiagramItem 作为箭头的起点和终点\n    startItem = new DiagramItem(DiagramItem::Step, nullptr);\n    endItem = new DiagramItem(DiagramItem::Step, nullptr);\n    startItem->setPos(0, 0);\n    endItem->setPos(100, 100);\n    arrow = new Arrow(startItem, endItem);\n}\n\nvoid TestArrow::cleanupTestCase()\n{\n    delete arrow;\n    delete startItem;\n    delete endItem;\n}\n\nvoid TestArrow::testConstructor()\n{\n    QVERIFY(arrow != nullptr);\n    QVERIFY(arrow->startItem() == startItem);\n    QVERIFY(arrow->endItem() == endItem);\n    QVERIFY(arrow->flags() & QGraphicsItem::ItemIsSelectable);\n    QCOMPARE(arrow->pen().width(), 2);\n    QCOMPARE(arrow->pen().style(), Qt::SolidLine);\n}\n\nvoid TestArrow::testBoundingRect()\n{\n    // 设置一条线\n    arrow->setLine(0, 0, 100, 100);\n    QRectF rect = arrow->boundingRect();\n    QVERIFY(rect.isValid());\n    // 边界矩形应包含线并带有额外的边距\n    QVERIFY(rect.contains(QPointF(0, 0)));\n    QVERIFY(rect.contains(QPointF(100, 100)));\n    // 检查额外的边距（基于笔宽）\n    qreal extra = (arrow->pen().width() + 20) / 2.0;\n    QVERIFY(rect.left() <= -extra);\n    QVERIFY(rect.top() <= -extra);\n    QVERIFY(rect.right() >= 100 + extra);\n    QVERIFY(rect.bottom() >= 100 + extra);\n}\n\nvoid TestArrow::testUpdatePosition()\n{\n    // 移动起点和终点项\n    startItem->setPos(50, 50);\n    endItem->setPos(200, 200);\n    arrow->updatePosition();\n    QLineF line = arrow->line();\n    // 线应连接起点和终点项在箭头局部坐标系中的位置 (0,0)\n    // 由于 mapFromItem，这通常是项之间的向量\n    // 我们至少检查线是否已更新（非零长度）\n    QVERIFY(line.length() > 0);\n}\n\nvoid TestArrow::testPaint()\n{\n    // 对于 paint 测试，我们主要检查形状和箭头头的创建\n    // 设置一条线以触发箭头头计算\n    arrow->setLine(0, 0, 150, 0); // 水平线\n    // 调用 update 会触发 paint，但我们可以检查内部状态\n    // 具体来说，我们可以检查 arrowHead 多边形是否已创建\n    // 注意：arrowHead 是私有成员，我们无法直接访问。\n    // 因此，我们改为测试 shape() 函数，它使用了 arrowHead。\n    QPainterPath path = arrow->shape();\n    QVERIFY(!path.isEmpty());\n    // 形状应包含线（来自基类）和箭头头\n    QVERIFY(path.elementCount() > 0);\n}\n\nQTEST_MAIN(TestArrow)\n#include \"test_arrow.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = tests\nCONFIG += console testcase\nQT += testlib svg\nQT += widgets\n\nINCLUDEPATH += ../..\n\nSOURCES += \\\n    test_arrow.cpp\n\nHEADERS += \\\n    # 如果需要，可在此添加头文件\n\n# 注意：为了成功编译，需要将 arrow.cpp 和 diagramitem.cpp 添加到项目中。\n# 由于这是测试子项目，您可能需要调整路径或将这些源文件复制到测试目录。\n# 或者，在主项目文件中包含这些源文件。\nQMAKE_CXXFLAGS += --coverage\nQMAKE_LFLAGS += --coverage"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 4
+      }
+    },
+    "applied": [
+      "tests/generated/test_arrow.cpp (4 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 4
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 4 个用例",
+      "details": "生成文件明细：\ntests/generated/test_arrow.cpp (4 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

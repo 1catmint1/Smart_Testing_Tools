@@ -1,0 +1,22 @@
+[stage] coverage
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-main
+[time] 20251223_194857
+[meta] cmd: gcovr -r "C:\Users\lenovo\Desktop\Diagramscene_ultima-main"  --object-directory tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug --gcov-executable D:/Qt/Tools/mingw1310_64/bin/gcov.exe --exclude-directories .git --exclude-directories .venv --exclude-directories tools --exclude-directories generated_tests --print-summary --html-details -o coverage.html --filter "^[^/]+\.(cpp|cxx|c|h|hpp|ui)$"
+[meta] cwd: C:\Users\lenovo\Desktop\Diagramscene_ultima-main
+[meta] returncode: 0
+[meta] timed_out: False
+[meta] timeout_s: 600.0
+[meta] summary: 0.0%
+[meta] coverage_summary: {'lines': '0.0%', 'functions': '0.0%', 'branches': '0.0%'}
+
+== findings ==
+- coverage | info | 覆盖率汇总：lines 0.0% | branches 0.0% | functions 0.0%
+
+== stdout (truncated) ==
+lines: 0.0% (0 out of 2546)
+functions: 0.0% (0 out of 146)
+branches: 0.0% (0 out of 5546)
+
+== stderr (truncated) ==
+(INFO) Reading coverage data...
+(INFO) Writing coverage report...

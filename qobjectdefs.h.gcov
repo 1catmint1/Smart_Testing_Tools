@@ -1,0 +1,767 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qobjectdefs.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2022 The Qt Company Ltd.
+        -:    2:// Copyright (C) 2019 Intel Corporation.
+        -:    3:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    4:
+        -:    5:#ifndef QOBJECTDEFS_H
+        -:    6:#define QOBJECTDEFS_H
+        -:    7:
+        -:    8:#if defined(__OBJC__) && !defined(__cplusplus)
+        -:    9:#  warning "File built in Objective-C mode (.m), but using Qt requires Objective-C++ (.mm)"
+        -:   10:#endif
+        -:   11:
+        -:   12:#include <QtCore/qnamespace.h>
+        -:   13:#include <QtCore/qobjectdefs_impl.h>
+        -:   14:#include <QtCore/qtcoreexports.h>
+        -:   15:#include <QtCore/qtmetamacros.h>
+        -:   16:
+        -:   17:QT_BEGIN_NAMESPACE
+        -:   18:
+        -:   19:class QByteArray;
+        -:   20:struct QArrayData;
+        -:   21:
+        -:   22:class QString;
+        -:   23:
+        -:   24:#ifndef QT_NO_META_MACROS
+        -:   25:// macro for onaming members
+        -:   26:#ifdef METHOD
+        -:   27:#undef METHOD
+        -:   28:#endif
+        -:   29:#ifdef SLOT
+        -:   30:#undef SLOT
+        -:   31:#endif
+        -:   32:#ifdef SIGNAL
+        -:   33:#undef SIGNAL
+        -:   34:#endif
+        -:   35:#endif // QT_NO_META_MACROS
+        -:   36:
+        -:   37:Q_CORE_EXPORT const char *qFlagLocation(const char *method);
+        -:   38:
+        -:   39:#ifndef QT_NO_META_MACROS
+        -:   40:# define QMETHOD_CODE  0                        // member type codes
+        -:   41:# define QSLOT_CODE    1
+        -:   42:# define QSIGNAL_CODE  2
+        -:   43:# define QT_PREFIX_CODE(code, a) QT_STRINGIFY(code) #a
+        -:   44:# define QT_STRINGIFY_METHOD(a) QT_PREFIX_CODE(QMETHOD_CODE, a)
+        -:   45:# define QT_STRINGIFY_SLOT(a) QT_PREFIX_CODE(QSLOT_CODE, a)
+        -:   46:# define QT_STRINGIFY_SIGNAL(a) QT_PREFIX_CODE(QSIGNAL_CODE, a)
+        -:   47:# ifndef QT_NO_DEBUG
+        -:   48:#  define QLOCATION "\0" __FILE__ ":" QT_STRINGIFY(__LINE__)
+        -:   49:#  ifndef QT_NO_KEYWORDS
+        -:   50:#   define METHOD(a)   qFlagLocation(QT_STRINGIFY_METHOD(a) QLOCATION)
+        -:   51:#  endif
+        -:   52:#  define SLOT(a)     qFlagLocation(QT_STRINGIFY_SLOT(a) QLOCATION)
+        -:   53:#  define SIGNAL(a)   qFlagLocation(QT_STRINGIFY_SIGNAL(a) QLOCATION)
+        -:   54:# else
+        -:   55:#  ifndef QT_NO_KEYWORDS
+        -:   56:#   define METHOD(a)  QT_STRINGIFY_METHOD(a)
+        -:   57:#  endif
+        -:   58:#  define SLOT(a)     QT_STRINGIFY_SLOT(a)
+        -:   59:#  define SIGNAL(a)   QT_STRINGIFY_SIGNAL(a)
+        -:   60:# endif
+        -:   61:#endif // QT_NO_META_MACROS
+        -:   62:
+        -:   63:#define Q_ARG(Type, data)           QtPrivate::Invoke::argument<Type>(QT_STRINGIFY(Type), data)
+        -:   64:#define Q_RETURN_ARG(Type, data)    QtPrivate::Invoke::returnArgument<Type>(QT_STRINGIFY(Type), data)
+        -:   65:
+        -:   66:class QObject;
+        -:   67:class QMetaMethod;
+        -:   68:class QMetaEnum;
+        -:   69:class QMetaProperty;
+        -:   70:class QMetaClassInfo;
+        -:   71:
+        -:   72:namespace QtPrivate {
+        -:   73:class QMetaTypeInterface;
+        -:   74:template<typename T> constexpr const QMetaTypeInterface *qMetaTypeInterfaceForType();
+        -:   75:}
+        -:   76:
+        -:   77:struct QMethodRawArguments
+        -:   78:{
+        -:   79:    void **arguments;
+        -:   80:};
+        -:   81:
+        -:   82:#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0)
+        -:   83:class Q_CORE_EXPORT QGenericArgument
+        -:   84:{
+        -:   85:public:
+        -:   86:    inline QGenericArgument(const char *aName = nullptr, const void *aData = nullptr)
+        -:   87:        : _data(aData), _name(aName) {}
+        -:   88:    inline void *data() const { return const_cast<void *>(_data); }
+        -:   89:    inline const char *name() const { return _name; }
+        -:   90:
+        -:   91:private:
+        -:   92:    const void *_data;
+        -:   93:    const char *_name;
+        -:   94:};
+        -:   95:
+        -:   96:class Q_CORE_EXPORT QGenericReturnArgument: public QGenericArgument
+        -:   97:{
+        -:   98:public:
+        -:   99:    inline QGenericReturnArgument(const char *aName = nullptr, void *aData = nullptr)
+        -:  100:        : QGenericArgument(aName, aData)
+        -:  101:        {}
+        -:  102:};
+        -:  103:
+        -:  104:template <class T>
+        -:  105:class QArgument: public QGenericArgument
+        -:  106:{
+        -:  107:public:
+        -:  108:    inline QArgument(const char *aName, const T &aData)
+        -:  109:        : QGenericArgument(aName, static_cast<const void *>(&aData))
+        -:  110:        {}
+        -:  111:};
+        -:  112:template <class T>
+        -:  113:class QArgument<T &>: public QGenericArgument
+        -:  114:{
+        -:  115:public:
+        -:  116:    inline QArgument(const char *aName, T &aData)
+        -:  117:        : QGenericArgument(aName, static_cast<const void *>(&aData))
+        -:  118:        {}
+        -:  119:};
+        -:  120:
+        -:  121:
+        -:  122:template <typename T>
+        -:  123:class QReturnArgument: public QGenericReturnArgument
+        -:  124:{
+        -:  125:public:
+        -:  126:    inline QReturnArgument(const char *aName, T &aData)
+        -:  127:        : QGenericReturnArgument(aName, static_cast<void *>(&aData))
+        -:  128:        {}
+        -:  129:};
+        -:  130:#endif
+        -:  131:
+        -:  132:struct QMetaMethodArgument
+        -:  133:{
+        -:  134:    const QtPrivate::QMetaTypeInterface *metaType;
+        -:  135:    const char *name;
+        -:  136:    const void *data;
+        -:  137:};
+        -:  138:
+        -:  139:struct QMetaMethodReturnArgument
+        -:  140:{
+        -:  141:    const QtPrivate::QMetaTypeInterface *metaType;
+        -:  142:    const char *name;
+        -:  143:    void *data;
+        -:  144:};
+        -:  145:
+        -:  146:template <typename T>
+        -:  147:struct QTemplatedMetaMethodReturnArgument : QMetaMethodReturnArgument
+        -:  148:{
+        -:  149:    using Type = T;
+        -:  150:};
+        -:  151:
+        -:  152:namespace QtPrivate {
+        -:  153:namespace Invoke {
+        -:  154:#if QT_VERSION <= QT_VERSION_CHECK(7, 0, 0)
+        -:  155:template <typename... Args>
+        -:  156:using AreOldStyleArgs = std::disjunction<std::is_base_of<QGenericArgument, Args>...>;
+        -:  157:
+        -:  158:template <typename T, typename... Args> using IfNotOldStyleArgs =
+        -:  159:    std::enable_if_t<!AreOldStyleArgs<Args...>::value, T>;
+        -:  160:#else
+        -:  161:template <typename T, typename... Args> using IfNotOldStyleArgs = T;
+        -:  162:#endif
+        -:  163:
+        -:  164:template <typename T> inline QMetaMethodArgument argument(const char *name, const T &t)
+        -:  165:{
+        -:  166:    if constexpr ((std::is_lvalue_reference_v<T> && std::is_const_v<std::remove_reference_t<T>>) ||
+        -:  167:            !std::is_reference_v<T>) {
+        -:  168:        return { qMetaTypeInterfaceForType<T>(), name, std::addressof(t) };
+        -:  169:    } else {
+        -:  170:        return { nullptr, name, std::addressof(t) };
+        -:  171:    }
+        -:  172:}
+        -:  173:
+        -:  174:template <typename T>
+        -:  175:inline QTemplatedMetaMethodReturnArgument<T> returnArgument(const char *name, T &t)
+        -:  176:{
+        -:  177:    return { qMetaTypeInterfaceForType<T>(), name, std::addressof(t) };
+        -:  178:}
+        -:  179:
+        -:  180:template <typename T> inline const char *typenameHelper(const T &)
+        -:  181:{
+        -:  182:    return nullptr;
+        -:  183:}
+        -:  184:template <typename T> inline const void *dataHelper(const T &t)
+        -:  185:{
+        -:  186:    return std::addressof(t);
+        -:  187:}
+        -:  188:template <typename T> inline const QMetaTypeInterface *metaTypeHelper(const T &)
+        -:  189:{
+        -:  190:    return qMetaTypeInterfaceForType<T>();
+        -:  191:}
+        -:  192:
+        -:  193:inline const char *typenameHelper(QMetaMethodArgument a)
+        -:  194:{ return a.name; }
+        -:  195:inline const void *dataHelper(QMetaMethodArgument a)
+        -:  196:{ return a.data; }
+        -:  197:inline const QMetaTypeInterface *metaTypeHelper(QMetaMethodArgument a)
+        -:  198:{ return a.metaType; }
+        -:  199:
+        -:  200:inline const char *typenameHelper(const char *) = delete;
+        -:  201:template <typename T> inline const void *dataHelper(const char *) = delete;
+        -:  202:inline const QMetaTypeInterface *metaTypeHelper(const char *) = delete;
+        -:  203:inline const char *typenameHelper(const char16_t *) = delete;
+        -:  204:template <typename T> inline const void *dataHelper(const char16_t *) = delete;
+        -:  205:inline const QMetaTypeInterface *metaTypeHelper(const char16_t *) = delete;
+        -:  206:
+        -:  207:} // namespace QtPrivate::Invoke
+        -:  208:
+        -:  209:template <typename... Args> inline auto invokeMethodHelper(QMetaMethodReturnArgument r, const Args &... arguments)
+        -:  210:{
+        -:  211:    std::array params = { const_cast<const void *>(r.data), Invoke::dataHelper(arguments)... };
+        -:  212:    std::array names = { r.name, Invoke::typenameHelper(arguments)... };
+        -:  213:    std::array types = { r.metaType, Invoke::metaTypeHelper(arguments)... };
+        -:  214:    static_assert(params.size() == types.size());
+        -:  215:    static_assert(params.size() == names.size());
+        -:  216:
+        -:  217:    struct R {
+        -:  218:        decltype(params) parameters;
+        -:  219:        decltype(names) typeNames;
+        -:  220:        decltype(types) metaTypes;
+        -:  221:        constexpr qsizetype parameterCount() const { return qsizetype(parameters.size()); }
+        -:  222:    };
+        -:  223:    return R { params, names, types };
+        -:  224:}
+        -:  225:} // namespace QtPrivate
+        -:  226:
+        -:  227:template <typename T> void qReturnArg(const T &&) = delete;
+        -:  228:template <typename T> inline QTemplatedMetaMethodReturnArgument<T> qReturnArg(T &data)
+        -:  229:{
+        -:  230:    return QtPrivate::Invoke::returnArgument(nullptr, data);
+        -:  231:}
+        -:  232:
+        -:  233:struct Q_CORE_EXPORT QMetaObject
+        -:  234:{
+        -:  235:    class Connection;
+        -:  236:    const char *className() const;
+        -:  237:    const QMetaObject *superClass() const;
+        -:  238:
+        -:  239:    bool inherits(const QMetaObject *metaObject) const noexcept;
+        -:  240:    QObject *cast(QObject *obj) const
+        -:  241:    { return const_cast<QObject *>(cast(const_cast<const QObject *>(obj))); }
+        -:  242:    const QObject *cast(const QObject *obj) const;
+        -:  243:
+        -:  244:#if !defined(QT_NO_TRANSLATION) || defined(Q_QDOC)
+        -:  245:    QString tr(const char *s, const char *c, int n = -1) const;
+        -:  246:#endif // QT_NO_TRANSLATION
+        -:  247:
+        -:  248:    QMetaType metaType() const;
+        -:  249:
+        -:  250:    int methodOffset() const;
+        -:  251:    int enumeratorOffset() const;
+        -:  252:    int propertyOffset() const;
+        -:  253:    int classInfoOffset() const;
+        -:  254:
+        -:  255:    int constructorCount() const;
+        -:  256:    int methodCount() const;
+        -:  257:    int enumeratorCount() const;
+        -:  258:    int propertyCount() const;
+        -:  259:    int classInfoCount() const;
+        -:  260:
+        -:  261:    int indexOfConstructor(const char *constructor) const;
+        -:  262:    int indexOfMethod(const char *method) const;
+        -:  263:    int indexOfSignal(const char *signal) const;
+        -:  264:    int indexOfSlot(const char *slot) const;
+        -:  265:    int indexOfEnumerator(const char *name) const;
+        -:  266:
+        -:  267:    int indexOfProperty(const char *name) const;
+        -:  268:    int indexOfClassInfo(const char *name) const;
+        -:  269:
+        -:  270:    QMetaMethod constructor(int index) const;
+        -:  271:    QMetaMethod method(int index) const;
+        -:  272:    QMetaEnum enumerator(int index) const;
+        -:  273:    QMetaProperty property(int index) const;
+        -:  274:    QMetaClassInfo classInfo(int index) const;
+        -:  275:    QMetaProperty userProperty() const;
+        -:  276:
+        -:  277:    static bool checkConnectArgs(const char *signal, const char *method);
+        -:  278:    static bool checkConnectArgs(const QMetaMethod &signal,
+        -:  279:                                 const QMetaMethod &method);
+        -:  280:    static QByteArray normalizedSignature(const char *method);
+        -:  281:    static QByteArray normalizedType(const char *type);
+        -:  282:
+        -:  283:    // internal index-based connect
+        -:  284:    static Connection connect(const QObject *sender, int signal_index,
+        -:  285:                        const QObject *receiver, int method_index,
+        -:  286:                        int type = 0, int *types = nullptr);
+        -:  287:    // internal index-based disconnect
+        -:  288:    static bool disconnect(const QObject *sender, int signal_index,
+        -:  289:                           const QObject *receiver, int method_index);
+        -:  290:    static bool disconnectOne(const QObject *sender, int signal_index,
+        -:  291:                              const QObject *receiver, int method_index);
+        -:  292:    // internal slot-name based connect
+        -:  293:    static void connectSlotsByName(QObject *o);
+        -:  294:
+        -:  295:#ifdef Q_QDOC
+        -:  296:    template<typename PointerToMemberFunction>
+        -:  297:    static QMetaObject::Connection connect(const QObject *sender, const QMetaMethod &signal, const QObject *receiver, PointerToMemberFunction method, Qt::ConnectionType type = Qt::AutoConnection);
+        -:  298:    template<typename Functor>
+        -:  299:    static QMetaObject::Connection connect(const QObject *sender, const QMetaMethod &signal, const QObject *context, Functor functor, Qt::ConnectionType type = Qt::AutoConnection);
+        -:  300:#else
+        -:  301:    template <typename Func>
+        -:  302:    static inline Connection
+        -:  303:        connect(const QObject *sender, const QMetaMethod &signal,
+        -:  304:                const typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *context, Func &&slot,
+        -:  305:                Qt::ConnectionType type = Qt::AutoConnection);
+        -:  306:#endif // Q_QDOC
+        -:  307:
+        -:  308:    // internal index-based signal activation
+        -:  309:    static void activate(QObject *sender, int signal_index, void **argv);
+        -:  310:    static void activate(QObject *sender, const QMetaObject *, int local_signal_index, void **argv);
+        -:  311:    static void activate(QObject *sender, int signal_offset, int local_signal_index, void **argv);
+        -:  312:    template <typename Ret, typename... Args> static inline void
+        -:  313:    activate(QObject *sender, const QMetaObject *mo, int local_signal_index, Ret *ret, const Args &... args)
+        -:  314:    {
+        -:  315:        void *_a[] = {
+        -:  316:            const_cast<void *>(reinterpret_cast<const volatile void *>(ret)),
+        -:  317:            const_cast<void *>(reinterpret_cast<const volatile void *>(std::addressof(args)))...
+        -:  318:        };
+        -:  319:        activate(sender, mo, local_signal_index, _a);
+        -:  320:    }
+        -:  321:
+        -:  322:#if QT_VERSION <= QT_VERSION_CHECK(7, 0, 0)
+        -:  323:    static bool invokeMethod(QObject *obj, const char *member,
+        -:  324:                             Qt::ConnectionType,
+        -:  325:                             QGenericReturnArgument ret,
+        -:  326:                             QGenericArgument val0 = QGenericArgument(nullptr),
+        -:  327:                             QGenericArgument val1 = QGenericArgument(),
+        -:  328:                             QGenericArgument val2 = QGenericArgument(),
+        -:  329:                             QGenericArgument val3 = QGenericArgument(),
+        -:  330:                             QGenericArgument val4 = QGenericArgument(),
+        -:  331:                             QGenericArgument val5 = QGenericArgument(),
+        -:  332:                             QGenericArgument val6 = QGenericArgument(),
+        -:  333:                             QGenericArgument val7 = QGenericArgument(),
+        -:  334:                             QGenericArgument val8 = QGenericArgument(),
+        -:  335:                             QGenericArgument val9 = QGenericArgument());
+        -:  336:
+        -:  337:    static inline bool invokeMethod(QObject *obj, const char *member,
+        -:  338:                             QGenericReturnArgument ret,
+        -:  339:                             QGenericArgument val0 = QGenericArgument(nullptr),
+        -:  340:                             QGenericArgument val1 = QGenericArgument(),
+        -:  341:                             QGenericArgument val2 = QGenericArgument(),
+        -:  342:                             QGenericArgument val3 = QGenericArgument(),
+        -:  343:                             QGenericArgument val4 = QGenericArgument(),
+        -:  344:                             QGenericArgument val5 = QGenericArgument(),
+        -:  345:                             QGenericArgument val6 = QGenericArgument(),
+        -:  346:                             QGenericArgument val7 = QGenericArgument(),
+        -:  347:                             QGenericArgument val8 = QGenericArgument(),
+        -:  348:                             QGenericArgument val9 = QGenericArgument())
+        -:  349:    {
+        -:  350:        return invokeMethod(obj, member, Qt::AutoConnection, ret, val0, val1, val2, val3,
+        -:  351:                val4, val5, val6, val7, val8, val9);
+        -:  352:    }
+        -:  353:
+        -:  354:    static inline bool invokeMethod(QObject *obj, const char *member,
+        -:  355:                             Qt::ConnectionType type,
+        -:  356:                             QGenericArgument val0,
+        -:  357:                             QGenericArgument val1 = QGenericArgument(),
+        -:  358:                             QGenericArgument val2 = QGenericArgument(),
+        -:  359:                             QGenericArgument val3 = QGenericArgument(),
+        -:  360:                             QGenericArgument val4 = QGenericArgument(),
+        -:  361:                             QGenericArgument val5 = QGenericArgument(),
+        -:  362:                             QGenericArgument val6 = QGenericArgument(),
+        -:  363:                             QGenericArgument val7 = QGenericArgument(),
+        -:  364:                             QGenericArgument val8 = QGenericArgument(),
+        -:  365:                             QGenericArgument val9 = QGenericArgument())
+        -:  366:    {
+        -:  367:        return invokeMethod(obj, member, type, QGenericReturnArgument(), val0, val1, val2,
+        -:  368:                                 val3, val4, val5, val6, val7, val8, val9);
+        -:  369:    }
+        -:  370:
+        -:  371:    static inline bool invokeMethod(QObject *obj, const char *member,
+        -:  372:                             QGenericArgument val0,
+        -:  373:                             QGenericArgument val1 = QGenericArgument(),
+        -:  374:                             QGenericArgument val2 = QGenericArgument(),
+        -:  375:                             QGenericArgument val3 = QGenericArgument(),
+        -:  376:                             QGenericArgument val4 = QGenericArgument(),
+        -:  377:                             QGenericArgument val5 = QGenericArgument(),
+        -:  378:                             QGenericArgument val6 = QGenericArgument(),
+        -:  379:                             QGenericArgument val7 = QGenericArgument(),
+        -:  380:                             QGenericArgument val8 = QGenericArgument(),
+        -:  381:                             QGenericArgument val9 = QGenericArgument())
+        -:  382:    {
+        -:  383:        return invokeMethod(obj, member, Qt::AutoConnection, QGenericReturnArgument(), val0,
+        -:  384:                val1, val2, val3, val4, val5, val6, val7, val8, val9);
+        -:  385:    }
+        -:  386:#endif // Qt < 7.0
+        -:  387:
+        -:  388:    template <typename ReturnArg, typename... Args> static
+        -:  389:#ifdef Q_QDOC
+        -:  390:    bool
+        -:  391:#else
+        -:  392:    QtPrivate::Invoke::IfNotOldStyleArgs<bool, Args...>
+        -:  393:#endif
+        -:  394:    invokeMethod(QObject *obj, const char *member, Qt::ConnectionType c,
+        -:  395:                 QTemplatedMetaMethodReturnArgument<ReturnArg> r, Args &&... arguments)
+        -:  396:    {
+        -:  397:        auto h = QtPrivate::invokeMethodHelper(r, std::forward<Args>(arguments)...);
+        -:  398:        return invokeMethodImpl(obj, member, c, h.parameterCount(), h.parameters.data(),
+        -:  399:                                h.typeNames.data(), h.metaTypes.data());
+        -:  400:    }
+        -:  401:
+        -:  402:    template <typename... Args> static
+        -:  403:#ifdef Q_QDOC
+        -:  404:    bool
+        -:  405:#else
+        -:  406:    QtPrivate::Invoke::IfNotOldStyleArgs<bool, Args...>
+        -:  407:#endif
+        -:  408:    invokeMethod(QObject *obj, const char *member, Qt::ConnectionType c, Args &&... arguments)
+        -:  409:    {
+        -:  410:        QTemplatedMetaMethodReturnArgument<void> r = {};
+        -:  411:        return invokeMethod(obj, member, c, r, std::forward<Args>(arguments)...);
+        -:  412:    }
+        -:  413:
+        -:  414:    template <typename ReturnArg, typename... Args> static
+        -:  415:#ifdef Q_QDOC
+        -:  416:    bool
+        -:  417:#else
+        -:  418:    QtPrivate::Invoke::IfNotOldStyleArgs<bool, Args...>
+        -:  419:#endif
+        -:  420:    invokeMethod(QObject *obj, const char *member, QTemplatedMetaMethodReturnArgument<ReturnArg> r,
+        -:  421:                 Args &&... arguments)
+        -:  422:    {
+        -:  423:        return invokeMethod(obj, member, Qt::AutoConnection, r, std::forward<Args>(arguments)...);
+        -:  424:    }
+        -:  425:
+        -:  426:    template <typename... Args> static
+        -:  427:#ifdef Q_QDOC
+        -:  428:    bool
+        -:  429:#else
+        -:  430:    QtPrivate::Invoke::IfNotOldStyleArgs<bool, Args...>
+        -:  431:#endif
+        -:  432:    invokeMethod(QObject *obj, const char *member, Args &&... arguments)
+        -:  433:    {
+        -:  434:        QTemplatedMetaMethodReturnArgument<void> r = {};
+        -:  435:        return invokeMethod(obj, member, Qt::AutoConnection, r, std::forward<Args>(arguments)...);
+        -:  436:    }
+        -:  437:
+        -:  438:#ifdef Q_QDOC
+        -:  439:    template<typename Functor, typename FunctorReturnType>
+        -:  440:    static bool invokeMethod(QObject *context, Functor &&function, Qt::ConnectionType type = Qt::AutoConnection, FunctorReturnType *ret = nullptr);
+        -:  441:    template<typename Functor, typename FunctorReturnType>
+        -:  442:    static bool invokeMethod(QObject *context, Functor &&function, FunctorReturnType *ret);
+        -:  443:
+        -:  444:    template<typename Functor, typename FunctorReturnType, typename... Args>
+        -:  445:    static bool invokeMethod(QObject *context, Functor &&function, Qt::ConnectionType type, QTemplatedMetaMethodReturnArgument<FunctorReturnType> ret, Args &&...arguments);
+        -:  446:    template<typename Functor, typename FunctorReturnType, typename... Args>
+        -:  447:    static bool invokeMethod(QObject *context, Functor &&function, QTemplatedMetaMethodReturnArgument<FunctorReturnType> ret, Args &&...arguments);
+        -:  448:    template<typename Functor, typename... Args>
+        -:  449:    static bool invokeMethod(QObject *context, Functor &&function, Qt::ConnectionType type, Args &&...arguments);
+        -:  450:    template<typename Functor, typename... Args>
+        -:  451:    static bool invokeMethod(QObject *context, Functor &&function, Args &&...arguments);
+        -:  452:#else
+        -:  453:    template <typename Func>
+        -:  454:    static std::enable_if_t<!std::disjunction_v<std::is_convertible<Func, const char *>,
+        -:  455:                                                QtPrivate::Invoke::AreOldStyleArgs<Func>>,
+        -:  456:                            bool>
+        -:  457:    invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+        -:  458:                 Func &&function, Qt::ConnectionType type,
+        -:  459:                 typename QtPrivate::Callable<Func>::ReturnType *ret)
+        -:  460:    {
+        -:  461:        using R = typename QtPrivate::Callable<Func>::ReturnType;
+        -:  462:        const auto getReturnArg = [ret]() -> QTemplatedMetaMethodReturnArgument<R> {
+        -:  463:            if constexpr (std::is_void_v<R>)
+        -:  464:                return {};
+        -:  465:            else
+        -:  466:                return ret ? qReturnArg(*ret) : QTemplatedMetaMethodReturnArgument<R>{};
+        -:  467:        };
+        -:  468:        return invokeMethod(object, std::forward<Func>(function), type, getReturnArg());
+        -:  469:    }
+        -:  470:    template <typename Func>
+        -:  471:    static std::enable_if_t<!std::disjunction_v<std::is_convertible<Func, const char *>,
+        -:  472:                                                QtPrivate::Invoke::AreOldStyleArgs<Func>>,
+        -:  473:                            bool>
+        -:  474:    invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+        -:  475:                 Func &&function, typename QtPrivate::Callable<Func>::ReturnType *ret)
+        -:  476:    {
+        -:  477:        return invokeMethod(object, std::forward<Func>(function), Qt::AutoConnection, ret);
+        -:  478:    }
+        -:  479:
+        -:  480:    template <typename Func, typename... Args>
+        -:  481:    static std::enable_if_t<!std::disjunction_v<std::is_convertible<Func, const char *>,
+        -:  482:                                                QtPrivate::Invoke::AreOldStyleArgs<Args...>>,
+        -:  483:                            bool>
+        -:  484:    invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+        -:  485:                 Func &&function, Qt::ConnectionType type,
+        -:  486:                 QTemplatedMetaMethodReturnArgument<
+        -:  487:                         typename QtPrivate::Callable<Func, Args...>::ReturnType>
+        -:  488:                         ret,
+        -:  489:                 Args &&...args)
+        -:  490:    {
+        -:  491:        return invokeMethodCallableHelper(object, std::forward<Func>(function), type, ret,
+        -:  492:                                          std::forward<Args>(args)...);
+        -:  493:    }
+        -:  494:
+        -:  495:    template <typename Func, typename... Args>
+        -:  496:    static std::enable_if_t<!std::disjunction_v<std::is_convertible<Func, const char *>,
+        -:  497:                                                QtPrivate::Invoke::AreOldStyleArgs<Args...>>,
+        -:  498:                            bool>
+        -:  499:    invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+        -:  500:                 Func &&function, Qt::ConnectionType type, Args &&...args)
+        -:  501:    {
+        -:  502:        using R = typename QtPrivate::Callable<Func, Args...>::ReturnType;
+        -:  503:        QTemplatedMetaMethodReturnArgument<R> r{ QtPrivate::qMetaTypeInterfaceForType<R>(), nullptr,
+        -:  504:                                                 nullptr };
+        -:  505:        return invokeMethod(object, std::forward<Func>(function), type, r,
+        -:  506:                            std::forward<Args>(args)...);
+        -:  507:    }
+        -:  508:
+        -:  509:    template <typename Func, typename... Args>
+        -:  510:    static std::enable_if_t<!std::disjunction_v<std::is_convertible<Func, const char *>,
+        -:  511:                                                QtPrivate::Invoke::AreOldStyleArgs<Args...>>,
+        -:  512:                            bool>
+        -:  513:    invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+        -:  514:                 Func &&function,
+        -:  515:                 QTemplatedMetaMethodReturnArgument<
+        -:  516:                         typename QtPrivate::Callable<Func, Args...>::ReturnType>
+        -:  517:                         ret,
+        -:  518:                 Args &&...args)
+        -:  519:    {
+        -:  520:        return invokeMethod(object, std::forward<Func>(function), Qt::AutoConnection, ret,
+        -:  521:                            std::forward<Args>(args)...);
+        -:  522:    }
+        -:  523:
+        -:  524:    template <typename Func, typename... Args>
+        -:  525:    static std::enable_if_t<!std::disjunction_v<std::is_convertible<Func, const char *>,
+        -:  526:                                                QtPrivate::Invoke::AreOldStyleArgs<Args...>>,
+        -:  527:                            bool>
+        -:  528:    invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+        -:  529:                 Func &&function, Args &&...args)
+        -:  530:    {
+        -:  531:        using R = typename QtPrivate::Callable<Func, Args...>::ReturnType;
+        -:  532:        QTemplatedMetaMethodReturnArgument<R> r{ QtPrivate::qMetaTypeInterfaceForType<R>(), nullptr,
+        -:  533:                                                 nullptr };
+        -:  534:        return invokeMethod(object, std::forward<Func>(function), Qt::AutoConnection, r,
+        -:  535:                            std::forward<Args>(args)...);
+        -:  536:    }
+        -:  537:
+        -:  538:#endif
+        -:  539:
+        -:  540:#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0)
+        -:  541:    QObject *newInstance(QGenericArgument val0,
+        -:  542:                         QGenericArgument val1 = QGenericArgument(),
+        -:  543:                         QGenericArgument val2 = QGenericArgument(),
+        -:  544:                         QGenericArgument val3 = QGenericArgument(),
+        -:  545:                         QGenericArgument val4 = QGenericArgument(),
+        -:  546:                         QGenericArgument val5 = QGenericArgument(),
+        -:  547:                         QGenericArgument val6 = QGenericArgument(),
+        -:  548:                         QGenericArgument val7 = QGenericArgument(),
+        -:  549:                         QGenericArgument val8 = QGenericArgument(),
+        -:  550:                         QGenericArgument val9 = QGenericArgument()) const;
+        -:  551:#endif
+        -:  552:
+        -:  553:    template <typename... Args>
+        -:  554:#ifdef Q_QDOC
+        -:  555:    QObject *
+        -:  556:#else
+        -:  557:    QtPrivate::Invoke::IfNotOldStyleArgs<QObject *, Args...>
+        -:  558:#endif
+        -:  559:    newInstance(Args &&... arguments) const
+        -:  560:    {
+        -:  561:        auto h = QtPrivate::invokeMethodHelper(QMetaMethodReturnArgument{}, std::forward<Args>(arguments)...);
+        -:  562:        return newInstanceImpl(this, h.parameterCount(), h.parameters.data(),
+        -:  563:                               h.typeNames.data(), h.metaTypes.data());
+        -:  564:    }
+        -:  565:
+        -:  566:    enum Call {
+        -:  567:        InvokeMetaMethod,
+        -:  568:        ReadProperty,
+        -:  569:        WriteProperty,
+        -:  570:        ResetProperty,
+        -:  571:        CreateInstance,
+        -:  572:        IndexOfMethod,
+        -:  573:        RegisterPropertyMetaType,
+        -:  574:        RegisterMethodArgumentMetaType,
+        -:  575:        BindableProperty,
+        -:  576:        CustomCall,
+        -:  577:        ConstructInPlace,
+        -:  578:    };
+        -:  579:
+        -:  580:    int static_metacall(Call, int, void **) const;
+        -:  581:    static int metacall(QObject *, Call, int, void **);
+        -:  582:
+      635:  583:    template <const QMetaObject &MO> static constexpr const QMetaObject *staticMetaObject()
+        -:  584:    {
+      635:  585:        return &MO;
+        -:  586:    }
+        -:  587:
+        -:  588:    struct SuperData {
+        -:  589:        using Getter = const QMetaObject *(*)();
+        -:  590:        const QMetaObject *direct;
+        -:  591:        SuperData() = default;
+        -:  592:        constexpr SuperData(std::nullptr_t) : direct(nullptr) {}
+        -:  593:        constexpr SuperData(const QMetaObject *mo) : direct(mo) {}
+        -:  594:
+        -:  595:        constexpr const QMetaObject *operator->() const { return operator const QMetaObject *(); }
+        -:  596:
+        -:  597:#ifdef QT_NO_DATA_RELOCATION
+        -:  598:        Getter indirect = nullptr;
+        -:  599:        constexpr SuperData(Getter g) : direct(nullptr), indirect(g) {}
+        -:  600:        constexpr operator const QMetaObject *() const
+        -:  601:        { return indirect ? indirect() : direct; }
+        -:  602:        template <const QMetaObject &MO> static constexpr SuperData link()
+        -:  603:        { return SuperData(QMetaObject::staticMetaObject<MO>); }
+        -:  604:#else
+        -:  605:        constexpr SuperData(Getter g) : direct(g()) {}
+        -:  606:        constexpr operator const QMetaObject *() const
+        -:  607:        { return direct; }
+        -:  608:        template <const QMetaObject &MO> static constexpr SuperData link()
+        -:  609:        { return SuperData(QMetaObject::staticMetaObject<MO>()); }
+        -:  610:#endif
+        -:  611:    };
+        -:  612:
+        -:  613:    struct Data { // private data
+        -:  614:        SuperData superdata;
+        -:  615:        const uint *stringdata;
+        -:  616:        const uint *data;
+        -:  617:        typedef void (*StaticMetacallFunction)(QObject *, QMetaObject::Call, int, void **);
+        -:  618:        StaticMetacallFunction static_metacall;
+        -:  619:        const SuperData *relatedMetaObjects;
+        -:  620:        const QtPrivate::QMetaTypeInterface *const *metaTypes;
+        -:  621:        void *extradata; //reserved for future use
+        -:  622:    } d;
+        -:  623:
+        -:  624:private:
+        -:  625:    // Just need to have this here with a separate name so the other inline
+        -:  626:    // functions can call this without any ambiguity
+        -:  627:    template <typename Func, typename... Args>
+        -:  628:    static bool
+        -:  629:    invokeMethodCallableHelper(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+        -:  630:            Func &&function, Qt::ConnectionType type, const QMetaMethodReturnArgument &ret,
+        -:  631:            Args &&...args)
+        -:  632:    {
+        -:  633:        using Callable = QtPrivate::Callable<Func, Args...>;
+        -:  634:        using ExpectedArguments = typename Callable::Arguments;
+        -:  635:        static_assert(sizeof...(Args) <= ExpectedArguments::size, "Too many arguments");
+        -:  636:        using ActualArguments = QtPrivate::List<Args...>;
+        -:  637:        static_assert(QtPrivate::CheckCompatibleArguments<ActualArguments,
+        -:  638:                              ExpectedArguments>::value,
+        -:  639:                "Incompatible arguments");
+        -:  640:
+        -:  641:        auto h = QtPrivate::invokeMethodHelper(ret, std::forward<Args>(args)...);
+        -:  642:
+        -:  643:        // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
+        -:  644:        auto callable = new QtPrivate::QCallableObject<std::decay_t<Func>, ActualArguments,
+        -:  645:                typename Callable::ReturnType>(std::forward<Func>(function));
+        -:  646:        return invokeMethodImpl(object, callable, type, h.parameterCount(), h.parameters.data(),
+        -:  647:                h.typeNames.data(), h.metaTypes.data());
+        -:  648:        // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
+        -:  649:    }
+        -:  650:
+        -:  651:    static bool invokeMethodImpl(QObject *object, const char *member, Qt::ConnectionType type,
+        -:  652:                                 qsizetype parameterCount, const void *const *parameters, const char *const *names,
+        -:  653:                                 const QtPrivate::QMetaTypeInterface * const *metaTypes);
+        -:  654:    static bool invokeMethodImpl(QObject *object, QtPrivate::QSlotObjectBase *slotObj,
+        -:  655:                                 Qt::ConnectionType type, qsizetype parameterCount,
+        -:  656:                                 const void *const *params, const char *const *names,
+        -:  657:                                 const QtPrivate::QMetaTypeInterface *const *metaTypes);
+        -:  658:#if QT_CORE_REMOVED_SINCE(6, 7)
+        -:  659:    static bool invokeMethodImpl(QObject *object, QtPrivate::QSlotObjectBase *slot, Qt::ConnectionType type, void *ret);
+        -:  660:#endif
+        -:  661:    static QObject *newInstanceImpl(const QMetaObject *mobj, qsizetype parameterCount,
+        -:  662:                                    const void **parameters, const char **typeNames,
+        -:  663:                                    const QtPrivate::QMetaTypeInterface **metaTypes);
+        -:  664:
+        -:  665:    static QMetaObject::Connection connectImpl(const QObject *sender, const QMetaMethod& signal,
+        -:  666:                                            const QObject *receiver, void **slotPtr,
+        -:  667:                                            QtPrivate::QSlotObjectBase *slot, Qt::ConnectionType type);
+        -:  668:
+        -:  669:    friend class QTimer;
+        -:  670:    friend class QChronoTimer;
+        -:  671:};
+        -:  672:
+        -:  673:class Q_CORE_EXPORT QMetaObject::Connection {
+        -:  674:    void *d_ptr; //QObjectPrivate::Connection*
+        -:  675:    explicit Connection(void *data) : d_ptr(data) {  }
+        -:  676:    friend class QObject;
+        -:  677:    friend class QObjectPrivate;
+        -:  678:    friend struct QMetaObject;
+        -:  679:    bool isConnected_helper() const;
+        -:  680:public:
+        -:  681:    ~Connection();
+        -:  682:    Connection();
+        -:  683:    Connection(const Connection &other);
+        -:  684:    Connection &operator=(const Connection &other);
+        -:  685:#ifdef Q_QDOC
+        -:  686:    operator bool() const;
+        -:  687:#else
+        -:  688:    // still using the restricted bool trick here, in order to support
+        -:  689:    // code using copy-init (e.g. `bool ok = connect(...)`)
+        -:  690:    typedef void *Connection::*RestrictedBool;
+        -:  691:    operator RestrictedBool() const { return d_ptr && isConnected_helper() ? &Connection::d_ptr : nullptr; }
+        -:  692:#endif
+        -:  693:
+        -:  694:    Connection(Connection &&other) noexcept : d_ptr(std::exchange(other.d_ptr, nullptr)) {}
+        -:  695:    QT_MOVE_ASSIGNMENT_OPERATOR_IMPL_VIA_PURE_SWAP(Connection)
+        -:  696:    void swap(Connection &other) noexcept { qt_ptr_swap(d_ptr, other.d_ptr); }
+        -:  697:};
+        -:  698:
+        -:  699:template <typename Func>
+        -:  700:QMetaObject::Connection
+        -:  701:    QMetaObject::connect(const QObject *sender, const QMetaMethod &signal,
+        -:  702:                         const typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *context, Func &&slot,
+        -:  703:                         Qt::ConnectionType type)
+        -:  704:{
+        -:  705:    using Slot = std::decay_t<Func>;
+        -:  706:    using FunctionSlotType = QtPrivate::FunctionPointer<Slot>;
+        -:  707:    void **pSlot = nullptr;
+        -:  708:    QtPrivate::QSlotObjectBase *slotObject;
+        -:  709:    if constexpr (FunctionSlotType::ArgumentCount != -1) {
+        -:  710:        slotObject = new QtPrivate::QCallableObject<Slot, typename FunctionSlotType::Arguments, typename FunctionSlotType::ReturnType>(std::forward<Func>(slot));
+        -:  711:        if constexpr (FunctionSlotType::IsPointerToMemberFunction) {
+        -:  712:            pSlot = const_cast<void **>(reinterpret_cast<void *const *>(&slot));
+        -:  713:        } else {
+        -:  714:            Q_ASSERT_X((type & Qt::UniqueConnection) == 0, "",
+        -:  715:                "QObject::connect: Unique connection requires the slot to be a pointer to "
+        -:  716:                "a member function of a QObject subclass.");
+        -:  717:        }
+        -:  718:    } else {
+        -:  719:        using FunctorSlotType = QtPrivate::FunctionPointer<decltype(&Slot::operator())>;
+        -:  720:        slotObject = new QtPrivate::QCallableObject<Slot, typename FunctorSlotType::Arguments, typename FunctorSlotType::ReturnType>(std::forward<Func>(slot));
+        -:  721:    }
+        -:  722:    return QMetaObject::connectImpl(sender, signal, context, pSlot, slotObject, type);
+        -:  723:}
+        -:  724:
+        -:  725:inline void swap(QMetaObject::Connection &lhs, QMetaObject::Connection &rhs) noexcept
+        -:  726:{
+        -:  727:    lhs.swap(rhs);
+        -:  728:}
+        -:  729:
+        -:  730:inline const QMetaObject *QMetaObject::superClass() const
+        -:  731:{ return d.superdata; }
+        -:  732:
+        -:  733:namespace QtPrivate {
+        -:  734:    // Trait that tells if a QObject has a Q_OBJECT macro
+        -:  735:    template <typename Object> struct HasQ_OBJECT_Macro {
+        -:  736:        template <typename T>
+        -:  737:        static char test(int (T::*)(QMetaObject::Call, int, void **));
+        -:  738:        static int test(int (Object::*)(QMetaObject::Call, int, void **));
+        -:  739:        enum { Value =  sizeof(test(&Object::qt_metacall)) == sizeof(int) };
+        -:  740:    };
+        -:  741:
+        -:  742:    template <class TgtType, class SrcType>
+        -:  743:    inline TgtType qobject_cast_helper(SrcType *object)
+        -:  744:    {
+        -:  745:        using ObjType = std::remove_cv_t<std::remove_pointer_t<TgtType>> ;
+        -:  746:        static_assert(std::is_pointer_v<TgtType>,
+        -:  747:                "qobject_cast requires to cast towards a pointer type");
+        -:  748:        static_assert(HasQ_OBJECT_Macro<ObjType>::Value,
+        -:  749:                "qobject_cast requires the type to have a Q_OBJECT macro");
+        -:  750:
+        -:  751:        if constexpr (std::is_final_v<ObjType>) {
+        -:  752:            if (object && object->metaObject() == &ObjType::staticMetaObject)
+        -:  753:                return static_cast<TgtType>(object);
+        -:  754:            return nullptr;
+        -:  755:        } else {
+        -:  756:            return static_cast<TgtType>(ObjType::staticMetaObject.cast(object));
+        -:  757:        }
+        -:  758:    }
+        -:  759:}
+        -:  760:
+        -:  761:QT_END_NAMESPACE
+        -:  762:
+        -:  763:#endif // QOBJECTDEFS_H

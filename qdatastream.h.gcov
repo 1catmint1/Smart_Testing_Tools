@@ -1,0 +1,713 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qdatastream.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2021 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:// Qt-Security score:critical reason:data-parser
+        -:    4:
+        -:    5:#ifndef QDATASTREAM_H
+        -:    6:#define QDATASTREAM_H
+        -:    7:
+        -:    8:#include <QtCore/qchar.h>
+        -:    9:#include <QtCore/qcontainerfwd.h>
+        -:   10:#include <QtCore/qiodevicebase.h>
+        -:   11:#include <QtCore/qnamespace.h>
+        -:   12:#include <QtCore/qscopedpointer.h>
+        -:   13:#include <QtCore/qttypetraits.h>
+        -:   14:
+        -:   15:#include <iterator>         // std::distance(), std::next()
+        -:   16:#include <memory>
+        -:   17:
+        -:   18:#ifdef Status
+        -:   19:#error qdatastream.h must be included before any header file that defines Status
+        -:   20:#endif
+        -:   21:
+        -:   22:QT_BEGIN_NAMESPACE
+        -:   23:
+        -:   24:#if QT_CORE_REMOVED_SINCE(6, 3)
+        -:   25:class qfloat16;
+        -:   26:#endif
+        -:   27:class QByteArray;
+        -:   28:class QDataStream;
+        -:   29:class QIODevice;
+        -:   30:class QString;
+        -:   31:
+        -:   32:#if !defined(QT_NO_DATASTREAM)
+        -:   33:namespace QtPrivate {
+        -:   34:class StreamStateSaver;
+        -:   35:template <typename Container>
+        -:   36:QDataStream &readArrayBasedContainer(QDataStream &s, Container &c);
+        -:   37:template <typename Container>
+        -:   38:QDataStream &readListBasedContainer(QDataStream &s, Container &c);
+        -:   39:template <typename Container>
+        -:   40:QDataStream &readAssociativeContainer(QDataStream &s, Container &c);
+        -:   41:template <typename Container>
+        -:   42:QDataStream &writeSequentialContainer(QDataStream &s, const Container &c);
+        -:   43:template <typename Container>
+        -:   44:QDataStream &writeAssociativeContainer(QDataStream &s, const Container &c);
+        -:   45:template <typename Container>
+        -:   46:QDataStream &writeAssociativeMultiContainer(QDataStream &s, const Container &c);
+        -:   47:}
+        -:   48:class Q_CORE_EXPORT QDataStream : public QIODeviceBase
+        -:   49:{
+        -:   50:public:
+        -:   51:    enum Version QT7_ONLY(: quint8) {
+        -:   52:        Qt_1_0 = 1,
+        -:   53:        Qt_2_0 = 2,
+        -:   54:        Qt_2_1 = 3,
+        -:   55:        Qt_3_0 = 4,
+        -:   56:        Qt_3_1 = 5,
+        -:   57:        Qt_3_3 = 6,
+        -:   58:        Qt_4_0 = 7,
+        -:   59:        Qt_4_1 = Qt_4_0,
+        -:   60:        Qt_4_2 = 8,
+        -:   61:        Qt_4_3 = 9,
+        -:   62:        Qt_4_4 = 10,
+        -:   63:        Qt_4_5 = 11,
+        -:   64:        Qt_4_6 = 12,
+        -:   65:        Qt_4_7 = Qt_4_6,
+        -:   66:        Qt_4_8 = Qt_4_7,
+        -:   67:        Qt_4_9 = Qt_4_8,
+        -:   68:        Qt_5_0 = 13,
+        -:   69:        Qt_5_1 = 14,
+        -:   70:        Qt_5_2 = 15,
+        -:   71:        Qt_5_3 = Qt_5_2,
+        -:   72:        Qt_5_4 = 16,
+        -:   73:        Qt_5_5 = Qt_5_4,
+        -:   74:        Qt_5_6 = 17,
+        -:   75:        Qt_5_7 = Qt_5_6,
+        -:   76:        Qt_5_8 = Qt_5_7,
+        -:   77:        Qt_5_9 = Qt_5_8,
+        -:   78:        Qt_5_10 = Qt_5_9,
+        -:   79:        Qt_5_11 = Qt_5_10,
+        -:   80:        Qt_5_12 = 18,
+        -:   81:        Qt_5_13 = 19,
+        -:   82:        Qt_5_14 = Qt_5_13,
+        -:   83:        Qt_5_15 = Qt_5_14,
+        -:   84:        Qt_6_0 = 20,
+        -:   85:        Qt_6_1 = Qt_6_0,
+        -:   86:        Qt_6_2 = Qt_6_0,
+        -:   87:        Qt_6_3 = Qt_6_0,
+        -:   88:        Qt_6_4 = Qt_6_0,
+        -:   89:        Qt_6_5 = Qt_6_0,
+        -:   90:        Qt_6_6 = 21,
+        -:   91:        Qt_6_7 = 22,
+        -:   92:        Qt_6_8 = Qt_6_7,
+        -:   93:        Qt_6_9 = Qt_6_7,
+        -:   94:        Qt_6_10 = 23,
+        -:   95:        Qt_DefaultCompiledVersion = Qt_6_10
+        -:   96:#if QT_VERSION >= QT_VERSION_CHECK(6, 11, 0)
+        -:   97:#error Add the datastream version for this Qt version and update Qt_DefaultCompiledVersion
+        -:   98:#endif
+        -:   99:    };
+        -:  100:
+        -:  101:    enum ByteOrder {
+        -:  102:        BigEndian = QSysInfo::BigEndian,
+        -:  103:        LittleEndian = QSysInfo::LittleEndian
+        -:  104:    };
+        -:  105:
+        -:  106:    enum Status QT7_ONLY(: quint8) {
+        -:  107:        Ok,
+        -:  108:        ReadPastEnd,
+        -:  109:        ReadCorruptData,
+        -:  110:        WriteFailed,
+        -:  111:        SizeLimitExceeded,
+        -:  112:    };
+        -:  113:
+        -:  114:    enum FloatingPointPrecision QT7_ONLY(: quint8) {
+        -:  115:        SinglePrecision,
+        -:  116:        DoublePrecision
+        -:  117:    };
+        -:  118:
+        -:  119:    QDataStream();
+        -:  120:    explicit QDataStream(QIODevice *);
+        -:  121:    QDataStream(QByteArray *, OpenMode flags);
+        -:  122:    QDataStream(const QByteArray &);
+        -:  123:    ~QDataStream();
+        -:  124:
+        -:  125:    QIODevice *device() const;
+        -:  126:    void setDevice(QIODevice *);
+        -:  127:
+        -:  128:    bool atEnd() const;
+        -:  129:
+        -:  130:    QT_CORE_INLINE_SINCE(6, 8)
+        -:  131:    Status status() const;
+        -:  132:    void setStatus(Status status);
+        -:  133:    void resetStatus();
+        -:  134:
+        -:  135:    QT_CORE_INLINE_SINCE(6, 8)
+        -:  136:    FloatingPointPrecision floatingPointPrecision() const;
+        -:  137:    void setFloatingPointPrecision(FloatingPointPrecision precision);
+        -:  138:
+        -:  139:    ByteOrder byteOrder() const;
+        -:  140:    void setByteOrder(ByteOrder);
+        -:  141:
+        -:  142:    int version() const;
+        -:  143:    void setVersion(int);
+        -:  144:
+        -:  145:    QDataStream &operator>>(char &i);
+        -:  146:    QDataStream &operator>>(qint8 &i);
+        -:  147:    QDataStream &operator>>(quint8 &i);
+        -:  148:    QDataStream &operator>>(qint16 &i);
+        -:  149:    QDataStream &operator>>(quint16 &i);
+        -:  150:    QDataStream &operator>>(qint32 &i);
+        -:  151:    inline QDataStream &operator>>(quint32 &i);
+        -:  152:    QDataStream &operator>>(qint64 &i);
+        -:  153:    QDataStream &operator>>(quint64 &i);
+        -:  154:    QDataStream &operator>>(std::nullptr_t &ptr) { ptr = nullptr; return *this; }
+        -:  155:
+        -:  156:    QDataStream &operator>>(bool &i);
+        -:  157:#if QT_CORE_REMOVED_SINCE(6, 3)
+        -:  158:    QDataStream &operator>>(qfloat16 &f);
+        -:  159:#endif
+        -:  160:    QDataStream &operator>>(float &f);
+        -:  161:    QDataStream &operator>>(double &f);
+        -:  162:    QDataStream &operator>>(char *&str);
+        -:  163:    QDataStream &operator>>(char16_t &c);
+        -:  164:    QDataStream &operator>>(char32_t &c);
+        -:  165:
+        -:  166:    QDataStream &operator<<(char i);
+        -:  167:    QDataStream &operator<<(qint8 i);
+        -:  168:    QDataStream &operator<<(quint8 i);
+        -:  169:    QDataStream &operator<<(qint16 i);
+        -:  170:    QDataStream &operator<<(quint16 i);
+        -:  171:    QDataStream &operator<<(qint32 i);
+        -:  172:    inline QDataStream &operator<<(quint32 i);
+        -:  173:    QDataStream &operator<<(qint64 i);
+        -:  174:    QDataStream &operator<<(quint64 i);
+        -:  175:    QDataStream &operator<<(std::nullptr_t) { return *this; }
+        -:  176:#if QT_CORE_REMOVED_SINCE(6, 8) || defined(Q_QDOC)
+        -:  177:    QDataStream &operator<<(bool i);
+        -:  178:#endif
+        -:  179:#if !defined(Q_QDOC)
+        -:  180:    // Disable implicit conversions to bool (e.g. for pointers)
+        -:  181:    template <typename T,
+        -:  182:             std::enable_if_t<std::is_same_v<T, bool>, bool> = true>
+    #####:  183:    QDataStream &operator<<(T i)
+        -:  184:    {
+    #####:  185:        return (*this << qint8(i));
+        -:  186:    }
+        -:  187:#endif
+        -:  188:#if QT_CORE_REMOVED_SINCE(6, 3)
+        -:  189:    QDataStream &operator<<(qfloat16 f);
+        -:  190:#endif
+        -:  191:    QDataStream &operator<<(float f);
+        -:  192:    QDataStream &operator<<(double f);
+        -:  193:    QDataStream &operator<<(const char *str);
+        -:  194:    QDataStream &operator<<(char16_t c);
+        -:  195:    QDataStream &operator<<(char32_t c);
+        -:  196:
+        -:  197:    explicit operator bool() const noexcept { return status() == Ok; }
+        -:  198:
+        -:  199:#if QT_DEPRECATED_SINCE(6, 11)
+        -:  200:    QT_DEPRECATED_VERSION_X_6_11("Use an overload that takes qint64 length.")
+        -:  201:    QDataStream &readBytes(char *&, uint &len);
+        -:  202:#endif
+        -:  203:#if QT_CORE_REMOVED_SINCE(6, 7)
+        -:  204:    QDataStream &writeBytes(const char *, uint len);
+        -:  205:    int skipRawData(int len);
+        -:  206:    int readRawData(char *, int len);
+        -:  207:    int writeRawData(const char *, int len);
+        -:  208:#endif
+        -:  209:    QDataStream &readBytes(char *&, qint64 &len);
+        -:  210:    qint64 readRawData(char *, qint64 len);
+        -:  211:    QDataStream &writeBytes(const char *, qint64 len);
+        -:  212:    qint64 writeRawData(const char *, qint64 len);
+        -:  213:    qint64 skipRawData(qint64 len);
+        -:  214:
+        -:  215:    void startTransaction();
+        -:  216:    bool commitTransaction();
+        -:  217:    void rollbackTransaction();
+        -:  218:    void abortTransaction();
+        -:  219:
+        -:  220:    bool isDeviceTransactionStarted() const;
+        -:  221:private:
+        -:  222:    Q_DISABLE_COPY(QDataStream)
+        -:  223:
+        -:  224:#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0)
+        -:  225:    void* const d = nullptr;
+        -:  226:#endif
+        -:  227:
+        -:  228:    QIODevice *dev = nullptr;
+        -:  229:    bool owndev = false;
+        -:  230:    bool noswap = QSysInfo::ByteOrder == QSysInfo::BigEndian;
+        -:  231:    quint8 fpPrecision = QDataStream::DoublePrecision;
+        -:  232:    quint8 q_status = Ok;
+        -:  233:#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0) && !defined(QT_BOOTSTRAPPED)
+        -:  234:    ByteOrder byteorder = BigEndian;
+        -:  235:    int ver = Qt_DefaultCompiledVersion;
+        -:  236:#else
+        -:  237:    Version ver = Qt_DefaultCompiledVersion;
+        -:  238:#endif
+        -:  239:    quint16 transactionDepth = 0;
+        -:  240:
+        -:  241:#if QT_CORE_REMOVED_SINCE(6, 7)
+        -:  242:    int readBlock(char *data, int len);
+        -:  243:#endif
+        -:  244:    qint64 readBlock(char *data, qint64 len);
+        -:  245:    static inline qint64 readQSizeType(QDataStream &s);
+        -:  246:    static inline bool writeQSizeType(QDataStream &s, qint64 value);
+        -:  247:    static constexpr quint32 NullCode = 0xffffffffu;
+        -:  248:    static constexpr quint32 ExtendedSize = 0xfffffffeu;
+        -:  249:
+        -:  250:    friend class QtPrivate::StreamStateSaver;
+        -:  251:    Q_CORE_EXPORT friend QDataStream &operator<<(QDataStream &out, const QString &str);
+        -:  252:    Q_CORE_EXPORT friend QDataStream &operator>>(QDataStream &in, QString &str);
+        -:  253:    Q_CORE_EXPORT friend QDataStream &operator<<(QDataStream &out, const QByteArray &ba);
+        -:  254:    Q_CORE_EXPORT friend QDataStream &operator>>(QDataStream &in, QByteArray &ba);
+        -:  255:    template <typename Container>
+        -:  256:    friend QDataStream &QtPrivate::readArrayBasedContainer(QDataStream &s, Container &c);
+        -:  257:    template <typename Container>
+        -:  258:    friend QDataStream &QtPrivate::readListBasedContainer(QDataStream &s, Container &c);
+        -:  259:    template <typename Container>
+        -:  260:    friend QDataStream &QtPrivate::readAssociativeContainer(QDataStream &s, Container &c);
+        -:  261:    template <typename Container>
+        -:  262:    friend QDataStream &QtPrivate::writeSequentialContainer(QDataStream &s, const Container &c);
+        -:  263:    template <typename Container>
+        -:  264:    friend QDataStream &QtPrivate::writeAssociativeContainer(QDataStream &s, const Container &c);
+        -:  265:    template <typename Container>
+        -:  266:    friend QDataStream &QtPrivate::writeAssociativeMultiContainer(QDataStream &s,
+        -:  267:                                                                  const Container &c);
+        -:  268:};
+        -:  269:
+        -:  270:namespace QtPrivate {
+        -:  271:
+        -:  272:class StreamStateSaver
+        -:  273:{
+        -:  274:    Q_DISABLE_COPY_MOVE(StreamStateSaver)
+        -:  275:public:
+        -:  276:    Q_NODISCARD_CTOR
+        -:  277:    explicit StreamStateSaver(QDataStream *s) : stream(s), oldStatus(s->status())
+        -:  278:    {
+        -:  279:        if (!stream->isDeviceTransactionStarted())
+        -:  280:            stream->resetStatus();
+        -:  281:    }
+        -:  282:    inline ~StreamStateSaver()
+        -:  283:    {
+        -:  284:        if (oldStatus != QDataStream::Ok) {
+        -:  285:            stream->resetStatus();
+        -:  286:            stream->setStatus(oldStatus);
+        -:  287:        }
+        -:  288:    }
+        -:  289:
+        -:  290:private:
+        -:  291:    QDataStream *stream;
+        -:  292:    QDataStream::Status oldStatus;
+        -:  293:};
+        -:  294:
+        -:  295:template <typename Container>
+        -:  296:QDataStream &readArrayBasedContainer(QDataStream &s, Container &c)
+        -:  297:{
+        -:  298:    StreamStateSaver stateSaver(&s);
+        -:  299:
+        -:  300:    c.clear();
+        -:  301:    qint64 size = QDataStream::readQSizeType(s);
+        -:  302:    const auto n = qsizetype(size);
+        -:  303:    if (size != n || size < 0) {
+        -:  304:        s.setStatus(QDataStream::SizeLimitExceeded);
+        -:  305:        return s;
+        -:  306:    }
+        -:  307:    c.reserve(n);
+        -:  308:    for (qsizetype i = 0; i < n; ++i) {
+        -:  309:        typename Container::value_type t;
+        -:  310:        if (!(s >> t)) {
+        -:  311:            c.clear();
+        -:  312:            break;
+        -:  313:        }
+        -:  314:        c.append(t);
+        -:  315:    }
+        -:  316:
+        -:  317:    return s;
+        -:  318:}
+        -:  319:
+        -:  320:template <typename Container>
+        -:  321:QDataStream &readListBasedContainer(QDataStream &s, Container &c)
+        -:  322:{
+        -:  323:    StreamStateSaver stateSaver(&s);
+        -:  324:
+        -:  325:    c.clear();
+        -:  326:    qint64 size = QDataStream::readQSizeType(s);
+        -:  327:    const auto n = qsizetype(size);
+        -:  328:    if (size != n || size < 0) {
+        -:  329:        s.setStatus(QDataStream::SizeLimitExceeded);
+        -:  330:        return s;
+        -:  331:    }
+        -:  332:    for (qsizetype i = 0; i < n; ++i) {
+        -:  333:        typename Container::value_type t;
+        -:  334:        if (!(s >> t)) {
+        -:  335:            c.clear();
+        -:  336:            break;
+        -:  337:        }
+        -:  338:        c << t;
+        -:  339:    }
+        -:  340:
+        -:  341:    return s;
+        -:  342:}
+        -:  343:
+        -:  344:template <typename Container>
+        -:  345:QDataStream &readAssociativeContainer(QDataStream &s, Container &c)
+        -:  346:{
+        -:  347:    StreamStateSaver stateSaver(&s);
+        -:  348:
+        -:  349:    c.clear();
+        -:  350:    qint64 size = QDataStream::readQSizeType(s);
+        -:  351:    const auto n = qsizetype(size);
+        -:  352:    if (size != n || size < 0) {
+        -:  353:        s.setStatus(QDataStream::SizeLimitExceeded);
+        -:  354:        return s;
+        -:  355:    }
+        -:  356:    for (qsizetype i = 0; i < n; ++i) {
+        -:  357:        typename Container::key_type k;
+        -:  358:        typename Container::mapped_type t;
+        -:  359:        if (!(s >> k >> t)) {
+        -:  360:            c.clear();
+        -:  361:            break;
+        -:  362:        }
+        -:  363:        c.insert(k, t);
+        -:  364:    }
+        -:  365:
+        -:  366:    return s;
+        -:  367:}
+        -:  368:
+        -:  369:template <typename Container>
+        -:  370:QDataStream &writeSequentialContainer(QDataStream &s, const Container &c)
+        -:  371:{
+        -:  372:    if (!QDataStream::writeQSizeType(s, c.size()))
+        -:  373:        return s;
+        -:  374:    for (const typename Container::value_type &t : c)
+        -:  375:        s << t;
+        -:  376:
+        -:  377:    return s;
+        -:  378:}
+        -:  379:
+        -:  380:template <typename Container>
+        -:  381:QDataStream &writeAssociativeContainer(QDataStream &s, const Container &c)
+        -:  382:{
+        -:  383:    if (!QDataStream::writeQSizeType(s, c.size()))
+        -:  384:        return s;
+        -:  385:    auto it = c.constBegin();
+        -:  386:    auto end = c.constEnd();
+        -:  387:    while (it != end) {
+        -:  388:        s << it.key() << it.value();
+        -:  389:        ++it;
+        -:  390:    }
+        -:  391:
+        -:  392:    return s;
+        -:  393:}
+        -:  394:
+        -:  395:template <typename Container>
+        -:  396:QDataStream &writeAssociativeMultiContainer(QDataStream &s, const Container &c)
+        -:  397:{
+        -:  398:    if (!QDataStream::writeQSizeType(s, c.size()))
+        -:  399:        return s;
+        -:  400:    auto it = c.constBegin();
+        -:  401:    auto end = c.constEnd();
+        -:  402:    while (it != end) {
+        -:  403:        const auto rangeStart = it++;
+        -:  404:        while (it != end && rangeStart.key() == it.key())
+        -:  405:            ++it;
+        -:  406:        const qint64 last = std::distance(rangeStart, it) - 1;
+        -:  407:        for (qint64 i = last; i >= 0; --i) {
+        -:  408:            auto next = std::next(rangeStart, i);
+        -:  409:            s << next.key() << next.value();
+        -:  410:        }
+        -:  411:    }
+        -:  412:
+        -:  413:    return s;
+        -:  414:}
+        -:  415:
+        -:  416:} // QtPrivate namespace
+        -:  417:
+        -:  418:template<typename ...T>
+        -:  419:using QDataStreamIfHasOStreamOperators =
+        -:  420:    std::enable_if_t<std::conjunction_v<QTypeTraits::has_ostream_operator<QDataStream, T>...>, QDataStream &>;
+        -:  421:template<typename Container, typename ...T>
+        -:  422:using QDataStreamIfHasOStreamOperatorsContainer =
+        -:  423:    std::enable_if_t<std::conjunction_v<QTypeTraits::has_ostream_operator_container<QDataStream, Container, T>...>, QDataStream &>;
+        -:  424:
+        -:  425:template<typename ...T>
+        -:  426:using QDataStreamIfHasIStreamOperators =
+        -:  427:    std::enable_if_t<std::conjunction_v<QTypeTraits::has_istream_operator<QDataStream, T>...>, QDataStream &>;
+        -:  428:template<typename Container, typename ...T>
+        -:  429:using QDataStreamIfHasIStreamOperatorsContainer =
+        -:  430:    std::enable_if_t<std::conjunction_v<QTypeTraits::has_istream_operator_container<QDataStream, Container, T>...>, QDataStream &>;
+        -:  431:
+        -:  432:/*****************************************************************************
+        -:  433:  QDataStream inline functions
+        -:  434: *****************************************************************************/
+        -:  435:
+        -:  436:inline QIODevice *QDataStream::device() const
+        -:  437:{ return dev; }
+        -:  438:
+        -:  439:#if QT_CORE_INLINE_IMPL_SINCE(6, 8)
+        -:  440:QDataStream::Status QDataStream::status() const
+        -:  441:{
+        -:  442:    return Status(q_status);
+        -:  443:}
+        -:  444:
+        -:  445:QDataStream::FloatingPointPrecision QDataStream::floatingPointPrecision() const
+        -:  446:{
+        -:  447:    return FloatingPointPrecision(fpPrecision);
+        -:  448:}
+        -:  449:#endif // INLINE_SINCE 6.8
+        -:  450:
+        -:  451:inline QDataStream::ByteOrder QDataStream::byteOrder() const
+        -:  452:{
+        -:  453:    if constexpr (QSysInfo::ByteOrder == QSysInfo::BigEndian)
+        -:  454:        return noswap ? BigEndian : LittleEndian;
+        -:  455:    return noswap ? LittleEndian : BigEndian;
+        -:  456:}
+        -:  457:
+        -:  458:inline int QDataStream::version() const
+        -:  459:{ return ver; }
+        -:  460:
+        -:  461:inline void QDataStream::setVersion(int v)
+        -:  462:{ ver = Version(v); }
+        -:  463:
+        -:  464:qint64 QDataStream::readQSizeType(QDataStream &s)
+        -:  465:{
+        -:  466:    quint32 first;
+        -:  467:    s >> first;
+        -:  468:    if (first == NullCode)
+        -:  469:        return -1;
+        -:  470:    if (first < ExtendedSize || s.version() < QDataStream::Qt_6_7)
+        -:  471:        return qint64(first);
+        -:  472:    qint64 extendedLen;
+        -:  473:    s >> extendedLen;
+        -:  474:    return extendedLen;
+        -:  475:}
+        -:  476:
+        -:  477:bool QDataStream::writeQSizeType(QDataStream &s, qint64 value)
+        -:  478:{
+        -:  479:    if (value < qint64(ExtendedSize)) {
+        -:  480:        s << quint32(value);
+        -:  481:    } else if (s.version() >= QDataStream::Qt_6_7) {
+        -:  482:        s << ExtendedSize << value;
+        -:  483:    } else if (value == qint64(ExtendedSize)) {
+        -:  484:        s << ExtendedSize;
+        -:  485:    } else {
+        -:  486:        s.setStatus(QDataStream::SizeLimitExceeded); // value is too big for old format
+        -:  487:        return false;
+        -:  488:    }
+        -:  489:    return true;
+        -:  490:}
+        -:  491:
+        -:  492:inline QDataStream &QDataStream::operator>>(char &i)
+        -:  493:{ return *this >> reinterpret_cast<qint8&>(i); }
+        -:  494:
+        -:  495:inline QDataStream &QDataStream::operator>>(quint8 &i)
+        -:  496:{ return *this >> reinterpret_cast<qint8&>(i); }
+        -:  497:
+        -:  498:inline QDataStream &QDataStream::operator>>(quint16 &i)
+        -:  499:{ return *this >> reinterpret_cast<qint16&>(i); }
+        -:  500:
+        -:  501:inline QDataStream &QDataStream::operator>>(quint32 &i)
+        -:  502:{ return *this >> reinterpret_cast<qint32&>(i); }
+        -:  503:
+        -:  504:inline QDataStream &QDataStream::operator>>(quint64 &i)
+        -:  505:{ return *this >> reinterpret_cast<qint64&>(i); }
+        -:  506:
+        -:  507:inline QDataStream &QDataStream::operator<<(char i)
+        -:  508:{ return *this << qint8(i); }
+        -:  509:
+        -:  510:inline QDataStream &QDataStream::operator<<(quint8 i)
+        -:  511:{ return *this << qint8(i); }
+        -:  512:
+        -:  513:inline QDataStream &QDataStream::operator<<(quint16 i)
+        -:  514:{ return *this << qint16(i); }
+        -:  515:
+        -:  516:inline QDataStream &QDataStream::operator<<(quint32 i)
+        -:  517:{ return *this << qint32(i); }
+        -:  518:
+        -:  519:inline QDataStream &QDataStream::operator<<(quint64 i)
+        -:  520:{ return *this << qint64(i); }
+        -:  521:
+        -:  522:template <typename Enum>
+        -:  523:inline QDataStream &operator<<(QDataStream &s, QFlags<Enum> e)
+        -:  524:{ return s << e.toInt(); }
+        -:  525:
+        -:  526:template <typename Enum>
+        -:  527:inline QDataStream &operator>>(QDataStream &s, QFlags<Enum> &e)
+        -:  528:{
+        -:  529:    typename QFlags<Enum>::Int i;
+        -:  530:    s >> i;
+        -:  531:    e = QFlags<Enum>::fromInt(i);
+        -:  532:    return s;
+        -:  533:}
+        -:  534:
+        -:  535:template <typename T>
+        -:  536:typename std::enable_if_t<std::is_enum<T>::value, QDataStream &>
+        -:  537:operator<<(QDataStream &s, const T &t)
+        -:  538:{
+        -:  539:    // std::underlying_type_t<T> may be long or ulong, for which QDataStream
+        -:  540:    // provides no streaming operators. For those, cast to qint64 or quint64.
+        -:  541:    return s << typename QIntegerForSizeof<T>::Unsigned(t);
+        -:  542:}
+        -:  543:
+        -:  544:template <typename T>
+        -:  545:typename std::enable_if_t<std::is_enum<T>::value, QDataStream &>
+        -:  546:operator>>(QDataStream &s, T &t)
+        -:  547:{
+        -:  548:    typename QIntegerForSizeof<T>::Unsigned i;
+        -:  549:    s >> i;
+        -:  550:    t = T(i);
+        -:  551:    return s;
+        -:  552:}
+        -:  553:
+        -:  554:Q_CORE_EXPORT QDataStream &operator<<(QDataStream &out, QChar chr);
+        -:  555:Q_CORE_EXPORT QDataStream &operator>>(QDataStream &in, QChar &chr);
+        -:  556:
+        -:  557:#ifndef Q_QDOC
+        -:  558:
+        -:  559:template<typename T>
+        -:  560:inline QDataStreamIfHasIStreamOperatorsContainer<QList<T>, T> operator>>(QDataStream &s, QList<T> &v)
+        -:  561:{
+        -:  562:    return QtPrivate::readArrayBasedContainer(s, v);
+        -:  563:}
+        -:  564:
+        -:  565:template<typename T>
+        -:  566:inline QDataStreamIfHasOStreamOperatorsContainer<QList<T>, T> operator<<(QDataStream &s, const QList<T> &v)
+        -:  567:{
+        -:  568:    return QtPrivate::writeSequentialContainer(s, v);
+        -:  569:}
+        -:  570:
+        -:  571:template <typename T>
+        -:  572:inline QDataStreamIfHasIStreamOperatorsContainer<QSet<T>, T> operator>>(QDataStream &s, QSet<T> &set)
+        -:  573:{
+        -:  574:    return QtPrivate::readListBasedContainer(s, set);
+        -:  575:}
+        -:  576:
+        -:  577:template <typename T>
+        -:  578:inline QDataStreamIfHasOStreamOperatorsContainer<QSet<T>, T> operator<<(QDataStream &s, const QSet<T> &set)
+        -:  579:{
+        -:  580:    return QtPrivate::writeSequentialContainer(s, set);
+        -:  581:}
+        -:  582:
+        -:  583:template <class Key, class T>
+        -:  584:inline QDataStreamIfHasIStreamOperatorsContainer<QHash<Key, T>, Key, T> operator>>(QDataStream &s, QHash<Key, T> &hash)
+        -:  585:{
+        -:  586:    return QtPrivate::readAssociativeContainer(s, hash);
+        -:  587:}
+        -:  588:
+        -:  589:template <class Key, class T>
+        -:  590:
+        -:  591:inline QDataStreamIfHasOStreamOperatorsContainer<QHash<Key, T>, Key, T> operator<<(QDataStream &s, const QHash<Key, T> &hash)
+        -:  592:{
+        -:  593:    return QtPrivate::writeAssociativeContainer(s, hash);
+        -:  594:}
+        -:  595:
+        -:  596:template <class Key, class T>
+        -:  597:inline QDataStreamIfHasIStreamOperatorsContainer<QMultiHash<Key, T>, Key, T> operator>>(QDataStream &s, QMultiHash<Key, T> &hash)
+        -:  598:{
+        -:  599:    return QtPrivate::readAssociativeContainer(s, hash);
+        -:  600:}
+        -:  601:
+        -:  602:template <class Key, class T>
+        -:  603:inline QDataStreamIfHasOStreamOperatorsContainer<QMultiHash<Key, T>, Key, T> operator<<(QDataStream &s, const QMultiHash<Key, T> &hash)
+        -:  604:{
+        -:  605:    return QtPrivate::writeAssociativeMultiContainer(s, hash);
+        -:  606:}
+        -:  607:
+        -:  608:template <class Key, class T>
+        -:  609:inline QDataStreamIfHasIStreamOperatorsContainer<QMap<Key, T>, Key, T> operator>>(QDataStream &s, QMap<Key, T> &map)
+        -:  610:{
+        -:  611:    return QtPrivate::readAssociativeContainer(s, map);
+        -:  612:}
+        -:  613:
+        -:  614:template <class Key, class T>
+        -:  615:inline QDataStreamIfHasOStreamOperatorsContainer<QMap<Key, T>, Key, T> operator<<(QDataStream &s, const QMap<Key, T> &map)
+        -:  616:{
+        -:  617:    return QtPrivate::writeAssociativeContainer(s, map);
+        -:  618:}
+        -:  619:
+        -:  620:template <class Key, class T>
+        -:  621:inline QDataStreamIfHasIStreamOperatorsContainer<QMultiMap<Key, T>, Key, T> operator>>(QDataStream &s, QMultiMap<Key, T> &map)
+        -:  622:{
+        -:  623:    return QtPrivate::readAssociativeContainer(s, map);
+        -:  624:}
+        -:  625:
+        -:  626:template <class Key, class T>
+        -:  627:inline QDataStreamIfHasOStreamOperatorsContainer<QMultiMap<Key, T>, Key, T> operator<<(QDataStream &s, const QMultiMap<Key, T> &map)
+        -:  628:{
+        -:  629:    return QtPrivate::writeAssociativeMultiContainer(s, map);
+        -:  630:}
+        -:  631:
+        -:  632:template <class T1, class T2>
+        -:  633:inline QDataStreamIfHasIStreamOperators<T1, T2> operator>>(QDataStream& s, std::pair<T1, T2> &p)
+        -:  634:{
+        -:  635:    s >> p.first >> p.second;
+        -:  636:    return s;
+        -:  637:}
+        -:  638:
+        -:  639:template <class T1, class T2>
+        -:  640:inline QDataStreamIfHasOStreamOperators<T1, T2> operator<<(QDataStream& s, const std::pair<T1, T2> &p)
+        -:  641:{
+        -:  642:    s << p.first << p.second;
+        -:  643:    return s;
+        -:  644:}
+        -:  645:
+        -:  646:#else
+        -:  647:
+        -:  648:template <class T>
+        -:  649:QDataStream &operator>>(QDataStream &s, QList<T> &l);
+        -:  650:
+        -:  651:template <class T>
+        -:  652:QDataStream &operator<<(QDataStream &s, const QList<T> &l);
+        -:  653:
+        -:  654:template <class T>
+        -:  655:QDataStream &operator>>(QDataStream &s, QSet<T> &set);
+        -:  656:
+        -:  657:template <class T>
+        -:  658:QDataStream &operator<<(QDataStream &s, const QSet<T> &set);
+        -:  659:
+        -:  660:template <class Key, class T>
+        -:  661:QDataStream &operator>>(QDataStream &s, QHash<Key, T> &hash);
+        -:  662:
+        -:  663:template <class Key, class T>
+        -:  664:QDataStream &operator<<(QDataStream &s, const QHash<Key, T> &hash);
+        -:  665:
+        -:  666:template <class Key, class T>
+        -:  667:QDataStream &operator>>(QDataStream &s, QMultiHash<Key, T> &hash);
+        -:  668:
+        -:  669:template <class Key, class T>
+        -:  670:QDataStream &operator<<(QDataStream &s, const QMultiHash<Key, T> &hash);
+        -:  671:
+        -:  672:template <class Key, class T>
+        -:  673:QDataStream &operator>>(QDataStream &s, QMap<Key, T> &map);
+        -:  674:
+        -:  675:template <class Key, class T>
+        -:  676:QDataStream &operator<<(QDataStream &s, const QMap<Key, T> &map);
+        -:  677:
+        -:  678:template <class Key, class T>
+        -:  679:QDataStream &operator>>(QDataStream &s, QMultiMap<Key, T> &map);
+        -:  680:
+        -:  681:template <class Key, class T>
+        -:  682:QDataStream &operator<<(QDataStream &s, const QMultiMap<Key, T> &map);
+        -:  683:
+        -:  684:template <class T1, class T2>
+        -:  685:QDataStream &operator>>(QDataStream& s, std::pair<T1, T2> &p);
+        -:  686:
+        -:  687:template <class T1, class T2>
+        -:  688:QDataStream &operator<<(QDataStream& s, const std::pair<T1, T2> &p);
+        -:  689:
+        -:  690:#endif // Q_QDOC
+        -:  691:
+        -:  692:inline QDataStream &operator>>(QDataStream &s, QKeyCombination &combination)
+        -:  693:{
+        -:  694:    int combined;
+        -:  695:    s >> combined;
+        -:  696:    combination = QKeyCombination::fromCombined(combined);
+        -:  697:    return s;
+        -:  698:}
+        -:  699:
+        -:  700:inline QDataStream &operator<<(QDataStream &s, QKeyCombination combination)
+        -:  701:{
+        -:  702:    return s << combination.toCombined();
+        -:  703:}
+        -:  704:
+        -:  705:#endif // QT_NO_DATASTREAM
+        -:  706:
+        -:  707:QT_END_NAMESPACE
+        -:  708:
+        -:  709:#endif // QDATASTREAM_H

@@ -1,0 +1,40 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qcompare_impl.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QCOMPARE_IMPL_H
+        -:    5:#define QCOMPARE_IMPL_H
+        -:    6:
+        -:    7:#if 0
+        -:    8:#pragma qt_sync_skip_header_check
+        -:    9:#pragma qt_sync_stop_processing
+        -:   10:#endif
+        -:   11:
+        -:   12:#include <QtCore/qtconfigmacros.h>
+        -:   13:#include <QtCore/qcompilerdetection.h>
+        -:   14:
+        -:   15:#include <type_traits>
+        -:   16:
+        -:   17:QT_BEGIN_NAMESPACE
+        -:   18:
+        -:   19:namespace QtPrivate {
+        -:   20:
+        -:   21:// [cmp.categories.pre] / 3, but using a safe bool trick
+        -:   22:// and also rejecting std::nullptr_t (unlike the example)
+        -:   23:class CompareAgainstLiteralZero {
+        -:   24:public:
+        -:   25:    using SafeZero = void (CompareAgainstLiteralZero::*)();
+    #####:   26:    Q_IMPLICIT constexpr CompareAgainstLiteralZero(SafeZero) noexcept {}
+        -:   27:
+        -:   28:    template <typename T, std::enable_if_t<std::is_null_pointer_v<T>, bool> = true>
+        -:   29:    CompareAgainstLiteralZero(T) = delete;
+        -:   30:};
+        -:   31:
+        -:   32:} // namespace QtPrivate
+        -:   33:
+        -:   34:QT_END_NAMESPACE
+        -:   35:
+        -:   36:#endif // QCOMPARE_IMPL_H

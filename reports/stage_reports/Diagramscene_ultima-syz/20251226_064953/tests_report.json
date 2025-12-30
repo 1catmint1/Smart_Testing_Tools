@@ -1,0 +1,26 @@
+{
+  "stage": "tests",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_064953",
+  "meta": {
+    "cmd": "cmd /c \"set PATH=D:\\Qt\\6.10.1\\mingw_64\\bin;D:\\Qt\\Tools\\mingw1310_64\\bin;%PATH% && cd /d C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz && cd tests\\generated && qmake tests.pro && mingw32-make clean && mingw32-make -f Makefile.Debug && debug\\tests.exe && move debug\\*.gc* .\"",
+    "cwd": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "timeout_s": 600.0,
+    "returncode": 3,
+    "stdout": "",
+    "stderr": "C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/tests.pro:17: Extra characters after test expression.\nError processing project file: tests.pro\n",
+    "timed_out": false
+  },
+  "findings": [
+    {
+      "category": "tests",
+      "severity": "error",
+      "title": "测试命令执行失败",
+      "details": "\nC:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/tests.pro:17: Extra characters after test expression.\nError processing project file: tests.pro\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

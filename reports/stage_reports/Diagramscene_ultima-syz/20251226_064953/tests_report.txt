@@ -1,0 +1,15 @@
+[stage] tests
+[project] C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[time] 20251226_064953
+[meta] cmd: cmd /c "set PATH=D:\Qt\6.10.1\mingw_64\bin;D:\Qt\Tools\mingw1310_64\bin;%PATH% && cd /d C:\Users\lenovo\Desktop\Diagramscene_ultima-syz && cd tests\generated && qmake tests.pro && mingw32-make clean && mingw32-make -f Makefile.Debug && debug\tests.exe && move debug\*.gc* ."
+[meta] cwd: C:\Users\lenovo\Desktop\Diagramscene_ultima-syz
+[meta] returncode: 3
+[meta] timed_out: False
+[meta] timeout_s: 600.0
+
+== findings ==
+- tests | error | 测试命令执行失败
+
+== stderr (truncated) ==
+C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/tests.pro:17: Extra characters after test expression.
+Error processing project file: tests.pro

@@ -1,0 +1,181 @@
+{
+  "stage": "single_file_loop",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251229_101012",
+  "meta": {
+    "mode": "single_file_loop",
+    "retries": 4
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "生成文件失败: tests/generated/tests.pro",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON appears truncated (no closing bracket found). depth=2, partial content length=27775\nLast response preview: {\n    \"schema\": \"qt_test\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/tests.pro\",\n            \"content\": \"QT += testlib widgets svg\\nTEMPLATE = app\\nCONFIG += console\\nCONFIG -= app_bundle\\nCONFIG += c++17\\n\\nSOURCES += \\\\\\n    tst_diagramitem.cpp \\\\\\n    ../diagramitem.cpp \\\\\\n    ../arrow.cpp \\\\\\n    ../diagramtextitem.cpp \\\\\\n    ../diagrampath.cpp\\n\\nHEADERS += \\\\\\n    ../diagramitem.h \\\\\\n    ../arrow.h \\\\\\n    ../diagramtextitem.h \\\\\\n    ../diagrampath.h\\n\\nINCLUDEPATH += ..\\n\\nDEFINES += QT_DEPRECATED_WARNINGS\\n\\nQMAKE_CXXFLAGS += -Wno-deprecated-declarations\"\n        },\n        {\n            \"name\": \"tst_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include <QApplication>\\n#include <QMenu>\\n#include <QGraphicsScene>\\n#include <QGraphicsSceneMouseEvent>\\n#include <QGraphicsSceneHoverEvent>\\n#include <QGraphicsSceneContextMenuEvent>\\n#include <QPainter>\\n#include <QImage>\\n#include <QStyleOptionGraphicsItem>\\n#include <QTransform>\\n#include <QPolygonF>\\n#include <QList>\\n#include <QMap>\\n#include <QColor>\\n#include <QSizeF>\\n#include <QRectF>\\n#include <QPointF>\\n#include <QBrush>\\n#include <QGraphicsTextItem>\\n#include <QFocusEvent>\\n#include <QGraphicsView>\\n#include <QGraphicsPathItem>\\n#include <QPainterPath>\\n#include <QJsonObject>\\n#include <QGraphicsPixmapItem>\\n#include <QPixmap>\\n#include <QGraphicsLineItem>\\n#include <QTextCursor>\\n#include <QTextCharFormat>\\n#include <QTextBlockFormat>\\n#include <QTextLength>\\n#include <QTextTable>\\n#include <QTextList>\\n#include <QTextFrame>\\n#include <QTextDocumentFragment>\\n#include <QTextBlock>\\n#include <QTextCursor>\\n#include <QTextCharFormat>\\n#include <QTextBlockFormat>\\n#include <QTextLength>\\n#include <QTextTable>\\n#include <QTextList>\\n#include <QTextFrame>\\n#include <QTextDocumentFragment>\\n#include <QTextBlock>\\n#include <QTextCursor>\\n#include <QTextCharFormat>\\n#include <QTextBlockFormat>\\n#include <QTextLength>\\n#include <QTextTable>\\n#include <QTextList>\\n#include",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 34 个用例",
+      "details": "生成文件明细：\ntests/generated/test_diagramitem.cpp (34 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "tests",
+      "severity": "error",
+      "title": "测试命令执行失败",
+      "details": "D:\\Qt\\6.10.1\\mingw_64\\bin\\moc.exe -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN -DQT_TESTCASE_BUILDDIR=\"\\\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\\\"\" --include C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/debug/moc_predefs.h -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++ -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -ID:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include test_diagramitem.cpp -o debug\\test_diagramitem.moc\ng++ -c -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN -DQT_TESTCASE_BUILDDIR=\"\\\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\\\"\" -I. -I../.. -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -Idebug -I/include -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++  -o debug\\test_diagramitem.o test_diagramitem.cpp\n\ntest_diagramitem.cpp: In member function 'void TestDiagramItem::testInitialFlags()':\ntest_diagramitem.cpp:521:74: error: conversion from 'QFlags<QGraphicsItem::GraphicsItemFlag>' to non-scalar type 'QFlags<Qt::ItemFlag>' requested\n  519 |     Qt::ItemFlags expectedFlags = QGraphicsItem::ItemIsFocusable |\n      |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        \n  520 |                                  QGraphicsItem::ItemIsSelectable |\n      |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        \n  521 |                                  QGraphicsItem::ItemSendsGeometryChanges |\n      |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n  522 |                                  QGraphicsItem::ItemIsMovable;\n      |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~             \nmingw32-make: *** [Makefile.Debug:1990: debug/test_diagramitem.o] Error 1\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 37 个用例",
+      "details": "生成文件明细：\ntests/generated/test_diagramitem.cpp (37 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "tests",
+      "severity": "error",
+      "title": "测试命令执行失败",
+      "details": "D:\\Qt\\6.10.1\\mingw_64\\bin\\moc.exe -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN -DQT_TESTCASE_BUILDDIR=\"\\\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\\\"\" --include C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/debug/moc_predefs.h -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++ -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -ID:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include test_diagramitem.cpp -o debug\\test_diagramitem.moc\ng++ -c -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN -DQT_TESTCASE_BUILDDIR=\"\\\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\\\"\" -I. -I../.. -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -Idebug -I/include -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++  -o debug\\test_diagramitem.o test_diagramitem.cpp\n\ntest_diagramitem.cpp: In member function 'void TestDiagramItem::testConstructorWithDifferentTypes()':\ntest_diagramitem.cpp:152:55: error: 'Process' is not a member of 'DiagramItem'\n  152 |     DiagramItem *item2 = new DiagramItem(DiagramItem::Process, contextMenu);\n      |                                                       ^~~~~~~\nIn file included from D:/Qt/6.10.1/mingw_64/include/QtTest/qtesteventloop.h:8,\n                 from D:/Qt/6.10.1/mingw_64/include/QtTest/qsignalspy.h:10,\n                 from D:/Qt/6.10.1/mingw_64/include/QtTest/QtTest:10,\n                 from test_diagramitem.cpp:7:\ntest_diagramitem.cpp:153:49: error: 'Process' is not a member of 'DiagramItem'\n  153 |     QCOMPARE(item2->myDiagramType, DiagramItem::Process);\n      |                                                 ^~~~~~~\nD:/Qt/6.10.1/mingw_64/include/QtTest/qtestcase.h:90:34: note: in definition of macro 'QCOMPARE'\n   90 |     if (!QTest::qCompare(actual, expected, #actual, #expected, __FILE__, __LINE__))\\\n      |                                  ^~~~~~~~\ntest_diagramitem.cpp: In member function 'void TestDiagramItem::testPaintProcessType()':\ntest_diagramitem.cpp:346:58: error: 'Process' is not a member of 'DiagramItem'\n  346 |     DiagramItem *testItem = new DiagramItem(DiagramItem::Process, contextMenu);\n      |                                                          ^~~~~~~\ntest_diagramitem.cpp: In member function 'void TestDiagramItem::testMousePressEvent()':\ntest_diagramitem.cpp:527:10: warning: unused variable 'wasSelected' [-Wunused-variable]\n  527 |     bool wasSelected = item->isSelected();\n      |          ^~~~~~~~~~~\nmingw32-make: *** [Makefile.Debug:1970: debug/test_diagramitem.o] Error 1\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "生成文件失败: tests/generated/test_diagramitem.cpp",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON appears truncated (no closing bracket found). depth=2, partial content length=25284\nLast response preview: ```json\n{\n    \"schema\": \"qt_test_suite\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include <QGraphicsScene>\\n#include <QGraphicsView>\\n#include <QGraphicsSceneMouseEvent>\\n#include <QGraphicsSceneHoverEvent>\\n#include <QGraphicsSceneContextMenuEvent>\\n#include <QMenu>\\n#include <QPainter>\\n#include <QStyleOptionGraphicsItem>\\n#include <QImage>\\n#include <QSignalSpy>\\n#include <QTimer>\\n#include <QBrush>\\n#include <QPolygonF>\\n#include <QTransform>\\n#include <QGraphicsTextItem>\\n#include <QFocusEvent>\\n#include <QKeyEvent>\\n#include <QApplication>\\n#include <QGraphicsLineItem>\\n#include <QPainterPath>\\n#include <QGraphicsPathItem>\\n#include <QMap>\\n#include <QRandomGenerator>\\n\\n#define private public\\n#define protected public\\n#include \\\"diagramitem.h\\\"\\n#undef protected\\n#undef private\\n\\n#include \\\"arrow.h\\\"\\n#include \\\"diagramtextitem.h\\\"\\n#include \\\"diagrampath.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void init();\\n    void cleanup();\\n    \\n    void testConstructor();\\n    void testConstructorWithDifferentTypes();\\n    void testBoundingRect();\\n    void testBoundingRectWithRotation();\\n    void testBoundingRectAfterSizeChange();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testSetFixedSizeUpdatesBoundingRect();\\n    void testRotationAngle();\\n    void testRotationAffectsBoundingRect();\\n    void testPaintStartEndType();\\n    void testPaintConditionalType();\\n    void testPaintStepType();\\n    void testPaintCircularType();\\n    void testPaintDocumentType();\\n    void testPaintPredefinedProcessType();\\n    void testPaintStoredDataType();\\n    void testPaintWithDifferentColors();\\n    void testPaintWithDifferentSizes();\\n    void testPaintWithRotation();\\n    void testMousePressEvent();\\n    void testMouseReleaseEvent();\\n    void testMouseMoveEvent();\\n    vo",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "生成文件失败: tests/generated/tests.pro",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON appears truncated (no closing bracket found). depth=2, partial content length=25193\nLast response preview: ```json\n{\n    \"schema\": \"qt_test\",\n    \"files\": [\n        {\n            \"name\": \"tests.pro\",\n            \"content\": \"QT += testlib widgets svg\\nTEMPLATE = app\\nTARGET = tst_diagramitem\\nCONFIG += console testcase\\nCONFIG -= app_bundle\\n\\nSOURCES += \\\\\\n    test_diagramitem.cpp \\\\\\n    ../../diagramitem.cpp \\\\\\n    ../../arrow.cpp \\\\\\n    ../../diagramtextitem.cpp \\\\\\n    ../../diagrampath.cpp\\n\\nHEADERS += \\\\\\n    ../../diagramitem.h \\\\\\n    ../../arrow.h \\\\\\n    ../../diagramtextitem.h \\\\\\n    ../../diagrampath.h\\n\\nINCLUDEPATH += ../..\\n\\nDEFINES += SRCDIR=\\\\\\\"$$PWD/../..\\\\\\\"\\n\\n# Coverage flags (if needed)\\n# QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage\\n# QMAKE_LFLAGS += --coverage\"\n        },\n        {\n            \"name\": \"test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include <QGraphicsScene>\\n#include <QGraphicsView>\\n#include <QGraphicsSceneMouseEvent>\\n#include <QGraphicsSceneHoverEvent>\\n#include <QGraphicsSceneContextMenuEvent>\\n#include <QMenu>\\n#include <QPainter>\\n#include <QStyleOptionGraphicsItem>\\n#include <QImage>\\n#include <QTimer>\\n#include <QSignalSpy>\\n#include <QBrush>\\n#include <QPolygonF>\\n#include <QTransform>\\n#include <QGraphicsTextItem>\\n#include <QTextDocument>\\n#include <QFocusEvent>\\n#include <QKeyEvent>\\n#include <QApplication>\\n#include <QGraphicsLineItem>\\n#include <QPainterPath>\\n#include <QGraphicsPathItem>\\n\\n#define private public\\n#define protected public\\n#include \\\"diagramitem.h\\\"\\n#include \\\"arrow.h\\\"\\n#include \\\"diagramtextitem.h\\\"\\n#include \\\"diagrampath.h\\\"\\n#undef protected\\n#undef private\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void init();\\n    void cleanup();\\n    \\n    void testConstructor();\\n    void testConstructorWithDifferentTypes();\\n    void testBoundingRect();\\n    void testBoundingRectWithRotation();\\n    void testBoundingRectAfterSizeChange();\\n    void testSetBrush();\\n    void testSetF",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 32 个用例",
+      "details": "生成文件明细：\ntests/generated/test_diagramitem.cpp (32 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "tests",
+      "severity": "error",
+      "title": "测试命令执行失败",
+      "details": "D:\\Qt\\6.10.1\\mingw_64\\bin\\moc.exe -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN -DQT_TESTCASE_BUILDDIR=\"\\\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\\\"\" --include C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/debug/moc_predefs.h -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++ -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -ID:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include test_diagramitem.cpp -o debug\\test_diagramitem.moc\ng++ -c -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN -DQT_TESTCASE_BUILDDIR=\"\\\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\\\"\" -I. -I../.. -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -Idebug -I/include -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++  -o debug\\test_diagramitem.o test_diagramitem.cpp\ng++ --coverage -Wl,-subsystem,console -mthreads -o debug\\tests.exe @debug\\object_script.tests.Debug D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Widgets.a D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Svg.a D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Gui.a D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Test.a D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Core.a -lmingw32 D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6EntryPoint.a -lshell32  \n********* Start testing of TestDiagramItem *********\nConfig: Using QtTest library 6.10.1, Qt 6.10.1 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 13.1.0), windows 11\nPASS   : TestDiagramItem::initTestCase()\nPASS   : TestDiagramItem::testConstructor()\nPASS   : TestDiagramItem::testConstructorWithDifferentTypes()\nPASS   : TestDiagramItem::testBoundingRect()\nPASS   : TestDiagramItem::testBoundingRectWithRotation()\nPASS   : TestDiagramItem::testBoundingRectAfterSizeChange()\nPASS   : TestDiagramItem::testSetBrush()\nPASS   : TestDiagramItem::testSetFixedSize()\nPASS   : TestDiagramItem::testSetFixedSizeUpdatesBoundingRect()\nPASS   : TestDiagramItem::testMousePressEvent()\nPASS   : TestDiagramItem::testMouseReleaseEvent()\nPASS   : TestDiagramItem::testMouseMoveEvent()\nPASS   : TestDiagramItem::testHoverEnterEvent()\nPASS   : TestDiagramItem::testHoverLeaveEvent()\nPASS   : TestDiagramItem::testHoverMoveEvent()\n\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "生成文件失败: tests/generated/tests.pro",
+      "details": "HTTPSConnectionPool(host='api.deepseek.com', port=443): Read timed out.",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批次 1/1 批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON appears truncated (no closing bracket found). depth=1, partial content length=25262\nLast response preview: [\n  {\n    \"path\": \"tests/generated/test_diagramitem.cpp\",\n    \"content\": \"#define private public\\n#define protected public\\n#include \\\"diagramitem.h\\\"\\n#undef protected\\n#undef private\\n\\n#include <QtTest>\\n#include <QGraphicsScene>\\n#include <QGraphicsView>\\n#include <QMenu>\\n#include <QPainter>\\n#include <QStyleOptionGraphicsItem>\\n#include <QGraphicsSceneMouseEvent>\\n#include <QGraphicsSceneHoverEvent>\\n#include <QGraphicsSceneContextMenuEvent>\\n#include <QTransform>\\n#include <QImage>\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void init();\\n    void cleanup();\\n    \\n    void testConstructor();\\n    void testBoundingRect();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testPaint();\\n    void testDiagramType();\\n    void testRotationAngle();\\n    void testBorder();\\n    void testGrapSize();\\n    void testMinSize();\\n    void testColor();\\n    void testTextItem();\\n    void testContextMenu();\\n    void testFlags();\\n    void testMousePressEvent();\\n    void testMouseMoveEvent();\\n    void testMouseReleaseEvent();\\n    void testHoverEnterEvent();\\n    void testHoverLeaveEvent();\\n    void testHoverMoveEvent();\\n    void testContextMenuEvent();\\n    void testPaintStartEnd();\\n    void testPaintConditional();\\n    void testPaintStep();\\n    void testPaintIo();\\n    void testPaintPath();\\n    void testPaintText();\\n    void testPaintRect();\\n    void testPaintEllipse();\\n    void testPaintDiamond();\\n    void testPaintParallelogram();\\n    void testPaintHexagon();\\n    void testPaintCloud();\\n    void testPaintStorage();\\n    void testPaintManualInput();\\n    void testPaintPreparation();\\n    void testPaintDisplay();\\n    void testPaintDelay();\\n    void testPaintExtract();\\n    void testPaintMerge();\\n    void testPaintOr();\\n    void testPaintSummingJunction();\\n    void testPaintCollate();\\n    void testPaintSort();\\n    void testPaintStoredData();\\n   ",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：1 个文件，共约 0 个用例",
+      "details": "生成文件明细：\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "tests",
+      "severity": "error",
+      "title": "测试命令执行失败",
+      "details": "mingw32-make: Nothing to be done for 'first'.\n********* Start testing of TestDiagramItem *********\nConfig: Using QtTest library 6.10.1, Qt 6.10.1 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 13.1.0), windows 11\nPASS   : TestDiagramItem::initTestCase()\nPASS   : TestDiagramItem::testConstructor()\nPASS   : TestDiagramItem::testConstructorWithDifferentTypes()\nPASS   : TestDiagramItem::testBoundingRect()\nPASS   : TestDiagramItem::testBoundingRectWithRotation()\nPASS   : TestDiagramItem::testBoundingRectAfterSizeChange()\nPASS   : TestDiagramItem::testSetBrush()\nPASS   : TestDiagramItem::testSetFixedSize()\nPASS   : TestDiagramItem::testSetFixedSizeUpdatesBoundingRect()\nPASS   : TestDiagramItem::testMousePressEvent()\nPASS   : TestDiagramItem::testMouseReleaseEvent()\nPASS   : TestDiagramItem::testMouseMoveEvent()\nPASS   : TestDiagramItem::testHoverEnterEvent()\nPASS   : TestDiagramItem::testHoverLeaveEvent()\nPASS   : TestDiagramItem::testHoverMoveEvent()\n\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "生成文件失败: tests/generated/test_diagramitem.cpp",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON appears truncated (no closing bracket found). depth=2, partial content length=26316\nLast response preview: ```json\n{\n    \"schema\": \"qt_test\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include <QGraphicsScene>\\n#include <QPainter>\\n#include <QGraphicsSceneMouseEvent>\\n#include <QGraphicsSceneHoverEvent>\\n#include <QGraphicsSceneContextMenuEvent>\\n#include <QStyleOptionGraphicsItem>\\n#include <QImage>\\n#include <QMenu>\\n#include <QGraphicsView>\\n\\n#define private public\\n#define protected public\\n#include \\\"diagramitem.h\\\"\\n#undef private\\n#undef protected\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void init();\\n    void cleanup();\\n    \\n    void testConstructor();\\n    void testConstructorWithDifferentTypes();\\n    void testBoundingRect();\\n    void testBoundingRectWithRotation();\\n    void testBoundingRectAfterSizeChange();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testSetFixedSizeUpdatesBoundingRect();\\n    void testMousePressEvent();\\n    void testMouseReleaseEvent();\\n    void testMouseMoveEvent();\\n    void testHoverEnterEvent();\\n    void testHoverLeaveEvent();\\n    void testHoverMoveEvent();\\n    void testContextMenuEvent();\\n    void testPaintStartEndType();\\n    void testPaintConditionalType();\\n    void testPaintWithRotation();\\n    void testPaintWithDifferentColors();\\n    void testTextItemInitialization();\\n    void testTextItemPosition();\\n    void testFlags();\\n    void testAcceptHoverEvents();\\n    void testRotationAngle();\\n    void testRotationAngleAffectsBoundingRect();\\n    void testBorderProperty();\\n    void testMinSizeProperty();\\n    void testGrapSizeProperty();\\n    void testItemIsSelectable();\\n    void testItemIsMovable();\\n    void testItemSendsGeometryChanges();\\n    void testPrivateMembersAccessible();\\n    void testAddArrow();\\n    void testRemoveArrow();\\n    void testRemoveArrows();\\n    void testAddPathes();\\n    void testRemovePath();\\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 30 个用例",
+      "details": "生成文件明细：\ntests/generated/test_diagramitem.cpp (30 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "tests",
+      "severity": "error",
+      "title": "测试命令执行失败",
+      "details": "D:\\Qt\\6.10.1\\mingw_64\\bin\\moc.exe -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN -DQT_TESTCASE_BUILDDIR=\"\\\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\\\"\" --include C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated/debug/moc_predefs.h -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++ -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated -IC:/Users/lenovo/Desktop/Diagramscene_ultima-syz -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -ID:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -ID:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include test_diagramitem.cpp -o debug\\test_diagramitem.moc\ng++ -c -fno-keep-inline-dllexport --coverage -g -Wall -Wextra -Wextra -fexceptions -mthreads -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_SVG_LIB -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN -DQT_TESTCASE_BUILDDIR=\"\\\"C:/Users/lenovo/Desktop/Diagramscene_ultima-syz/tests/generated\\\"\" -I. -I../.. -ID:/Qt/6.10.1/mingw_64/include -ID:/Qt/6.10.1/mingw_64/include/QtWidgets -ID:/Qt/6.10.1/mingw_64/include/QtSvg -ID:/Qt/6.10.1/mingw_64/include/QtGui -ID:/Qt/6.10.1/mingw_64/include/QtTest -ID:/Qt/6.10.1/mingw_64/include/QtCore -Idebug -I/include -ID:/Qt/6.10.1/mingw_64/mkspecs/win32-g++  -o debug\\test_diagramitem.o test_diagramitem.cpp\ng++ --coverage -Wl,-subsystem,console -mthreads -o debug\\tests.exe @debug\\object_script.tests.Debug D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Widgets.a D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Svg.a D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Gui.a D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Test.a D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6Core.a -lmingw32 D:\\Qt\\6.10.1\\mingw_64\\lib\\libQt6EntryPoint.a -lshell32  \n********* Start testing of TestDiagramItem *********\nConfig: Using QtTest library 6.10.1, Qt 6.10.1 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 13.1.0), windows 11\nPASS   : TestDiagramItem::initTestCase()\nPASS   : TestDiagramItem::testConstructor()\nPASS   : TestDiagramItem::testConstructorWithDifferentTypes()\nPASS   : TestDiagramItem::testBoundingRect()\nPASS   : TestDiagramItem::testBoundingRectWithRotation()\nPASS   : TestDiagramItem::testBoundingRectAfterSizeChange()\nPASS   : TestDiagramItem::testSetBrush()\nPASS   : TestDiagramItem::testSetFixedSize()\nPASS   : TestDiagramItem::testSetFixedSizeUpdatesBoundingRect()\nPASS   : TestDiagramItem::testRotationAngle()\nPASS   : TestDiagramItem::testRotationAffectsBoundingRect()\nFAIL!  : TestDiagramItem::testPaintStartEnd() 'hasContent' returned FALSE. ()\ntest_diagramitem.cpp(278) : failure location\nFAIL!  : TestDiagramItem::testPaintConditional() '!conditionalItem->myPolygon.isEmpty()' returned FALSE. ()\ntest_diagramitem.cpp(299) : failure location\nFAIL!  : TestDiagramItem::testPaintStep() 'hasContent' returned FALSE. ()\ntest_diagramitem.cpp(329) : failure location\nPASS   : TestDiagramItem::testPaintIo()\nPASS   : TestDiagramItem::testPaintWithDifferentColors()\nPASS   : TestDiagramItem::testMousePressEvent()\nPASS   : TestDiagramItem::testMouseReleaseEvent()\nPASS   : TestDiagramItem::testMouseMoveEvent()\nPASS   : TestDiagramItem::testHoverEnterEvent()\nPASS   : TestDiagramItem::testHoverLeaveEvent()\nPASS   : TestDiagramItem::testHoverMoveEvent()\nPASS   : TestDiagramItem::testContextMenuEvent()\nPASS   : TestDiagramItem::testTextItemInitialization()\nPASS   : TestDiagramItem::testTextItemPosition()\nPASS   : TestDiagramItem::testItemFlags()\nPASS   : TestDiagramItem::testItemInScene()\nPASS   : TestDiagramItem::testItemSelection()\nFAIL!  : TestDiagramItem::testItemFocus() 'item->hasFocus()' returned FALSE. ()\ntest_diagramitem.cpp(526) : failure location\nPASS   : TestDiagramItem::testProtectedMembers()\nPASS   : TestDiagramItem::testPrivateMembers()\nPASS   : TestDiagramItem::cleanupTestCase()\nTotals: 28 passed, 4 failed, 0 skipped, 0 blacklisted, 74ms\n********* Finished testing of TestDiagramItem *********\n\ntest_diagramitem.cpp: In member function 'void TestDiagramItem::testBoundingRectWithRotation()':\ntest_diagramitem.cpp:166:12: warning: variable 'originalRect' set but not used [-Wunused-but-set-variable]\n  166 |     QRectF originalRect = item->boundingRect();\n      |            ^~~~~~~~~~~~\ntest_diagramitem.cpp: In member function 'void TestDiagramItem::testSetFixedSizeUpdatesBoundingRect()':\ntest_diagramitem.cpp:205:12: warning: variable 'originalSize' set but not used [-Wunused-but-set-variable]\n  205 |     QSizeF originalSize = item->m_grapSize;\n      |            ^~~~~~~~~~~~\ntest_diagramitem.cpp:217:12: warning: variable 'expectedSize' set but not used [-Wunused-but-set-variable]\n  217 |     QSizeF expectedSize = newSize + QSize(40, 40);\n      |            ^~~~~~~~~~~~\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "coverage",
+      "severity": "info",
+      "title": "覆盖率汇总：lines 0.0% | branches 0.0% | functions 0.0%",
+      "details": "（来自覆盖率命令输出解析）",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

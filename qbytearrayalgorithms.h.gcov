@@ -1,0 +1,169 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qbytearrayalgorithms.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2021 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:// Qt-Security score:critical reason:data-parser
+        -:    4:
+        -:    5:#ifndef QBYTEARRAYALGORITHMS_H
+        -:    6:#define QBYTEARRAYALGORITHMS_H
+        -:    7:
+        -:    8:#include <QtCore/qnamespace.h>
+        -:    9:
+        -:   10:#include <string.h>
+        -:   11:#include <stdarg.h>
+        -:   12:
+        -:   13:#if 0
+        -:   14:#pragma qt_class(QByteArrayAlgorithms)
+        -:   15:#endif
+        -:   16:
+        -:   17:QT_BEGIN_NAMESPACE
+        -:   18:
+        -:   19:class QByteArrayView;
+        -:   20:
+        -:   21:namespace QtPrivate {
+        -:   22:
+        -:   23:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION
+        -:   24:bool startsWith(QByteArrayView haystack, QByteArrayView needle) noexcept;
+        -:   25:
+        -:   26:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION
+        -:   27:bool endsWith(QByteArrayView haystack, QByteArrayView needle) noexcept;
+        -:   28:
+        -:   29:[[nodiscard]] inline // defined in qbytearrayview.h
+        -:   30:qsizetype findByteArray(QByteArrayView haystack, qsizetype from, char needle) noexcept;
+        -:   31:
+        -:   32:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION
+        -:   33:qsizetype findByteArray(QByteArrayView haystack, qsizetype from, QByteArrayView needle) noexcept;
+        -:   34:
+        -:   35:[[nodiscard]] inline // defined in qbytearrayview.h
+        -:   36:qsizetype lastIndexOf(QByteArrayView haystack, qsizetype from, uchar needle) noexcept;
+        -:   37:
+        -:   38:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION
+        -:   39:qsizetype lastIndexOf(QByteArrayView haystack, qsizetype from, QByteArrayView needle) noexcept;
+        -:   40:
+        -:   41:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION
+        -:   42:qsizetype count(QByteArrayView haystack, QByteArrayView needle) noexcept;
+        -:   43:
+        -:   44:[[nodiscard]] Q_CORE_EXPORT int compareMemory(QByteArrayView lhs, QByteArrayView rhs);
+        -:   45:
+        -:   46:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION QByteArrayView trimmed(QByteArrayView s) noexcept;
+        -:   47:
+        -:   48:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION bool isValidUtf8(QByteArrayView s) noexcept;
+        -:   49:
+        -:   50:template <typename T>
+        -:   51:class ParsedNumber
+        -:   52:{
+        -:   53:    T m_value;
+        -:   54:    quint32 m_error : 1;
+        -:   55:    quint32 m_reserved : 31;
+        -:   56:    void *m_reserved2 = nullptr;
+        -:   57:public:
+        -:   58:    constexpr ParsedNumber() noexcept : m_value(), m_error(true), m_reserved(0) {}
+        -:   59:    constexpr explicit ParsedNumber(T v) : m_value(v), m_error(false), m_reserved(0) {}
+        -:   60:
+        -:   61:    // minimal optional-like API:
+        -:   62:    explicit operator bool() const noexcept { return !m_error; }
+        -:   63:    T &operator*() { Q_ASSERT(*this); return m_value; }
+        -:   64:    const T &operator*() const { Q_ASSERT(*this); return m_value; }
+        -:   65:    T *operator->() noexcept { return *this ? &m_value : nullptr; }
+        -:   66:    const T *operator->() const noexcept { return *this ? &m_value : nullptr; }
+        -:   67:    template <typename U> // not = T, as that'd allow calls that are incompatible with std::optional
+        -:   68:    T value_or(U &&u) const { return *this ? m_value : T(std::forward<U>(u)); }
+        -:   69:};
+        -:   70:
+        -:   71:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION ParsedNumber<double> toDouble(QByteArrayView a) noexcept;
+        -:   72:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION ParsedNumber<float> toFloat(QByteArrayView a) noexcept;
+        -:   73:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION ParsedNumber<qlonglong> toSignedInteger(QByteArrayView data, int base);
+        -:   74:[[nodiscard]] Q_CORE_EXPORT Q_DECL_PURE_FUNCTION ParsedNumber<qulonglong> toUnsignedInteger(QByteArrayView data, int base);
+        -:   75:
+        -:   76:// QByteArrayView has incomplete type here, and we can't include qbytearrayview.h,
+        -:   77:// since it includes qbytearrayalgorithms.h. Use the ByteArrayView template type as
+        -:   78:// a workaround.
+        -:   79:template <typename T, typename ByteArrayView,
+        -:   80:          typename = std::enable_if_t<std::is_same_v<ByteArrayView, QByteArrayView>>>
+        -:   81:static inline T toIntegral(ByteArrayView data, bool *ok, int base)
+        -:   82:{
+        -:   83:    const auto val = [&] {
+        -:   84:        if constexpr (std::is_unsigned_v<T>)
+        -:   85:            return toUnsignedInteger(data, base);
+        -:   86:        else
+        -:   87:            return toSignedInteger(data, base);
+        -:   88:    }();
+        -:   89:    const bool failed = !val || T(*val) != *val;
+        -:   90:    if (ok)
+        -:   91:        *ok = !failed;
+        -:   92:    if (failed)
+        -:   93:        return 0;
+        -:   94:    return T(*val);
+        -:   95:}
+        -:   96:
+        -:   97:} // namespace QtPrivate
+        -:   98:
+        -:   99:/*****************************************************************************
+        -:  100:  Safe and portable C string functions; extensions to standard string.h
+        -:  101: *****************************************************************************/
+        -:  102:
+        -:  103:[[nodiscard]] Q_DECL_PURE_FUNCTION Q_CORE_EXPORT
+        -:  104:const void *qmemrchr(const void *s, int needle, size_t n) noexcept;
+        -:  105:Q_CORE_EXPORT char *qstrdup(const char *);
+        -:  106:
+    #####:  107:inline size_t qstrlen(const char *str)
+        -:  108:{
+        -:  109:    QT_WARNING_PUSH
+        -:  110:#if defined(Q_CC_GNU_ONLY) && Q_CC_GNU >= 900 && Q_CC_GNU < 1000
+        -:  111:    // spurious compiler warning (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=91490#c6)
+        -:  112:    // when Q_DECLARE_METATYPE_TEMPLATE_1ARG is used
+        -:  113:    QT_WARNING_DISABLE_GCC("-Wstringop-overflow")
+        -:  114:#endif
+    #####:  115:    return str ? strlen(str) : 0;
+        -:  116:    QT_WARNING_POP
+        -:  117:}
+        -:  118:
+        -:  119:inline size_t qstrnlen(const char *str, size_t maxlen)
+        -:  120:{
+        -:  121:    if (!str)
+        -:  122:        return 0;
+        -:  123:    auto end = static_cast<const char *>(memchr(str, '\0', maxlen));
+        -:  124:    return end ? end - str : maxlen;
+        -:  125:}
+        -:  126:
+        -:  127:// implemented in qbytearray.cpp
+        -:  128:Q_CORE_EXPORT char *qstrcpy(char *dst, const char *src);
+        -:  129:Q_CORE_EXPORT char *qstrncpy(char *dst, const char *src, size_t len);
+        -:  130:
+        -:  131:Q_CORE_EXPORT int qstrcmp(const char *str1, const char *str2);
+        -:  132:
+        -:  133:inline int qstrncmp(const char *str1, const char *str2, size_t len)
+        -:  134:{
+        -:  135:    return (str1 && str2) ? strncmp(str1, str2, len)
+        -:  136:        : (str1 ? 1 : (str2 ? -1 : 0));
+        -:  137:}
+        -:  138:Q_CORE_EXPORT int qstricmp(const char *, const char *);
+        -:  139:Q_CORE_EXPORT int qstrnicmp(const char *, const char *, size_t len);
+        -:  140:Q_CORE_EXPORT int qstrnicmp(const char *, qsizetype, const char *, qsizetype = -1);
+        -:  141:
+        -:  142:#ifndef QT_NO_QSNPRINTF // use std::(v)snprintf() from <cstdio> instead
+        -:  143:#if QT_DEPRECATED_SINCE(6, 9)
+        -:  144:#define QSNPF_DEPR(vsn) \
+        -:  145:    QT_DEPRECATED_VERSION_X_6_9("Use C++11 std::" #vsn "printf() instead, taking care to " \
+        -:  146:                                "ensure that you didn't rely on QString::asprintf() " \
+        -:  147:                                "idiosyncrasies that q" #vsn "printf might, but " \
+        -:  148:                                "std::" #vsn "printf() does not, support.")
+        -:  149:// implemented in qvsnprintf.cpp
+        -:  150:QSNPF_DEPR(vsn)
+        -:  151:Q_CORE_EXPORT int qvsnprintf(char *str, size_t n, const char *fmt, va_list ap)
+        -:  152:    Q_ATTRIBUTE_FORMAT_PRINTF(3, 0);
+        -:  153:QSNPF_DEPR(sn)
+        -:  154:Q_CORE_EXPORT int qsnprintf(char *str, size_t n, const char *fmt, ...)
+        -:  155:    Q_ATTRIBUTE_FORMAT_PRINTF(3, 4);
+        -:  156:#undef QSNPF_DEPR
+        -:  157:#endif // QT_DEPRECATED_SINCE(6, 9)
+        -:  158:#endif // QT_NO_QSNPRINTF
+        -:  159:
+        -:  160:// qChecksum: Internet checksum
+        -:  161:Q_CORE_EXPORT quint16 qChecksum(QByteArrayView data, Qt::ChecksumType standard = Qt::ChecksumIso3309);
+        -:  162:
+        -:  163:QT_END_NAMESPACE
+        -:  164:
+        -:  165:#endif // QBYTEARRAYALGORITHMS_H

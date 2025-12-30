@@ -1,0 +1,69 @@
+{
+  "exe_path": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\\diagramscene.exe",
+  "timestamp": "2025-12-25T22:02:40.864745",
+  "smoke_test": {
+    "exe": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\\diagramscene.exe",
+    "timeout_sec": 15,
+    "alive": true,
+    "cpu_samples": [
+      61.3,
+      23.1,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "memory_samples_mb": [
+      45.30859375,
+      54.3828125,
+      54.3828125,
+      54.390625,
+      54.390625
+    ],
+    "returncode": null,
+    "startup_time_s": 0,
+    "duration_s": 1.0,
+    "summary": {
+      "status": "passed",
+      "warnings": 0,
+      "errors": 0
+    }
+  },
+  "ui_probe": {
+    "exe": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\\diagramscene.exe",
+    "timeout_sec": 15,
+    "window_title": "流程图工程界面",
+    "window_appear_time_s": 0.66
+  },
+  "findings": [
+    {
+      "title": "已自动选择候选 exe",
+      "severity": "info",
+      "details": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\\diagramscene.exe"
+    },
+    {
+      "title": "进程启动成功",
+      "severity": "info",
+      "details": "pid=86736"
+    },
+    {
+      "title": "启动响应时间 0 秒",
+      "severity": "info",
+      "details": "应用成功启动并保持运行"
+    },
+    {
+      "title": "内存占用 54.4 MB",
+      "severity": "info",
+      "details": "初始 45.3 → 最终 54.4 MB"
+    },
+    {
+      "title": "检测到可见窗口",
+      "severity": "info",
+      "details": "流程图工程界面"
+    },
+    {
+      "title": "窗口显示时间: 0.66秒",
+      "severity": "info",
+      "details": "从启动到主窗口可见耗时 0.66 秒"
+    }
+  ]
+}

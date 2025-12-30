@@ -1,0 +1,323 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qcheckedint_impl.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2025 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QCHECKEDINT_H
+        -:    5:#define QCHECKEDINT_H
+        -:    6:
+        -:    7:#include <QtCore/qassert.h>
+        -:    8:#include <QtCore/qcompare.h>
+        -:    9:#include <QtCore/qhashfunctions.h>
+        -:   10:#include <QtCore/qnumeric.h>
+        -:   11:
+        -:   12:#include <type_traits>
+        -:   13:
+        -:   14:QT_BEGIN_NAMESPACE
+        -:   15:
+        -:   16:namespace QtPrivate {
+        -:   17:namespace QCheckedIntegers {
+        -:   18:
+        -:   19:template <typename Int>
+        -:   20:struct CheckIntTypeHelper
+        -:   21:{
+        -:   22:    static_assert(std::is_integral_v<Int>, "Only integer types are supported");
+        -:   23:    static_assert(std::is_signed_v<Int>, "Only signed types are supported");
+        -:   24:    static_assert(std::is_same_v<Int, decltype(+Int{})>, "Only fully promoted types are supported");
+        -:   25:};
+        -:   26:
+        -:   27:// Implements wraparound semantics, and checks for overflow.
+        -:   28:// Never causes UB on any operation.
+        -:   29:template <typename Int>
+        -:   30:struct SafeCheckImpl : private CheckIntTypeHelper<Int>
+        -:   31:{
+        -:   32:    static inline constexpr Int MinInt = (std::numeric_limits<Int>::min)();
+        -:   33:    static inline constexpr Int MaxInt = (std::numeric_limits<Int>::max)();
+        -:   34:
+        -:   35:    [[nodiscard]]
+        -:   36:    static constexpr bool add(Int a, Int b, Int *result) noexcept
+        -:   37:    {
+        -:   38:        return !qAddOverflow(a, b, result);
+        -:   39:    }
+        -:   40:
+        -:   41:    [[nodiscard]]
+        -:   42:    static constexpr bool sub(Int a, Int b, Int *result) noexcept
+        -:   43:    {
+        -:   44:        return !qSubOverflow(a, b, result);
+        -:   45:    }
+        -:   46:
+        -:   47:    [[nodiscard]]
+        -:   48:    static constexpr bool mul(Int a, Int b, Int *result) noexcept
+        -:   49:    {
+        -:   50:        return !qMulOverflow(a, b, result);
+        -:   51:    }
+        -:   52:
+        -:   53:    [[nodiscard]]
+        -:   54:    static constexpr bool div(Int a, Int b, Int *result) noexcept
+        -:   55:    {
+        -:   56:        if (Q_UNLIKELY(b == 0))
+        -:   57:            return false;
+        -:   58:
+        -:   59:        *result = a / b;
+        -:   60:        return true;
+        -:   61:    }
+        -:   62:};
+        -:   63:
+        -:   64:// Reports failed checks through Q_ASSERT.
+        -:   65:struct AssertReportPolicy
+        -:   66:{
+        -:   67:    static constexpr void check(bool ok, const char *where, const char *description)
+        -:   68:    {
+        -:   69:        Q_ASSERT_X(ok, where, description);
+        -:   70:    }
+        -:   71:};
+        -:   72:
+        -:   73:template <typename Int,
+        -:   74:          typename Impl = SafeCheckImpl<Int>,
+        -:   75:          typename FailureReportPolicy = AssertReportPolicy>
+        -:   76:class QCheckedInt : private CheckIntTypeHelper<Int>
+        -:   77:{
+        -:   78:    Int m_i;
+        -:   79:
+        -:   80:#define Q_CHECKEDINT_POLICY_CHECK(cond, what) \
+        -:   81:    FailureReportPolicy::check(cond, Q_FUNC_INFO, what)
+        -:   82:
+        -:   83:public:
+        -:   84:    template <typename AInt>
+        -:   85:    using if_is_same_int = std::enable_if_t<std::is_same_v<Int, AInt>, bool>;
+        -:   86:
+        -:   87:    QCheckedInt() = default;
+        -:   88:
+    #####:   89:    explicit constexpr QCheckedInt(Int i) noexcept
+    #####:   90:        : m_i(i)
+    #####:   91:    {}
+        -:   92:
+        -:   93:    // Conversions
+        -:   94:    explicit constexpr operator Int() const noexcept
+        -:   95:    {
+        -:   96:        return m_i;
+        -:   97:    }
+        -:   98:
+        -:   99:    // Accessors
+        -:  100:    constexpr Int value() const noexcept { return m_i; }
+        -:  101:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  102:    constexpr void setValue(AInt i) noexcept { m_i = i; }
+        -:  103:
+        -:  104:    constexpr Int &as_underlying() & noexcept { return m_i; }
+        -:  105:    constexpr const Int &as_underlying() const & noexcept { return m_i; }
+        -:  106:    constexpr Int &&as_underlying() && noexcept { return std::move(m_i); }
+        -:  107:    constexpr const Int &&as_underlying() const && noexcept { return std::move(m_i); }
+        -:  108:
+        -:  109:    // Unary ops
+        -:  110:    constexpr QCheckedInt operator+() const noexcept { return *this; }
+        -:  111:    constexpr QCheckedInt operator-() const
+        -:  112:    {
+        -:  113:        QCheckedInt result{};
+        -:  114:        const bool ok = Impl::sub(Int(0), m_i, &result.m_i);
+        -:  115:        Q_CHECKEDINT_POLICY_CHECK(ok, "Overflow in unary negation");
+        -:  116:        return result;
+        -:  117:    }
+        -:  118:
+        -:  119:    constexpr QCheckedInt &operator++()
+        -:  120:    {
+        -:  121:        const bool ok = Impl::add(m_i, Int(1), &m_i);
+        -:  122:        Q_CHECKEDINT_POLICY_CHECK(ok, "Overflow in operator++");
+        -:  123:        return *this;
+        -:  124:    }
+        -:  125:
+        -:  126:    constexpr QCheckedInt operator++(int)
+        -:  127:    {
+        -:  128:        QCheckedInt result = *this;
+        -:  129:        ++*this;
+        -:  130:        return result;
+        -:  131:    }
+        -:  132:
+        -:  133:    constexpr QCheckedInt &operator--()
+        -:  134:    {
+        -:  135:        const bool ok = Impl::sub(m_i, Int(1), &m_i);
+        -:  136:        Q_CHECKEDINT_POLICY_CHECK(ok, "Overflow in operator--");
+        -:  137:        return *this;
+        -:  138:    }
+        -:  139:
+        -:  140:    constexpr QCheckedInt operator--(int)
+        -:  141:    {
+        -:  142:        QCheckedInt result = *this;
+        -:  143:        --*this;
+        -:  144:        return result;
+        -:  145:    }
+        -:  146:
+        -:  147:    // Addition
+        -:  148:    friend constexpr QCheckedInt operator+(QCheckedInt lhs, QCheckedInt rhs)
+        -:  149:    {
+        -:  150:        QCheckedInt result{};
+        -:  151:        const bool ok = Impl::add(lhs.m_i, rhs.m_i, &result.m_i);
+        -:  152:        Q_CHECKEDINT_POLICY_CHECK(ok, "Overflow in operator+");
+        -:  153:        return result;
+        -:  154:    }
+        -:  155:
+        -:  156:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  157:    friend constexpr QCheckedInt operator+(QCheckedInt lhs, AInt rhs)
+        -:  158:    {
+        -:  159:        return lhs + QCheckedInt(rhs);
+        -:  160:    }
+        -:  161:
+        -:  162:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  163:    friend constexpr QCheckedInt operator+(AInt lhs, QCheckedInt rhs)
+        -:  164:    {
+        -:  165:        return QCheckedInt(lhs) + rhs;
+        -:  166:    }
+        -:  167:
+        -:  168:    constexpr QCheckedInt &operator+=(QCheckedInt other)
+        -:  169:    {
+        -:  170:        return *this = *this + other;
+        -:  171:    }
+        -:  172:
+        -:  173:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  174:    constexpr QCheckedInt &operator+=(AInt other)
+        -:  175:    {
+        -:  176:        return *this = *this + QCheckedInt(other);
+        -:  177:    }
+        -:  178:
+        -:  179:    // Subtraction
+        -:  180:    friend constexpr QCheckedInt operator-(QCheckedInt lhs, QCheckedInt rhs)
+        -:  181:    {
+        -:  182:        QCheckedInt result{};
+        -:  183:        const bool ok = Impl::sub(lhs.m_i, rhs.m_i, &result.m_i);
+        -:  184:        Q_CHECKEDINT_POLICY_CHECK(ok, "Overflow in operator-");
+        -:  185:        return result;
+        -:  186:    }
+        -:  187:
+        -:  188:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  189:    friend constexpr QCheckedInt operator-(QCheckedInt lhs, AInt rhs)
+        -:  190:    {
+        -:  191:        return lhs - QCheckedInt(rhs);
+        -:  192:    }
+        -:  193:
+        -:  194:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  195:    friend constexpr QCheckedInt operator-(AInt lhs, QCheckedInt rhs)
+        -:  196:    {
+        -:  197:        return QCheckedInt(lhs) - rhs;
+        -:  198:    }
+        -:  199:
+        -:  200:    constexpr QCheckedInt &operator-=(QCheckedInt other)
+        -:  201:    {
+        -:  202:        return *this = *this - other;
+        -:  203:    }
+        -:  204:
+        -:  205:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  206:    constexpr QCheckedInt &operator-=(AInt other)
+        -:  207:    {
+        -:  208:        return *this = *this - QCheckedInt(other);
+        -:  209:    }
+        -:  210:
+        -:  211:    // Multiplication
+        -:  212:    friend constexpr QCheckedInt operator*(QCheckedInt lhs, QCheckedInt rhs)
+        -:  213:    {
+        -:  214:        QCheckedInt result{};
+        -:  215:        const bool ok = Impl::mul(lhs.m_i, rhs.m_i, &result.m_i);
+        -:  216:        Q_CHECKEDINT_POLICY_CHECK(ok, "Overflow in operator*");
+        -:  217:        return result;
+        -:  218:    }
+        -:  219:
+        -:  220:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  221:    friend constexpr QCheckedInt operator*(QCheckedInt lhs, AInt rhs)
+        -:  222:    {
+        -:  223:        return lhs * QCheckedInt(rhs);
+        -:  224:    }
+        -:  225:
+        -:  226:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  227:    friend constexpr QCheckedInt operator*(AInt lhs, QCheckedInt rhs)
+        -:  228:    {
+        -:  229:        return QCheckedInt(lhs) * rhs;
+        -:  230:    }
+        -:  231:
+        -:  232:    constexpr QCheckedInt &operator*=(QCheckedInt other)
+        -:  233:    {
+        -:  234:        return *this = *this * other;
+        -:  235:    }
+        -:  236:
+        -:  237:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  238:    constexpr QCheckedInt &operator*=(AInt other)
+        -:  239:    {
+        -:  240:        return *this = *this * QCheckedInt(other);
+        -:  241:    }
+        -:  242:
+        -:  243:    // Division
+        -:  244:    friend constexpr QCheckedInt operator/(QCheckedInt lhs, QCheckedInt rhs)
+        -:  245:    {
+        -:  246:        QCheckedInt result{};
+        -:  247:        const bool ok = Impl::div(lhs.m_i, rhs.m_i, &result.m_i);
+        -:  248:        Q_CHECKEDINT_POLICY_CHECK(ok, "Division by zero");
+        -:  249:        return result;
+        -:  250:    }
+        -:  251:
+        -:  252:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  253:    friend constexpr QCheckedInt operator/(QCheckedInt lhs, AInt rhs)
+        -:  254:    {
+        -:  255:        return lhs / QCheckedInt(rhs);
+        -:  256:    }
+        -:  257:
+        -:  258:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  259:    friend constexpr QCheckedInt operator/(AInt lhs, QCheckedInt rhs)
+        -:  260:    {
+        -:  261:        return QCheckedInt(lhs) / rhs;
+        -:  262:    }
+        -:  263:
+        -:  264:    constexpr QCheckedInt &operator/=(QCheckedInt other)
+        -:  265:    {
+        -:  266:        return *this = *this / other;
+        -:  267:    }
+        -:  268:
+        -:  269:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  270:    constexpr QCheckedInt &operator/=(AInt other)
+        -:  271:    {
+        -:  272:        return *this = *this / QCheckedInt(other);
+        -:  273:    }
+        -:  274:
+        -:  275:#undef Q_CHECKEDINT_POLICY_CHECK
+        -:  276:
+        -:  277:    // Comparisons
+    #####:  278:    friend constexpr bool comparesEqual(QCheckedInt lhs, QCheckedInt rhs) noexcept
+        -:  279:    {
+    #####:  280:        return lhs.m_i == rhs.m_i;
+        -:  281:    }
+        -:  282:
+        -:  283:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  284:    friend constexpr bool comparesEqual(QCheckedInt lhs, AInt rhs) noexcept
+        -:  285:    {
+        -:  286:        return lhs.m_i == rhs;
+        -:  287:    }
+        -:  288:
+        -:  289:    friend constexpr Qt::strong_ordering compareThreeWay(QCheckedInt lhs, QCheckedInt rhs) noexcept
+        -:  290:    {
+        -:  291:        return Qt::compareThreeWay(lhs.m_i, rhs.m_i);
+        -:  292:    }
+        -:  293:
+        -:  294:    template <typename AInt, if_is_same_int<AInt> = true>
+        -:  295:    friend constexpr Qt::strong_ordering compareThreeWay(QCheckedInt lhs, AInt rhs) noexcept
+        -:  296:    {
+        -:  297:        return Qt::compareThreeWay(lhs.m_i, rhs);
+        -:  298:    }
+        -:  299:
+    #####:  300:    Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(QCheckedInt)
+        -:  301:    Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(
+        -:  302:        QCheckedInt,
+        -:  303:        AInt,
+        -:  304:        template <typename AInt, if_is_same_int<AInt> = true>)
+        -:  305:
+        -:  306:private:
+        -:  307:    friend size_t constexpr qHash(QCheckedInt key, size_t seed = 0) noexcept
+        -:  308:    {
+        -:  309:        using QT_PREPEND_NAMESPACE(qHash); // ### needed?
+        -:  310:        return qHash(key.value(), seed);
+        -:  311:    }
+        -:  312:};
+        -:  313:
+        -:  314:} // namespace QCheckedIntegers
+        -:  315:} // namespace QtPrivate
+        -:  316:
+        -:  317:QT_END_NAMESPACE
+        -:  318:
+        -:  319:#endif // QCHECKEDINT_H

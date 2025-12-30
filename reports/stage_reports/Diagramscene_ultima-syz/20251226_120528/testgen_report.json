@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_120528",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\diagrampath.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_diagrampath.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_diagrampath.cpp",
+          "content": "#include <QtTest>\n// Enable access to protected members\n#define protected public\n#define private public\n#include \"diagrampath.h\"\n\nclass TestDiagramPath : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void testQuadFunction();\n    void testConstructor();\n    void testUpdatePath();\n    void testDrawHead();\n};\n\nvoid TestDiagramPath::testQuadFunction()\n{\n    DiagramPath path(nullptr, nullptr, DiagramItem::TransformState::Top, DiagramItem::TransformState::Bottom);\n    \n    QPointF startPoint(0, 0);\n    QPointF endPoint1(10, 10);\n    QCOMPARE(path.quad(startPoint, endPoint1), 1);\n    \n    QPointF endPoint2(-10, 10);\n    QCOMPARE(path.quad(startPoint, endPoint2), 4);\n    \n    QPointF endPoint3(-10, -10);\n    QCOMPARE(path.quad(startPoint, endPoint3), 4);\n    \n    QPointF endPoint4(10, -10);\n    QCOMPARE(path.quad(startPoint, endPoint4), 1);\n}\n\nvoid TestDiagramPath::testConstructor()\n{\n    DiagramItem *startItem = nullptr;\n    DiagramItem *endItem = nullptr;\n    DiagramItem::TransformState startState = DiagramItem::TransformState::Top;\n    DiagramItem::TransformState endState = DiagramItem::TransformState::Bottom;\n    \n    DiagramPath path(startItem, endItem, startState, endState);\n    \n    QVERIFY(path.startItem == startItem);\n    QVERIFY(path.endItem == endItem);\n    QVERIFY(path.startState == startState);\n    QVERIFY(path.endState == endState);\n    QVERIFY(path.flags() & QGraphicsItem::ItemIsSelectable);\n}\n\nvoid TestDiagramPath::testUpdatePath()\n{\n    DiagramItem *startItem = nullptr;\n    DiagramItem *endItem = nullptr;\n    DiagramItem::TransformState startState = DiagramItem::TransformState::Top;\n    DiagramItem::TransformState endState = DiagramItem::TransformState::Bottom;\n    \n    DiagramPath path(startItem, endItem, startState, endState);\n    \n    path.updatePath();\n    \n    QVERIFY(!path.path().isEmpty());\n}\n\nvoid TestDiagramPath::testDrawHead()\n{\n    DiagramItem *startItem = nullptr;\n    DiagramItem *endItem = nullptr;\n    DiagramItem::TransformState startState = DiagramItem::TransformState::Top;\n    DiagramItem::TransformState endState = DiagramItem::TransformState::Bottom;\n    \n    DiagramPath path(startItem, endItem, startState, endState);\n    \n    QPointF endpoint(100, 100);\n    QPointF endRectPoint1(100, 80);\n    QPointF endRectPoint2(100, 120);\n    QPointF endRectPoint3(80, 100);\n    QPointF endRectPoint4(120, 100);\n    \n    path.drawHead(endpoint, endRectPoint1);\n    path.drawHead(endpoint, endRectPoint2);\n    path.drawHead(endpoint, endRectPoint3);\n    path.drawHead(endpoint, endRectPoint4);\n    \n    QVERIFY(!path.path().isEmpty());\n}\n\nQTEST_MAIN(TestDiagramPath)\n#include \"test_diagrampath.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = tests\nCONFIG += console testcase\nCONFIG -= app_bundle\nQT += testlib widgets svg\n\n# Include all generated test cpp/h automatically (use $$files to expand on Windows)\nSOURCES += $$files($$PWD/*.cpp)\nHEADERS += $$files($$PWD/*.h)\n\n# Project sources and headers (relative to tests/generated)\nSOURCES +=     ../../arrow.cpp     ../../diagramitem.cpp     ../../diagramitemgroup.cpp     ../../diagrampath.cpp     ../../diagramscene.cpp     ../../diagramtextitem.cpp     ../../findreplacedialog.cpp     ../../mainwindow.cpp\n\nHEADERS +=     ../../arrow.h     ../../diagramitem.h     ../../diagramitemgroup.h     ../../diagrampath.h     ../../diagramscene.h     ../../diagramtextitem.h     ../../findreplacedialog.h     ../../mainwindow.h\n\nINCLUDEPATH += $$PWD/../..\nDEPENDPATH += $$PWD/../..\nQMAKE_CXXFLAGS += --coverage\nQMAKE_LFLAGS += --coverage\n\nDESTDIR = $$PWD/debug\nOBJECTS_DIR = $$PWD/obj\nMOC_DIR = $$PWD/moc\nRCC_DIR = $$PWD/rcc\nUI_DIR = $$PWD/ui\n"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 4
+      }
+    },
+    "applied": [
+      "tests/generated/test_diagrampath.cpp (4 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 4
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 4 个用例",
+      "details": "生成文件明细：\ntests/generated/test_diagrampath.cpp (4 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

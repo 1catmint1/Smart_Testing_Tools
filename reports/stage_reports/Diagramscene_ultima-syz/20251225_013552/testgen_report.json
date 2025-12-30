@@ -1,0 +1,51 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251225_013552",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [],
+      "patches": [],
+      "stats": {
+        "files_generated": 0,
+        "cases_approx": 0
+      }
+    },
+    "applied": [],
+    "total_cases_count": 0
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: {\n    \"schema\": \"QtTest project for Diagramscene_ultima-syz\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/tests.pro\",\n            \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow \\\\\\n    test_geometry_utils \\\\\\n    test_item_factory \\\\\\n    test_selection_behavior \\\\\\n    test_z_order_operations \\\\\\n    test_item_properties \\\\\\n    test_scene_boundaries \\\\\\n    test_serialization \\\\\\n    test_undo_redo \\\\\\n    test_clipboard_operations \\\\\\n    test_grid_snapping \\\\\\n    test_connection_logic \\\\\\n    test_text_operations \\\\\\n    test_color_management \\\\\\n    test_font_handling \\\\\\n    test_pen_brush_styles \\\\\\n    test_alignment_operations \\\\\\n    test_group_ungroup \\\\\\n    test_layer_management \\\\\\n    test_export_formats \\\\\\n    test_import_operations \\\\\\n    test_zoom_operations \\\\\\n    test_pan_operations \\\\\\n    test_selection_rect \\\\\\n    test_rubber_band \\\\\\n    test_keyboard_shortcuts \\\\\\n    test_mouse_gestures \\\\\\n    test_context_menu \\\\\\n    test_toolbar_actions \\\\\\n    test_status_bar \\\\\\n    test_dock_widgets \\\\\\n    test_preferences \\\\\\n    test_autosave \\\\\\n    test_backup_system \\\\\\n    test_versioning \\\\\\n    test_collaboration \\\\\\n    test_performance \\\\\\n    test_memory_management \\\\\\n    test_error_handling \\\\\\n    test_edge_cases \\\\\\n    test_integration\\n\\nCONFIG += ordered\\n\"\n        },\n        {\n            \"name\": \"tests/generated/test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include \\\"diagramitem.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testConstructor();\\n    void testBoundingRect();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testRotationAngle();\\n  ",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: ```json\n{\n    \"schema\": \"QtTest project with .pro file and test .cpp files\",\n    \"files\": [\n        {\n            \"name\": \"tests/generated/tests.pro\",\n            \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow \\\\\\n    test_geometry_utils \\\\\\n    test_item_factory \\\\\\n    test_selection_behavior \\\\\\n    test_z_order_operations \\\\\\n    test_item_properties \\\\\\n    test_scene_boundaries \\\\\\n    test_serialization \\\\\\n    test_undo_redo \\\\\\n    test_clipboard_operations \\\\\\n    test_grid_snapping \\\\\\n    test_connection_logic \\\\\\n    test_text_operations \\\\\\n    test_color_management \\\\\\n    test_font_handling \\\\\\n    test_pen_brush_styles \\\\\\n    test_alignment_operations \\\\\\n    test_group_ungroup \\\\\\n    test_layer_management \\\\\\n    test_export_formats \\\\\\n    test_import_operations \\\\\\n    test_zoom_operations \\\\\\n    test_pan_operations \\\\\\n    test_selection_rect \\\\\\n    test_rubber_band \\\\\\n    test_keyboard_shortcuts \\\\\\n    test_mouse_gestures \\\\\\n    test_context_menu \\\\\\n    test_toolbar_actions \\\\\\n    test_status_bar \\\\\\n    test_dock_widgets \\\\\\n    test_preferences \\\\\\n    test_autosave \\\\\\n    test_backup_system \\\\\\n    test_versioning \\\\\\n    test_collaboration \\\\\\n    test_performance \\\\\\n    test_memory_management \\\\\\n    test_error_handling \\\\\\n    test_edge_cases \\\\\\n    test_integration\\n\\nCONFIG += ordered\\n\"\n        },\n        {\n            \"name\": \"tests/generated/test_diagramitem.cpp\",\n            \"content\": \"#include <QtTest>\\n#include \\\"diagramitem.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testConstructor();\\n    void testBoundingRect();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testRotat",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "未写入任何 QtTest 文件（LLM 输出为空或不合法）",
+      "details": "",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

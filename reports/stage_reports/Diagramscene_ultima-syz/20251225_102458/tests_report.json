@@ -1,0 +1,20 @@
+{
+  "stage": "tests",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251225_102458",
+  "meta": {
+    "skipped": true
+  },
+  "findings": [
+    {
+      "category": "tests",
+      "severity": "warning",
+      "title": "未配置测试命令，跳过测试执行",
+      "details": "设置环境变量 QT_TEST_AI_TEST_CMD，例如：ctest -C Debug",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

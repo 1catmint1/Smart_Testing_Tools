@@ -1,0 +1,124 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qforeach.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2022 The Qt Company Ltd.
+        -:    2:// Copyright (C) 2019 Intel Corporation.
+        -:    3:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    4:
+        -:    5:#ifndef QFOREACH_H
+        -:    6:#define QFOREACH_H
+        -:    7:
+        -:    8:#include <QtCore/qtclasshelpermacros.h>
+        -:    9:#include <QtCore/qtconfigmacros.h>
+        -:   10:#include <QtCore/qtdeprecationmarkers.h>
+        -:   11:#include <QtCore/qttypetraits.h>
+        -:   12:
+        -:   13:QT_BEGIN_NAMESPACE
+        -:   14:
+        -:   15:#if 0
+        -:   16:#pragma qt_class(QForeach)
+        -:   17:#pragma qt_sync_stop_processing
+        -:   18:#endif
+        -:   19:
+        -:   20:#ifndef QT_NO_FOREACH
+        -:   21:
+        -:   22:namespace QtPrivate {
+        -:   23:
+        -:   24:template <typename T>
+        -:   25:class QForeachContainer {
+        -:   26:    Q_DISABLE_COPY_MOVE(QForeachContainer)
+        -:   27:public:
+    #####:   28:    QForeachContainer(const T &t) : c(t), i(std::as_const(c).begin()), e(std::as_const(c).end()) {}
+------------------
+_ZN9QtPrivate17QForeachContainerI5QListIP13QGraphicsItemEEC1ERKS4_:
+    #####:   28:    QForeachContainer(const T &t) : c(t), i(std::as_const(c).begin()), e(std::as_const(c).end()) {}
+------------------
+_ZN9QtPrivate17QForeachContainerI5QListIP11DiagramPathEEC1ERKS4_:
+    #####:   28:    QForeachContainer(const T &t) : c(t), i(std::as_const(c).begin()), e(std::as_const(c).end()) {}
+------------------
+_ZN9QtPrivate17QForeachContainerI5QListI15ReadDiagramPathEEC1ERKS3_:
+    #####:   28:    QForeachContainer(const T &t) : c(t), i(std::as_const(c).begin()), e(std::as_const(c).end()) {}
+------------------
+_ZN9QtPrivate17QForeachContainerI5QListI15ReadDiagramItemEEC1ERKS3_:
+    #####:   28:    QForeachContainer(const T &t) : c(t), i(std::as_const(c).begin()), e(std::as_const(c).end()) {}
+------------------
+    #####:   29:    QForeachContainer(T &&t) : c(std::move(t)), i(std::as_const(c).begin()), e(std::as_const(c).end())  {}
+------------------
+_ZN9QtPrivate17QForeachContainerI5QListIP7QActionEEC1EOS4_:
+    #####:   29:    QForeachContainer(T &&t) : c(std::move(t)), i(std::as_const(c).begin()), e(std::as_const(c).end())  {}
+------------------
+_ZN9QtPrivate17QForeachContainerI5QListIP13QGraphicsItemEEC1EOS4_:
+    #####:   29:    QForeachContainer(T &&t) : c(std::move(t)), i(std::as_const(c).begin()), e(std::as_const(c).end())  {}
+------------------
+        -:   30:
+        -:   31:    T c;
+        -:   32:    typename T::const_iterator i, e;
+        -:   33:};
+        -:   34:
+        -:   35:// Containers that have a detach function are considered shared, and are OK in a foreach loop
+        -:   36:template <typename T, typename = decltype(std::declval<T>().detach())>
+    #####:   37:inline void warnIfContainerIsNotShared(int) {}
+------------------
+_ZN9QtPrivate26warnIfContainerIsNotSharedI5QListIP7QActionEvEEvi:
+    #####:   37:inline void warnIfContainerIsNotShared(int) {}
+------------------
+_ZN9QtPrivate26warnIfContainerIsNotSharedI5QListIP11DiagramPathEvEEvi:
+    #####:   37:inline void warnIfContainerIsNotShared(int) {}
+------------------
+_ZN9QtPrivate26warnIfContainerIsNotSharedI5QListIP13QGraphicsItemEvEEvi:
+    #####:   37:inline void warnIfContainerIsNotShared(int) {}
+------------------
+_ZN9QtPrivate26warnIfContainerIsNotSharedI5QListI15ReadDiagramPathEvEEvi:
+    #####:   37:inline void warnIfContainerIsNotShared(int) {}
+------------------
+_ZN9QtPrivate26warnIfContainerIsNotSharedI5QListI15ReadDiagramItemEvEEvi:
+    #####:   37:inline void warnIfContainerIsNotShared(int) {}
+------------------
+        -:   38:
+        -:   39:#if QT_DEPRECATED_SINCE(6, 0)
+        -:   40:// Other containers will copy themselves if used in foreach, this use is deprecated
+        -:   41:template <typename T>
+        -:   42:QT_DEPRECATED_VERSION_X_6_0("Do not use foreach/Q_FOREACH with containers which are not implicitly shared. "
+        -:   43:    "Prefer using a range-based for loop with these containers: `for (const auto &it : container)`, "
+        -:   44:    "keeping in mind that range-based for doesn't copy the container as Q_FOREACH does")
+        -:   45:inline void warnIfContainerIsNotShared(...) {}
+        -:   46:#endif
+        -:   47:
+        -:   48:template<typename T>
+    #####:   49:QForeachContainer<typename std::decay<T>::type> qMakeForeachContainer(T &&t)
+        -:   50:{
+    #####:   51:    warnIfContainerIsNotShared<typename std::decay<T>::type>(0);
+    #####:   52:    return QForeachContainer<typename std::decay<T>::type>(std::forward<T>(t));
+        -:   53:}
+        -:   54:
+        -:   55:}
+        -:   56:
+        -:   57:// Use C++17 if statement with initializer. User's code ends up in a else so
+        -:   58:// scoping of different ifs is not broken
+        -:   59:#define Q_FOREACH_IMPL(variable, name, container)                                             \
+        -:   60:    for (auto name = QtPrivate::qMakeForeachContainer(container); name.i != name.e; ++name.i) \
+        -:   61:        if (variable = *name.i; false) {} else
+        -:   62:
+        -:   63:#define Q_FOREACH_JOIN(A, B) Q_FOREACH_JOIN_IMPL(A, B)
+        -:   64:#define Q_FOREACH_JOIN_IMPL(A, B) A ## B
+        -:   65:
+        -:   66:#define Q_FOREACH(variable, container) \
+        -:   67:    Q_FOREACH_IMPL(variable, Q_FOREACH_JOIN(_container_, __LINE__), container)
+        -:   68:#endif // QT_NO_FOREACH
+        -:   69:
+        -:   70:#define Q_FOREVER for(;;)
+        -:   71:#ifndef QT_NO_KEYWORDS
+        -:   72:# ifndef QT_NO_FOREACH
+        -:   73:#  ifndef foreach
+        -:   74:#    define foreach Q_FOREACH
+        -:   75:#  endif
+        -:   76:# endif // QT_NO_FOREACH
+        -:   77:#  ifndef forever
+        -:   78:#    define forever Q_FOREVER
+        -:   79:#  endif
+        -:   80:#endif
+        -:   81:
+        -:   82:QT_END_NAMESPACE
+        -:   83:
+        -:   84:#endif /* QFOREACH_H */

@@ -1,0 +1,93 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qoverload.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2022 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QOVERLOAD_H
+        -:    5:#define QOVERLOAD_H
+        -:    6:
+        -:    7:#include <QtCore/qtconfigmacros.h>
+        -:    8:
+        -:    9:#if 0
+        -:   10:#pragma qt_class(QOverload)
+        -:   11:#endif
+        -:   12:
+        -:   13:QT_BEGIN_NAMESPACE
+        -:   14:
+        -:   15:#ifdef Q_QDOC
+        -:   16:// Just for documentation generation
+        -:   17:template<typename T>
+        -:   18:auto qOverload(T functionPointer);
+        -:   19:template<typename T>
+        -:   20:auto qConstOverload(T memberFunctionPointer);
+        -:   21:template<typename T>
+        -:   22:auto qNonConstOverload(T memberFunctionPointer);
+        -:   23:#else
+        -:   24:template <typename... Args>
+        -:   25:struct QNonConstOverload
+        -:   26:{
+        -:   27:    template <typename R, typename T>
+        -:   28:    constexpr auto operator()(R (T::*ptr)(Args...)) const noexcept -> decltype(ptr)
+        -:   29:    { return ptr; }
+        -:   30:
+        -:   31:    template <typename R, typename T>
+        3:   32:    static constexpr auto of(R (T::*ptr)(Args...)) noexcept -> decltype(ptr)
+        3:   33:    { return ptr; }
+------------------
+_ZN17QNonConstOverloadIJiEE2ofIv9QComboBoxEEDtfp_EMT0_FT_iE:
+        1:   32:    static constexpr auto of(R (T::*ptr)(Args...)) noexcept -> decltype(ptr)
+        1:   33:    { return ptr; }
+------------------
+_ZN17QNonConstOverloadIJP15QAbstractButtonEE2ofIv12QButtonGroupEEDtfp_EMT0_FT_S1_E:
+        2:   32:    static constexpr auto of(R (T::*ptr)(Args...)) noexcept -> decltype(ptr)
+        2:   33:    { return ptr; }
+------------------
+        -:   34:};
+        -:   35:
+        -:   36:template <typename... Args>
+        -:   37:struct QConstOverload
+        -:   38:{
+        -:   39:    template <typename R, typename T>
+        -:   40:    constexpr auto operator()(R (T::*ptr)(Args...) const) const noexcept -> decltype(ptr)
+        -:   41:    { return ptr; }
+        -:   42:
+        -:   43:    template <typename R, typename T>
+        -:   44:    static constexpr auto of(R (T::*ptr)(Args...) const) noexcept -> decltype(ptr)
+        -:   45:    { return ptr; }
+        -:   46:};
+        -:   47:
+        -:   48:template <typename... Args>
+        -:   49:struct QOverload : QConstOverload<Args...>, QNonConstOverload<Args...>
+        -:   50:{
+        -:   51:    using QConstOverload<Args...>::of;
+        -:   52:    using QConstOverload<Args...>::operator();
+        -:   53:    using QNonConstOverload<Args...>::of;
+        -:   54:    using QNonConstOverload<Args...>::operator();
+        -:   55:
+        -:   56:    template <typename R>
+        -:   57:    constexpr auto operator()(R (*ptr)(Args...)) const noexcept -> decltype(ptr)
+        -:   58:    { return ptr; }
+        -:   59:
+        -:   60:    template <typename R>
+        -:   61:    static constexpr auto of(R (*ptr)(Args...)) noexcept -> decltype(ptr)
+        -:   62:    { return ptr; }
+        -:   63:};
+        -:   64:
+        -:   65:template <typename... Args> constexpr inline QOverload<Args...> qOverload = {};
+        -:   66:template <typename... Args> constexpr inline QConstOverload<Args...> qConstOverload = {};
+        -:   67:template <typename... Args> constexpr inline QNonConstOverload<Args...> qNonConstOverload = {};
+        -:   68:
+        -:   69:#endif // Q_QDOC
+        -:   70:
+        -:   71:#define QT_VA_ARGS_CHOOSE(_1, _2, _3, _4, _5, _6, _7, _8, _9, N, ...) N
+        -:   72:#define QT_VA_ARGS_EXPAND(...) __VA_ARGS__ // Needed for MSVC
+        -:   73:#define QT_VA_ARGS_COUNT(...) QT_VA_ARGS_EXPAND(QT_VA_ARGS_CHOOSE(__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0))
+        -:   74:#define QT_OVERLOADED_MACRO_EXPAND(MACRO, ARGC) MACRO##_##ARGC
+        -:   75:#define QT_OVERLOADED_MACRO_IMP(MACRO, ARGC) QT_OVERLOADED_MACRO_EXPAND(MACRO, ARGC)
+        -:   76:#define QT_OVERLOADED_MACRO(MACRO, ...) QT_VA_ARGS_EXPAND(QT_OVERLOADED_MACRO_IMP(MACRO, QT_VA_ARGS_COUNT(__VA_ARGS__))(__VA_ARGS__))
+        -:   77:
+        -:   78:QT_END_NAMESPACE
+        -:   79:
+        -:   80:#endif /* QOVERLOAD_H */

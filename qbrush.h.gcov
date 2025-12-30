@@ -1,0 +1,489 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtGui/qbrush.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2016 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QBRUSH_H
+        -:    5:#define QBRUSH_H
+        -:    6:
+        -:    7:#include <QtGui/qtguiglobal.h>
+        -:    8:#include <QtCore/qlist.h>
+        -:    9:#include <QtCore/qpoint.h>
+        -:   10:#include <QtCore/qscopedpointer.h>
+        -:   11:#include <QtGui/qcolor.h>
+        -:   12:#include <QtGui/qimage.h>
+        -:   13:#include <QtGui/qpixmap.h>
+        -:   14:#include <QtGui/qtransform.h>
+        -:   15:
+        -:   16:QT_BEGIN_NAMESPACE
+        -:   17:
+        -:   18:
+        -:   19:struct QBrushData;
+        -:   20:class QPixmap;
+        -:   21:class QGradient;
+        -:   22:class QVariant;
+        -:   23:struct QBrushDataPointerDeleter
+        -:   24:{
+        -:   25:    void operator()(QBrushData *d) const noexcept;
+        -:   26:};
+        -:   27:
+        -:   28:class Q_GUI_EXPORT QBrush
+        -:   29:{
+        -:   30:public:
+        -:   31:    QBrush();
+        -:   32:    QBrush(Qt::BrushStyle bs);
+        -:   33:    QBrush(const QColor &color, Qt::BrushStyle bs=Qt::SolidPattern);
+        -:   34:    QBrush(Qt::GlobalColor color, Qt::BrushStyle bs=Qt::SolidPattern);
+        -:   35:
+        -:   36:    QBrush(const QColor &color, const QPixmap &pixmap);
+        -:   37:    QBrush(Qt::GlobalColor color, const QPixmap &pixmap);
+        -:   38:    QBrush(const QPixmap &pixmap);
+        -:   39:    QBrush(const QImage &image);
+        -:   40:
+        -:   41:    QBrush(const QBrush &brush);
+        -:   42:
+        -:   43:    QBrush(const QGradient &gradient);
+        -:   44:
+        -:   45:    ~QBrush();
+        -:   46:    QBrush &operator=(const QBrush &brush);
+        -:   47:    QT_MOVE_ASSIGNMENT_OPERATOR_IMPL_VIA_PURE_SWAP(QBrush)
+        -:   48:    inline void swap(QBrush &other) noexcept
+        -:   49:    { d.swap(other.d); }
+        -:   50:
+        -:   51:    QBrush &operator=(Qt::BrushStyle style);
+        -:   52:    QBrush &operator=(QColor color);
+        -:   53:    QBrush &operator=(Qt::GlobalColor color) { return operator=(QColor(color)); }
+        -:   54:
+        -:   55:    operator QVariant() const;
+        -:   56:
+        -:   57:    inline Qt::BrushStyle style() const;
+        -:   58:    void setStyle(Qt::BrushStyle);
+        -:   59:
+        -:   60:    inline QTransform transform() const;
+        -:   61:    void setTransform(const QTransform &);
+        -:   62:
+        -:   63:    QPixmap texture() const;
+        -:   64:    void setTexture(const QPixmap &pixmap);
+        -:   65:
+        -:   66:    QImage textureImage() const;
+        -:   67:    void setTextureImage(const QImage &image);
+        -:   68:
+        -:   69:    inline const QColor &color() const;
+        -:   70:    void setColor(const QColor &color);
+        -:   71:    inline void setColor(Qt::GlobalColor color);
+        -:   72:
+        -:   73:    const QGradient *gradient() const;
+        -:   74:
+        -:   75:    bool isOpaque() const;
+        -:   76:
+        -:   77:    bool operator==(const QBrush &b) const;
+        -:   78:    inline bool operator!=(const QBrush &b) const { return !(operator==(b)); }
+        -:   79:
+        -:   80:    using DataPtr = std::unique_ptr<QBrushData, QBrushDataPointerDeleter>;
+        -:   81:
+        -:   82:private:
+        -:   83:    friend class QRasterPaintEngine;
+        -:   84:    friend class QRasterPaintEnginePrivate;
+        -:   85:    friend struct QSpanData;
+        -:   86:    friend class QPainter;
+        -:   87:    friend bool Q_GUI_EXPORT qHasPixmapTexture(const QBrush& brush);
+        -:   88:
+        -:   89:    bool doCompareEqualColor(QColor rhs) const noexcept;
+        -:   90:    friend bool comparesEqual(const QBrush &lhs, QColor rhs) noexcept
+        -:   91:    {
+        -:   92:        return lhs.doCompareEqualColor(rhs);
+        -:   93:    }
+        -:   94:    Q_DECLARE_EQUALITY_COMPARABLE(QBrush, QColor)
+        -:   95:    Q_DECLARE_EQUALITY_COMPARABLE(QBrush, Qt::GlobalColor)
+        -:   96:
+        -:   97:    bool doCompareEqualStyle(Qt::BrushStyle rhs) const noexcept;
+        -:   98:    friend bool comparesEqual(const QBrush &lhs, Qt::BrushStyle rhs) noexcept
+        -:   99:    {
+        -:  100:        return lhs.doCompareEqualStyle(rhs);
+        -:  101:    }
+        -:  102:    Q_DECLARE_EQUALITY_COMPARABLE(QBrush, Qt::BrushStyle)
+        -:  103:
+        -:  104:    void detach(Qt::BrushStyle newStyle);
+        -:  105:    void init(const QColor &color, Qt::BrushStyle bs);
+        -:  106:    DataPtr d;
+        -:  107:
+        -:  108:public:
+        -:  109:    inline bool isDetached() const;
+        -:  110:    inline DataPtr &data_ptr() { return d; }
+        -:  111:};
+        -:  112:
+        -:  113:inline void QBrush::setColor(Qt::GlobalColor acolor)
+        -:  114:{ setColor(QColor(acolor)); }
+        -:  115:
+        -:  116:Q_DECLARE_SHARED(QBrush)
+        -:  117:
+        -:  118:/*****************************************************************************
+        -:  119:  QBrush stream functions
+        -:  120: *****************************************************************************/
+        -:  121:
+        -:  122:#ifndef QT_NO_DATASTREAM
+        -:  123:Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, const QBrush &);
+        -:  124:Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, QBrush &);
+        -:  125:#endif
+        -:  126:
+        -:  127:#ifndef QT_NO_DEBUG_STREAM
+        -:  128:Q_GUI_EXPORT QDebug operator<<(QDebug, const QBrush &);
+        -:  129:#endif
+        -:  130:
+        -:  131:struct QBrushData
+        -:  132:{
+        -:  133:    QAtomicInt ref;
+        -:  134:    Qt::BrushStyle style;
+        -:  135:    QColor color;
+        -:  136:    QTransform transform;
+        -:  137:protected:
+        -:  138:    QBrushData() = default;
+        -:  139:    QT_DECLARE_RO5_SMF_AS_DEFAULTED(QBrushData)
+        -:  140:};
+        -:  141:
+        -:  142:inline Qt::BrushStyle QBrush::style() const { return d->style; }
+    #####:  143:inline const QColor &QBrush::color() const { return d->color; }
+        -:  144:inline QTransform QBrush::transform() const { return d->transform; }
+        -:  145:inline bool QBrush::isDetached() const { return d->ref.loadRelaxed() == 1; }
+        -:  146:
+        -:  147:
+        -:  148:/*******************************************************************************
+        -:  149: * QGradients
+        -:  150: */
+        -:  151:class QGradientPrivate;
+        -:  152:
+        -:  153:typedef std::pair<qreal, QColor> QGradientStop;
+        -:  154:typedef QList<QGradientStop> QGradientStops;
+        -:  155:
+        -:  156:class Q_GUI_EXPORT QGradient
+        -:  157:{
+        -:  158:    Q_GADGET
+        -:  159:public:
+        -:  160:    enum Type {
+        -:  161:        LinearGradient,
+        -:  162:        RadialGradient,
+        -:  163:        ConicalGradient,
+        -:  164:        NoGradient
+        -:  165:    };
+        -:  166:    Q_ENUM(Type)
+        -:  167:
+        -:  168:    enum Spread {
+        -:  169:        PadSpread,
+        -:  170:        ReflectSpread,
+        -:  171:        RepeatSpread
+        -:  172:    };
+        -:  173:    Q_ENUM(Spread)
+        -:  174:
+        -:  175:    enum CoordinateMode {
+        -:  176:        LogicalMode,
+        -:  177:        StretchToDeviceMode,
+        -:  178:        ObjectBoundingMode,
+        -:  179:        ObjectMode
+        -:  180:    };
+        -:  181:    Q_ENUM(CoordinateMode)
+        -:  182:
+        -:  183:    enum InterpolationMode {
+        -:  184:        ColorInterpolation,
+        -:  185:        ComponentInterpolation
+        -:  186:    };
+        -:  187:
+        -:  188:    enum Preset {
+        -:  189:        WarmFlame = 1,
+        -:  190:        NightFade = 2,
+        -:  191:        SpringWarmth = 3,
+        -:  192:        JuicyPeach = 4,
+        -:  193:        YoungPassion = 5,
+        -:  194:        LadyLips = 6,
+        -:  195:        SunnyMorning = 7,
+        -:  196:        RainyAshville = 8,
+        -:  197:        FrozenDreams = 9,
+        -:  198:        WinterNeva = 10,
+        -:  199:        DustyGrass = 11,
+        -:  200:        TemptingAzure = 12,
+        -:  201:        HeavyRain = 13,
+        -:  202:        AmyCrisp = 14,
+        -:  203:        MeanFruit = 15,
+        -:  204:        DeepBlue = 16,
+        -:  205:        RipeMalinka = 17,
+        -:  206:        CloudyKnoxville = 18,
+        -:  207:        MalibuBeach = 19,
+        -:  208:        NewLife = 20,
+        -:  209:        TrueSunset = 21,
+        -:  210:        MorpheusDen = 22,
+        -:  211:        RareWind = 23,
+        -:  212:        NearMoon = 24,
+        -:  213:        WildApple = 25,
+        -:  214:        SaintPetersburg = 26,
+        -:  215:        PlumPlate = 28,
+        -:  216:        EverlastingSky = 29,
+        -:  217:        HappyFisher = 30,
+        -:  218:        Blessing = 31,
+        -:  219:        SharpeyeEagle = 32,
+        -:  220:        LadogaBottom = 33,
+        -:  221:        LemonGate = 34,
+        -:  222:        ItmeoBranding = 35,
+        -:  223:        ZeusMiracle = 36,
+        -:  224:        OldHat = 37,
+        -:  225:        StarWine = 38,
+        -:  226:        HappyAcid = 41,
+        -:  227:        AwesomePine = 42,
+        -:  228:        NewYork = 43,
+        -:  229:        ShyRainbow = 44,
+        -:  230:        MixedHopes = 46,
+        -:  231:        FlyHigh = 47,
+        -:  232:        StrongBliss = 48,
+        -:  233:        FreshMilk = 49,
+        -:  234:        SnowAgain = 50,
+        -:  235:        FebruaryInk = 51,
+        -:  236:        KindSteel = 52,
+        -:  237:        SoftGrass = 53,
+        -:  238:        GrownEarly = 54,
+        -:  239:        SharpBlues = 55,
+        -:  240:        ShadyWater = 56,
+        -:  241:        DirtyBeauty = 57,
+        -:  242:        GreatWhale = 58,
+        -:  243:        TeenNotebook = 59,
+        -:  244:        PoliteRumors = 60,
+        -:  245:        SweetPeriod = 61,
+        -:  246:        WideMatrix = 62,
+        -:  247:        SoftCherish = 63,
+        -:  248:        RedSalvation = 64,
+        -:  249:        BurningSpring = 65,
+        -:  250:        NightParty = 66,
+        -:  251:        SkyGlider = 67,
+        -:  252:        HeavenPeach = 68,
+        -:  253:        PurpleDivision = 69,
+        -:  254:        AquaSplash = 70,
+        -:  255:        SpikyNaga = 72,
+        -:  256:        LoveKiss = 73,
+        -:  257:        CleanMirror = 75,
+        -:  258:        PremiumDark = 76,
+        -:  259:        ColdEvening = 77,
+        -:  260:        CochitiLake = 78,
+        -:  261:        SummerGames = 79,
+        -:  262:        PassionateBed = 80,
+        -:  263:        MountainRock = 81,
+        -:  264:        DesertHump = 82,
+        -:  265:        JungleDay = 83,
+        -:  266:        PhoenixStart = 84,
+        -:  267:        OctoberSilence = 85,
+        -:  268:        FarawayRiver = 86,
+        -:  269:        AlchemistLab = 87,
+        -:  270:        OverSun = 88,
+        -:  271:        PremiumWhite = 89,
+        -:  272:        MarsParty = 90,
+        -:  273:        EternalConstance = 91,
+        -:  274:        JapanBlush = 92,
+        -:  275:        SmilingRain = 93,
+        -:  276:        CloudyApple = 94,
+        -:  277:        BigMango = 95,
+        -:  278:        HealthyWater = 96,
+        -:  279:        AmourAmour = 97,
+        -:  280:        RiskyConcrete = 98,
+        -:  281:        StrongStick = 99,
+        -:  282:        ViciousStance = 100,
+        -:  283:        PaloAlto = 101,
+        -:  284:        HappyMemories = 102,
+        -:  285:        MidnightBloom = 103,
+        -:  286:        Crystalline = 104,
+        -:  287:        PartyBliss = 106,
+        -:  288:        ConfidentCloud = 107,
+        -:  289:        LeCocktail = 108,
+        -:  290:        RiverCity = 109,
+        -:  291:        FrozenBerry = 110,
+        -:  292:        ChildCare = 112,
+        -:  293:        FlyingLemon = 113,
+        -:  294:        NewRetrowave = 114,
+        -:  295:        HiddenJaguar = 115,
+        -:  296:        AboveTheSky = 116,
+        -:  297:        Nega = 117,
+        -:  298:        DenseWater = 118,
+        -:  299:        Seashore = 120,
+        -:  300:        MarbleWall = 121,
+        -:  301:        CheerfulCaramel = 122,
+        -:  302:        NightSky = 123,
+        -:  303:        MagicLake = 124,
+        -:  304:        YoungGrass = 125,
+        -:  305:        ColorfulPeach = 126,
+        -:  306:        GentleCare = 127,
+        -:  307:        PlumBath = 128,
+        -:  308:        HappyUnicorn = 129,
+        -:  309:        AfricanField = 131,
+        -:  310:        SolidStone = 132,
+        -:  311:        OrangeJuice = 133,
+        -:  312:        GlassWater = 134,
+        -:  313:        NorthMiracle = 136,
+        -:  314:        FruitBlend = 137,
+        -:  315:        MillenniumPine = 138,
+        -:  316:        HighFlight = 139,
+        -:  317:        MoleHall = 140,
+        -:  318:        SpaceShift = 142,
+        -:  319:        ForestInei = 143,
+        -:  320:        RoyalGarden = 144,
+        -:  321:        RichMetal = 145,
+        -:  322:        JuicyCake = 146,
+        -:  323:        SmartIndigo = 147,
+        -:  324:        SandStrike = 148,
+        -:  325:        NorseBeauty = 149,
+        -:  326:        AquaGuidance = 150,
+        -:  327:        SunVeggie = 151,
+        -:  328:        SeaLord = 152,
+        -:  329:        BlackSea = 153,
+        -:  330:        GrassShampoo = 154,
+        -:  331:        LandingAircraft = 155,
+        -:  332:        WitchDance = 156,
+        -:  333:        SleeplessNight = 157,
+        -:  334:        AngelCare = 158,
+        -:  335:        CrystalRiver = 159,
+        -:  336:        SoftLipstick = 160,
+        -:  337:        SaltMountain = 161,
+        -:  338:        PerfectWhite = 162,
+        -:  339:        FreshOasis = 163,
+        -:  340:        StrictNovember = 164,
+        -:  341:        MorningSalad = 165,
+        -:  342:        DeepRelief = 166,
+        -:  343:        SeaStrike = 167,
+        -:  344:        NightCall = 168,
+        -:  345:        SupremeSky = 169,
+        -:  346:        LightBlue = 170,
+        -:  347:        MindCrawl = 171,
+        -:  348:        LilyMeadow = 172,
+        -:  349:        SugarLollipop = 173,
+        -:  350:        SweetDessert = 174,
+        -:  351:        MagicRay = 175,
+        -:  352:        TeenParty = 176,
+        -:  353:        FrozenHeat = 177,
+        -:  354:        GagarinView = 178,
+        -:  355:        FabledSunset = 179,
+        -:  356:        PerfectBlue = 180,
+        -:  357:
+        -:  358:        NumPresets
+        -:  359:    };
+        -:  360:    Q_ENUM(Preset)
+        -:  361:
+        -:  362:    QGradient();
+        -:  363:    QGradient(Preset);
+        -:  364:    ~QGradient();
+        -:  365:
+        -:  366:    Type type() const { return m_type; }
+        -:  367:
+        -:  368:    inline void setSpread(Spread spread);
+        -:  369:    Spread spread() const { return m_spread; }
+        -:  370:
+        -:  371:    void setColorAt(qreal pos, const QColor &color);
+        -:  372:
+        -:  373:    void setStops(const QGradientStops &stops);
+        -:  374:    QGradientStops stops() const;
+        -:  375:
+        -:  376:    CoordinateMode coordinateMode() const;
+        -:  377:    void setCoordinateMode(CoordinateMode mode);
+        -:  378:
+        -:  379:    InterpolationMode interpolationMode() const;
+        -:  380:    void setInterpolationMode(InterpolationMode mode);
+        -:  381:
+        -:  382:    bool operator==(const QGradient &gradient) const;
+        -:  383:    inline bool operator!=(const QGradient &other) const
+        -:  384:    { return !operator==(other); }
+        -:  385:
+        -:  386:    union QGradientData {
+        -:  387:        struct {
+        -:  388:            qreal x1, y1, x2, y2;
+        -:  389:        } linear;
+        -:  390:        struct {
+        -:  391:            qreal cx, cy, fx, fy, cradius, fradius;
+        -:  392:        } radial;
+        -:  393:        struct {
+        -:  394:            qreal cx, cy, angle;
+        -:  395:        } conical;
+        -:  396:    };
+        -:  397:
+        -:  398:private:
+        -:  399:    friend class QLinearGradient;
+        -:  400:    friend class QRadialGradient;
+        -:  401:    friend class QConicalGradient;
+        -:  402:    friend class QBrush;
+        -:  403:
+        -:  404:    Type m_type = NoGradient;
+        -:  405:    Spread m_spread = PadSpread;
+        -:  406:    QGradientStops m_stops;
+        -:  407:    QGradientData m_data;
+        -:  408:    CoordinateMode m_coordinateMode = LogicalMode;
+        -:  409:    InterpolationMode m_interpolationMode = ColorInterpolation;
+        -:  410:};
+        -:  411:
+        -:  412:inline void QGradient::setSpread(Spread aspread)
+        -:  413:{ m_spread = aspread; }
+        -:  414:
+        -:  415:class Q_GUI_EXPORT QLinearGradient : public QGradient
+        -:  416:{
+        -:  417:public:
+        -:  418:    QLinearGradient();
+        -:  419:    QLinearGradient(const QPointF &start, const QPointF &finalStop);
+        -:  420:    QLinearGradient(qreal xStart, qreal yStart, qreal xFinalStop, qreal yFinalStop);
+        -:  421:    ~QLinearGradient();
+        -:  422:
+        -:  423:    QPointF start() const;
+        -:  424:    void setStart(const QPointF &start);
+        -:  425:    inline void setStart(qreal x, qreal y) { setStart(QPointF(x, y)); }
+        -:  426:
+        -:  427:    QPointF finalStop() const;
+        -:  428:    void setFinalStop(const QPointF &stop);
+        -:  429:    inline void setFinalStop(qreal x, qreal y) { setFinalStop(QPointF(x, y)); }
+        -:  430:};
+        -:  431:
+        -:  432:
+        -:  433:class Q_GUI_EXPORT QRadialGradient : public QGradient
+        -:  434:{
+        -:  435:public:
+        -:  436:    QRadialGradient();
+        -:  437:    QRadialGradient(const QPointF &center, qreal radius, const QPointF &focalPoint);
+        -:  438:    QRadialGradient(qreal cx, qreal cy, qreal radius, qreal fx, qreal fy);
+        -:  439:
+        -:  440:    QRadialGradient(const QPointF &center, qreal radius);
+        -:  441:    QRadialGradient(qreal cx, qreal cy, qreal radius);
+        -:  442:
+        -:  443:    QRadialGradient(const QPointF &center, qreal centerRadius, const QPointF &focalPoint, qreal focalRadius);
+        -:  444:    QRadialGradient(qreal cx, qreal cy, qreal centerRadius, qreal fx, qreal fy, qreal focalRadius);
+        -:  445:
+        -:  446:    ~QRadialGradient();
+        -:  447:
+        -:  448:    QPointF center() const;
+        -:  449:    void setCenter(const QPointF &center);
+        -:  450:    inline void setCenter(qreal x, qreal y) { setCenter(QPointF(x, y)); }
+        -:  451:
+        -:  452:    QPointF focalPoint() const;
+        -:  453:    void setFocalPoint(const QPointF &focalPoint);
+        -:  454:    inline void setFocalPoint(qreal x, qreal y) { setFocalPoint(QPointF(x, y)); }
+        -:  455:
+        -:  456:    qreal radius() const;
+        -:  457:    void setRadius(qreal radius);
+        -:  458:
+        -:  459:    qreal centerRadius() const;
+        -:  460:    void setCenterRadius(qreal radius);
+        -:  461:
+        -:  462:    qreal focalRadius() const;
+        -:  463:    void setFocalRadius(qreal radius);
+        -:  464:};
+        -:  465:
+        -:  466:
+        -:  467:class Q_GUI_EXPORT QConicalGradient : public QGradient
+        -:  468:{
+        -:  469:public:
+        -:  470:    QConicalGradient();
+        -:  471:    QConicalGradient(const QPointF &center, qreal startAngle);
+        -:  472:    QConicalGradient(qreal cx, qreal cy, qreal startAngle);
+        -:  473:    ~QConicalGradient();
+        -:  474:
+        -:  475:    QPointF center() const;
+        -:  476:    void setCenter(const QPointF &center);
+        -:  477:    inline void setCenter(qreal x, qreal y) { setCenter(QPointF(x, y)); }
+        -:  478:
+        -:  479:    qreal angle() const;
+        -:  480:    void setAngle(qreal angle);
+        -:  481:};
+        -:  482:
+        -:  483:QT_END_NAMESPACE
+        -:  484:
+        -:  485:#endif // QBRUSH_H

@@ -1,0 +1,317 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtGui/qpainterpath.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/diagrampath.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/diagrampath.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2016 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QPAINTERPATH_H
+        -:    5:#define QPAINTERPATH_H
+        -:    6:
+        -:    7:#include <QtGui/qtguiglobal.h>
+        -:    8:#include <QtGui/qtransform.h>
+        -:    9:#include <QtCore/qglobal.h>
+        -:   10:#include <QtCore/qline.h>
+        -:   11:#include <QtCore/qlist.h>
+        -:   12:#include <QtCore/qrect.h>
+        -:   13:
+        -:   14:QT_BEGIN_NAMESPACE
+        -:   15:
+        -:   16:
+        -:   17:class QFont;
+        -:   18:class QPainterPathPrivate;
+        -:   19:class QPainterPathStrokerPrivate;
+        -:   20:class QPen;
+        -:   21:class QPolygonF;
+        -:   22:class QRegion;
+        -:   23:class QTransform;
+        -:   24:class QVectorPath;
+        -:   25:
+        -:   26:class Q_GUI_EXPORT QPainterPath
+        -:   27:{
+        -:   28:public:
+        -:   29:    enum ElementType {
+        -:   30:        MoveToElement,
+        -:   31:        LineToElement,
+        -:   32:        CurveToElement,
+        -:   33:        CurveToDataElement
+        -:   34:    };
+        -:   35:
+        -:   36:    class Element {
+        -:   37:    public:
+        -:   38:        qreal x;
+        -:   39:        qreal y;
+        -:   40:        ElementType type;
+        -:   41:
+        -:   42:        bool isMoveTo() const { return type == MoveToElement; }
+        -:   43:        bool isLineTo() const { return type == LineToElement; }
+        -:   44:        bool isCurveTo() const { return type == CurveToElement; }
+        -:   45:
+        -:   46:        operator QPointF () const { return QPointF(x, y); }
+        -:   47:
+        -:   48:        bool operator==(const Element &e) const { return qFuzzyCompare(x, e.x)
+        -:   49:            && qFuzzyCompare(y, e.y) && type == e.type; }
+        -:   50:        inline bool operator!=(const Element &e) const { return !operator==(e); }
+        -:   51:    };
+        -:   52:
+        -:   53:    QPainterPath() noexcept;
+        -:   54:    explicit QPainterPath(const QPointF &startPoint);
+        -:   55:    QPainterPath(const QPainterPath &other);
+        -:   56:    QPainterPath &operator=(const QPainterPath &other);
+        -:   57:    QPainterPath(QPainterPath &&other) noexcept
+        -:   58:        : d_ptr(std::exchange(other.d_ptr, nullptr))
+        -:   59:    {}
+        -:   60:    QT_MOVE_ASSIGNMENT_OPERATOR_IMPL_VIA_PURE_SWAP(QPainterPath)
+        -:   61:    ~QPainterPath();
+        -:   62:
+        -:   63:    inline void swap(QPainterPath &other) noexcept { qt_ptr_swap(d_ptr, other.d_ptr); }
+        -:   64:
+        -:   65:    void clear();
+        -:   66:    void reserve(int size);
+        -:   67:    int capacity() const;
+        -:   68:
+        -:   69:    void closeSubpath();
+        -:   70:
+        -:   71:    void moveTo(const QPointF &p);
+        -:   72:    inline void moveTo(qreal x, qreal y);
+        -:   73:
+        -:   74:    void lineTo(const QPointF &p);
+        -:   75:    inline void lineTo(qreal x, qreal y);
+        -:   76:
+        -:   77:    void arcMoveTo(const QRectF &rect, qreal angle);
+        -:   78:    inline void arcMoveTo(qreal x, qreal y, qreal w, qreal h, qreal angle);
+        -:   79:
+        -:   80:    void arcTo(const QRectF &rect, qreal startAngle, qreal arcLength);
+        -:   81:    inline void arcTo(qreal x, qreal y, qreal w, qreal h, qreal startAngle, qreal arcLength);
+        -:   82:
+        -:   83:    void cubicTo(const QPointF &ctrlPt1, const QPointF &ctrlPt2, const QPointF &endPt);
+        -:   84:    inline void cubicTo(qreal ctrlPt1x, qreal ctrlPt1y, qreal ctrlPt2x, qreal ctrlPt2y,
+        -:   85:                        qreal endPtx, qreal endPty);
+        -:   86:    void quadTo(const QPointF &ctrlPt, const QPointF &endPt);
+        -:   87:    inline void quadTo(qreal ctrlPtx, qreal ctrlPty, qreal endPtx, qreal endPty);
+        -:   88:
+        -:   89:    QPointF currentPosition() const;
+        -:   90:
+        -:   91:    void addRect(const QRectF &rect);
+        -:   92:    inline void addRect(qreal x, qreal y, qreal w, qreal h);
+        -:   93:    void addEllipse(const QRectF &rect);
+        -:   94:    inline void addEllipse(qreal x, qreal y, qreal w, qreal h);
+        -:   95:    inline void addEllipse(const QPointF &center, qreal rx, qreal ry);
+        -:   96:    void addPolygon(const QPolygonF &polygon);
+        -:   97:    void addText(const QPointF &point, const QFont &f, const QString &text);
+        -:   98:    inline void addText(qreal x, qreal y, const QFont &f, const QString &text);
+        -:   99:    void addPath(const QPainterPath &path);
+        -:  100:    void addRegion(const QRegion &region);
+        -:  101:
+        -:  102:    void addRoundedRect(const QRectF &rect, qreal xRadius, qreal yRadius,
+        -:  103:                        Qt::SizeMode mode = Qt::AbsoluteSize);
+        -:  104:    inline void addRoundedRect(qreal x, qreal y, qreal w, qreal h,
+        -:  105:                               qreal xRadius, qreal yRadius,
+        -:  106:                               Qt::SizeMode mode = Qt::AbsoluteSize);
+        -:  107:
+        -:  108:    void connectPath(const QPainterPath &path);
+        -:  109:
+        -:  110:    bool contains(const QPointF &pt) const;
+        -:  111:    bool contains(const QRectF &rect) const;
+        -:  112:    bool intersects(const QRectF &rect) const;
+        -:  113:
+        -:  114:    void translate(qreal dx, qreal dy);
+        -:  115:    inline void translate(const QPointF &offset);
+        -:  116:
+        -:  117:    [[nodiscard]] QPainterPath translated(qreal dx, qreal dy) const;
+        -:  118:    [[nodiscard]] inline QPainterPath translated(const QPointF &offset) const;
+        -:  119:
+        -:  120:    QRectF boundingRect() const;
+        -:  121:    QRectF controlPointRect() const;
+        -:  122:
+        -:  123:    Qt::FillRule fillRule() const;
+        -:  124:    void setFillRule(Qt::FillRule fillRule);
+        -:  125:
+        -:  126:    bool isEmpty() const;
+        -:  127:
+        -:  128:    [[nodiscard]] QPainterPath toReversed() const;
+        -:  129:
+        -:  130:    QList<QPolygonF> toSubpathPolygons(const QTransform &matrix = QTransform()) const;
+        -:  131:    QList<QPolygonF> toFillPolygons(const QTransform &matrix = QTransform()) const;
+        -:  132:    QPolygonF toFillPolygon(const QTransform &matrix = QTransform()) const;
+        -:  133:
+        -:  134:    int elementCount() const;
+        -:  135:    QPainterPath::Element elementAt(int i) const;
+        -:  136:    void setElementPositionAt(int i, qreal x, qreal y);
+        -:  137:
+        -:  138:    bool isCachingEnabled() const;
+        -:  139:    void setCachingEnabled(bool enabled);
+        -:  140:    qreal   length() const;
+        -:  141:    qreal   percentAtLength(qreal len) const;
+        -:  142:    QPointF pointAtPercent(qreal t) const;
+        -:  143:    qreal   angleAtPercent(qreal t) const;
+        -:  144:    qreal   slopeAtPercent(qreal t) const;
+        -:  145:    [[nodiscard]] QPainterPath trimmed(qreal fromFraction, qreal toFraction, qreal offset = 0) const;
+        -:  146:
+        -:  147:    bool intersects(const QPainterPath &p) const;
+        -:  148:    bool contains(const QPainterPath &p) const;
+        -:  149:    [[nodiscard]] QPainterPath united(const QPainterPath &r) const;
+        -:  150:    [[nodiscard]] QPainterPath intersected(const QPainterPath &r) const;
+        -:  151:    [[nodiscard]] QPainterPath subtracted(const QPainterPath &r) const;
+        -:  152:
+        -:  153:    [[nodiscard]] QPainterPath simplified() const;
+        -:  154:
+        -:  155:    bool operator==(const QPainterPath &other) const;
+        -:  156:    bool operator!=(const QPainterPath &other) const;
+        -:  157:
+        -:  158:    QPainterPath operator&(const QPainterPath &other) const;
+        -:  159:    QPainterPath operator|(const QPainterPath &other) const;
+        -:  160:    QPainterPath operator+(const QPainterPath &other) const;
+        -:  161:    QPainterPath operator-(const QPainterPath &other) const;
+        -:  162:    QPainterPath &operator&=(const QPainterPath &other);
+        -:  163:    QPainterPath &operator|=(const QPainterPath &other);
+        -:  164:    QPainterPath &operator+=(const QPainterPath &other);
+        -:  165:    QPainterPath &operator-=(const QPainterPath &other);
+        -:  166:
+        -:  167:private:
+        -:  168:    QPainterPathPrivate *d_ptr;
+        -:  169:
+        -:  170:    inline void ensureData() { if (!d_ptr) ensureData_helper(); }
+        -:  171:    void ensureData_helper();
+        -:  172:    void setDirty(bool);
+        -:  173:    void computeBoundingRect() const;
+        -:  174:    void computeControlPointRect() const;
+        -:  175:
+        -:  176:    QPainterPathPrivate *d_func() const { return d_ptr; }
+        -:  177:
+        -:  178:    friend class QPainterPathStroker;
+        -:  179:    friend class QPainterPathStrokerPrivate;
+        -:  180:    friend class QPainterPathPrivate;
+        -:  181:    friend class QTransform;
+        -:  182:    friend class QVectorPath;
+        -:  183:    friend Q_GUI_EXPORT const QVectorPath &qtVectorPathForPath(const QPainterPath &);
+        -:  184:
+        -:  185:#ifndef QT_NO_DATASTREAM
+        -:  186:    friend Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, const QPainterPath &);
+        -:  187:    friend Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, QPainterPath &);
+        -:  188:#endif
+        -:  189:};
+        -:  190:
+        -:  191:Q_DECLARE_SHARED(QPainterPath)
+        -:  192:Q_DECLARE_TYPEINFO(QPainterPath::Element, Q_PRIMITIVE_TYPE);
+        -:  193:
+        -:  194:#ifndef QT_NO_DATASTREAM
+        -:  195:Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, const QPainterPath &);
+        -:  196:Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, QPainterPath &);
+        -:  197:#endif
+        -:  198:
+        -:  199:class Q_GUI_EXPORT QPainterPathStroker
+        -:  200:{
+        -:  201:    Q_DECLARE_PRIVATE(QPainterPathStroker)
+        -:  202:public:
+        -:  203:    QPainterPathStroker();
+        -:  204:    explicit QPainterPathStroker(const QPen &pen);
+        -:  205:    ~QPainterPathStroker();
+        -:  206:
+        -:  207:    void setWidth(qreal width);
+        -:  208:    qreal width() const;
+        -:  209:
+        -:  210:    void setCapStyle(Qt::PenCapStyle style);
+        -:  211:    Qt::PenCapStyle capStyle() const;
+        -:  212:
+        -:  213:    void setJoinStyle(Qt::PenJoinStyle style);
+        -:  214:    Qt::PenJoinStyle joinStyle() const;
+        -:  215:
+        -:  216:    void setMiterLimit(qreal length);
+        -:  217:    qreal miterLimit() const;
+        -:  218:
+        -:  219:    void setCurveThreshold(qreal threshold);
+        -:  220:    qreal curveThreshold() const;
+        -:  221:
+        -:  222:    void setDashPattern(Qt::PenStyle);
+        -:  223:    void setDashPattern(const QList<qreal> &dashPattern);
+        -:  224:    QList<qreal> dashPattern() const;
+        -:  225:
+        -:  226:    void setDashOffset(qreal offset);
+        -:  227:    qreal dashOffset() const;
+        -:  228:
+        -:  229:    QPainterPath createStroke(const QPainterPath &path) const;
+        -:  230:
+        -:  231:private:
+        -:  232:    Q_DISABLE_COPY(QPainterPathStroker)
+        -:  233:
+        -:  234:    friend class QX11PaintEngine;
+        -:  235:
+        -:  236:    QScopedPointer<QPainterPathStrokerPrivate> d_ptr;
+        -:  237:};
+        -:  238:
+        -:  239:inline void QPainterPath::moveTo(qreal x, qreal y)
+        -:  240:{
+        -:  241:    moveTo(QPointF(x, y));
+        -:  242:}
+        -:  243:
+    #####:  244:inline void QPainterPath::lineTo(qreal x, qreal y)
+        -:  245:{
+    #####:  246:    lineTo(QPointF(x, y));
+    #####:  247:}
+        -:  248:
+        -:  249:inline void QPainterPath::arcTo(qreal x, qreal y, qreal w, qreal h, qreal startAngle, qreal arcLength)
+        -:  250:{
+        -:  251:    arcTo(QRectF(x, y, w, h), startAngle, arcLength);
+        -:  252:}
+        -:  253:
+        -:  254:inline void QPainterPath::arcMoveTo(qreal x, qreal y, qreal w, qreal h, qreal angle)
+        -:  255:{
+        -:  256:    arcMoveTo(QRectF(x, y, w, h), angle);
+        -:  257:}
+        -:  258:
+        -:  259:inline void QPainterPath::cubicTo(qreal ctrlPt1x, qreal ctrlPt1y, qreal ctrlPt2x, qreal ctrlPt2y,
+        -:  260:                                   qreal endPtx, qreal endPty)
+        -:  261:{
+        -:  262:    cubicTo(QPointF(ctrlPt1x, ctrlPt1y), QPointF(ctrlPt2x, ctrlPt2y),
+        -:  263:            QPointF(endPtx, endPty));
+        -:  264:}
+        -:  265:
+        -:  266:inline void QPainterPath::quadTo(qreal ctrlPtx, qreal ctrlPty, qreal endPtx, qreal endPty)
+        -:  267:{
+        -:  268:    quadTo(QPointF(ctrlPtx, ctrlPty), QPointF(endPtx, endPty));
+        -:  269:}
+        -:  270:
+        -:  271:inline void QPainterPath::addEllipse(qreal x, qreal y, qreal w, qreal h)
+        -:  272:{
+        -:  273:    addEllipse(QRectF(x, y, w, h));
+        -:  274:}
+        -:  275:
+        -:  276:inline void QPainterPath::addEllipse(const QPointF &center, qreal rx, qreal ry)
+        -:  277:{
+        -:  278:    addEllipse(QRectF(center.x() - rx, center.y() - ry, 2 * rx, 2 * ry));
+        -:  279:}
+        -:  280:
+        -:  281:inline void QPainterPath::addRect(qreal x, qreal y, qreal w, qreal h)
+        -:  282:{
+        -:  283:    addRect(QRectF(x, y, w, h));
+        -:  284:}
+        -:  285:
+        -:  286:inline void QPainterPath::addRoundedRect(qreal x, qreal y, qreal w, qreal h,
+        -:  287:                                         qreal xRadius, qreal yRadius,
+        -:  288:                                         Qt::SizeMode mode)
+        -:  289:{
+        -:  290:    addRoundedRect(QRectF(x, y, w, h), xRadius, yRadius, mode);
+        -:  291:}
+        -:  292:
+        -:  293:inline void QPainterPath::addText(qreal x, qreal y, const QFont &f, const QString &text)
+        -:  294:{
+        -:  295:    addText(QPointF(x, y), f, text);
+        -:  296:}
+        -:  297:
+        -:  298:inline void QPainterPath::translate(const QPointF &offset)
+        -:  299:{ translate(offset.x(), offset.y()); }
+        -:  300:
+        -:  301:inline QPainterPath QPainterPath::translated(const QPointF &offset) const
+        -:  302:{ return translated(offset.x(), offset.y()); }
+        -:  303:
+        -:  304:inline QPainterPath operator *(const QPainterPath &p, const QTransform &m)
+        -:  305:{ return m.map(p); }
+        -:  306:
+        -:  307:#ifndef QT_NO_DEBUG_STREAM
+        -:  308:Q_GUI_EXPORT QDebug operator<<(QDebug, const QPainterPath &);
+        -:  309:#endif
+        -:  310:
+        -:  311:QT_END_NAMESPACE
+        -:  312:
+        -:  313:#endif // QPAINTERPATH_H

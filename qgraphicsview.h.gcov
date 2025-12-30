@@ -1,0 +1,286 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtWidgets/qgraphicsview.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2016 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:// Qt-Security score:significant reason:default
+        -:    4:
+        -:    5:#ifndef QGRAPHICSVIEW_H
+        -:    6:#define QGRAPHICSVIEW_H
+        -:    7:
+        -:    8:#include <QtWidgets/qtwidgetsglobal.h>
+        -:    9:#include <QtCore/qmetatype.h>
+        -:   10:#include <QtGui/qpainter.h>
+        -:   11:#include <QtWidgets/qscrollarea.h>
+        -:   12:#include <QtWidgets/qgraphicsscene.h>
+        -:   13:
+        -:   14:QT_REQUIRE_CONFIG(graphicsview);
+        -:   15:
+        -:   16:QT_BEGIN_NAMESPACE
+        -:   17:
+        -:   18:class QGraphicsItem;
+        -:   19:class QPainterPath;
+        -:   20:class QPolygonF;
+        -:   21:class QStyleOptionGraphicsItem;
+        -:   22:
+        -:   23:class QGraphicsViewPrivate;
+        -:   24:class Q_WIDGETS_EXPORT QGraphicsView : public QAbstractScrollArea
+        -:   25:{
+        -:   26:    Q_OBJECT
+        -:   27:    Q_FLAGS(QPainter::RenderHints CacheMode OptimizationFlags)
+        -:   28:    Q_PROPERTY(QBrush backgroundBrush READ backgroundBrush WRITE setBackgroundBrush)
+        -:   29:    Q_PROPERTY(QBrush foregroundBrush READ foregroundBrush WRITE setForegroundBrush)
+        -:   30:    Q_PROPERTY(bool interactive READ isInteractive WRITE setInteractive)
+        -:   31:    Q_PROPERTY(QRectF sceneRect READ sceneRect WRITE setSceneRect)
+        -:   32:    Q_PROPERTY(Qt::Alignment alignment READ alignment WRITE setAlignment)
+        -:   33:    Q_PROPERTY(QPainter::RenderHints renderHints READ renderHints WRITE setRenderHints)
+        -:   34:    Q_PROPERTY(DragMode dragMode READ dragMode WRITE setDragMode)
+        -:   35:    Q_PROPERTY(CacheMode cacheMode READ cacheMode WRITE setCacheMode)
+        -:   36:    Q_PROPERTY(ViewportAnchor transformationAnchor READ transformationAnchor
+        -:   37:               WRITE setTransformationAnchor)
+        -:   38:    Q_PROPERTY(ViewportAnchor resizeAnchor READ resizeAnchor WRITE setResizeAnchor)
+        -:   39:    Q_PROPERTY(ViewportUpdateMode viewportUpdateMode READ viewportUpdateMode
+        -:   40:               WRITE setViewportUpdateMode)
+        -:   41:#if QT_CONFIG(rubberband)
+        -:   42:    Q_PROPERTY(Qt::ItemSelectionMode rubberBandSelectionMode READ rubberBandSelectionMode
+        -:   43:               WRITE setRubberBandSelectionMode)
+        -:   44:#endif
+        -:   45:    Q_PROPERTY(OptimizationFlags optimizationFlags READ optimizationFlags
+        -:   46:               WRITE setOptimizationFlags)
+        -:   47:
+        -:   48:public:
+        -:   49:    enum ViewportAnchor {
+        -:   50:        NoAnchor,
+        -:   51:        AnchorViewCenter,
+        -:   52:        AnchorUnderMouse
+        -:   53:    };
+        -:   54:    Q_ENUM(ViewportAnchor)
+        -:   55:
+        -:   56:    enum CacheModeFlag {
+        -:   57:        CacheNone = 0x0,
+        -:   58:        CacheBackground = 0x1
+        -:   59:    };
+        -:   60:    Q_DECLARE_FLAGS(CacheMode, CacheModeFlag)
+        -:   61:
+        -:   62:    enum DragMode {
+        -:   63:        NoDrag,
+        -:   64:        ScrollHandDrag,
+        -:   65:        RubberBandDrag
+        -:   66:    };
+        -:   67:    Q_ENUM(DragMode)
+        -:   68:
+        -:   69:    enum ViewportUpdateMode {
+        -:   70:        FullViewportUpdate,
+        -:   71:        MinimalViewportUpdate,
+        -:   72:        SmartViewportUpdate,
+        -:   73:        NoViewportUpdate,
+        -:   74:        BoundingRectViewportUpdate
+        -:   75:    };
+        -:   76:    Q_ENUM(ViewportUpdateMode)
+        -:   77:
+        -:   78:    enum OptimizationFlag {
+        -:   79:        DontSavePainterState = 0x1,
+        -:   80:        DontAdjustForAntialiasing = 0x2,
+        -:   81:        IndirectPainting = 0x4
+        -:   82:    };
+        -:   83:    Q_DECLARE_FLAGS(OptimizationFlags, OptimizationFlag)
+        -:   84:
+        -:   85:    QGraphicsView(QWidget *parent = nullptr);
+        -:   86:    QGraphicsView(QGraphicsScene *scene, QWidget *parent = nullptr);
+        -:   87:    ~QGraphicsView();
+        -:   88:
+        -:   89:    QSize sizeHint() const override;
+        -:   90:
+        -:   91:    QPainter::RenderHints renderHints() const;
+        -:   92:    void setRenderHint(QPainter::RenderHint hint, bool enabled = true);
+        -:   93:    void setRenderHints(QPainter::RenderHints hints);
+        -:   94:
+        -:   95:    Qt::Alignment alignment() const;
+        -:   96:    void setAlignment(Qt::Alignment alignment);
+        -:   97:
+        -:   98:    ViewportAnchor transformationAnchor() const;
+        -:   99:    void setTransformationAnchor(ViewportAnchor anchor);
+        -:  100:
+        -:  101:    ViewportAnchor resizeAnchor() const;
+        -:  102:    void setResizeAnchor(ViewportAnchor anchor);
+        -:  103:
+        -:  104:    ViewportUpdateMode viewportUpdateMode() const;
+        -:  105:    void setViewportUpdateMode(ViewportUpdateMode mode);
+        -:  106:
+        -:  107:    OptimizationFlags optimizationFlags() const;
+        -:  108:    void setOptimizationFlag(OptimizationFlag flag, bool enabled = true);
+        -:  109:    void setOptimizationFlags(OptimizationFlags flags);
+        -:  110:
+        -:  111:    DragMode dragMode() const;
+        -:  112:    void setDragMode(DragMode mode);
+        -:  113:
+        -:  114:#if QT_CONFIG(rubberband)
+        -:  115:    Qt::ItemSelectionMode rubberBandSelectionMode() const;
+        -:  116:    void setRubberBandSelectionMode(Qt::ItemSelectionMode mode);
+        -:  117:    QRect rubberBandRect() const;
+        -:  118:#endif
+        -:  119:
+        -:  120:    CacheMode cacheMode() const;
+        -:  121:    void setCacheMode(CacheMode mode);
+        -:  122:    void resetCachedContent();
+        -:  123:
+        -:  124:    bool isInteractive() const;
+        -:  125:    void setInteractive(bool allowed);
+        -:  126:
+        -:  127:    QGraphicsScene *scene() const;
+        -:  128:    void setScene(QGraphicsScene *scene);
+        -:  129:
+        -:  130:    QRectF sceneRect() const;
+        -:  131:    void setSceneRect(const QRectF &rect);
+        -:  132:    inline void setSceneRect(qreal x, qreal y, qreal w, qreal h);
+        -:  133:
+        -:  134:    QTransform transform() const;
+        -:  135:    QTransform viewportTransform() const;
+        -:  136:    bool isTransformed() const;
+        -:  137:    void setTransform(const QTransform &matrix, bool combine = false);
+        -:  138:    void resetTransform();
+        -:  139:    void rotate(qreal angle);
+        -:  140:    void scale(qreal sx, qreal sy);
+        -:  141:    void shear(qreal sh, qreal sv);
+        -:  142:    void translate(qreal dx, qreal dy);
+        -:  143:
+        -:  144:    void centerOn(const QPointF &pos);
+        -:  145:    inline void centerOn(qreal x, qreal y);
+        -:  146:    void centerOn(const QGraphicsItem *item);
+        -:  147:    void ensureVisible(const QRectF &rect, int xmargin = 50, int ymargin = 50);
+        -:  148:    inline void ensureVisible(qreal x, qreal y, qreal w, qreal h, int xmargin = 50, int ymargin = 50);
+        -:  149:    void ensureVisible(const QGraphicsItem *item, int xmargin = 50, int ymargin = 50);
+        -:  150:    void fitInView(const QRectF &rect, Qt::AspectRatioMode aspectRadioMode = Qt::IgnoreAspectRatio);
+        -:  151:    inline void fitInView(qreal x, qreal y, qreal w, qreal h,
+        -:  152:                          Qt::AspectRatioMode aspectRadioMode = Qt::IgnoreAspectRatio);
+        -:  153:    void fitInView(const QGraphicsItem *item,
+        -:  154:                   Qt::AspectRatioMode aspectRadioMode = Qt::IgnoreAspectRatio);
+        -:  155:
+        -:  156:    void render(QPainter *painter, const QRectF &target = QRectF(), const QRect &source = QRect(),
+        -:  157:                Qt::AspectRatioMode aspectRatioMode = Qt::KeepAspectRatio);
+        -:  158:
+        -:  159:    QList<QGraphicsItem *> items() const;
+        -:  160:    QList<QGraphicsItem *> items(const QPoint &pos) const;
+        -:  161:    inline QList<QGraphicsItem *> items(int x, int y) const;
+        -:  162:    QList<QGraphicsItem *> items(const QRect &rect, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
+        -:  163:    inline QList<QGraphicsItem *> items(int x, int y, int w, int h, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
+        -:  164:    QList<QGraphicsItem *> items(const QPolygon &polygon, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
+        -:  165:    QList<QGraphicsItem *> items(const QPainterPath &path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
+        -:  166:    QGraphicsItem *itemAt(const QPoint &pos) const;
+        -:  167:    inline QGraphicsItem *itemAt(int x, int y) const;
+        -:  168:
+        -:  169:    QPointF mapToScene(const QPoint &point) const;
+        -:  170:    QPolygonF mapToScene(const QRect &rect) const;
+        -:  171:    QPolygonF mapToScene(const QPolygon &polygon) const;
+        -:  172:    QPainterPath mapToScene(const QPainterPath &path) const;
+        -:  173:    QPoint mapFromScene(const QPointF &point) const;
+        -:  174:    QPolygon mapFromScene(const QRectF &rect) const;
+        -:  175:    QPolygon mapFromScene(const QPolygonF &polygon) const;
+        -:  176:    QPainterPath mapFromScene(const QPainterPath &path) const;
+        -:  177:    inline QPointF mapToScene(int x, int y) const;
+        -:  178:    inline QPolygonF mapToScene(int x, int y, int w, int h) const;
+        -:  179:    inline QPoint mapFromScene(qreal x, qreal y) const;
+        -:  180:    inline QPolygon mapFromScene(qreal x, qreal y, qreal w, qreal h) const;
+        -:  181:
+        -:  182:    QVariant inputMethodQuery(Qt::InputMethodQuery query) const override;
+        -:  183:
+        -:  184:    QBrush backgroundBrush() const;
+        -:  185:    void setBackgroundBrush(const QBrush &brush);
+        -:  186:
+        -:  187:    QBrush foregroundBrush() const;
+        -:  188:    void setForegroundBrush(const QBrush &brush);
+        -:  189:
+        -:  190:public Q_SLOTS:
+        -:  191:    void updateScene(const QList<QRectF> &rects);
+        -:  192:    void invalidateScene(const QRectF &rect = QRectF(), QGraphicsScene::SceneLayers layers = QGraphicsScene::AllLayers);
+        -:  193:    void updateSceneRect(const QRectF &rect);
+        -:  194:
+        -:  195:#if QT_CONFIG(rubberband)
+        -:  196:Q_SIGNALS:
+        -:  197:    void rubberBandChanged(QRect viewportRect, QPointF fromScenePoint, QPointF toScenePoint);
+        -:  198:#endif
+        -:  199:
+        -:  200:protected Q_SLOTS:
+        -:  201:    void setupViewport(QWidget *widget) override;
+        -:  202:
+        -:  203:protected:
+        -:  204:    QGraphicsView(QGraphicsViewPrivate &, QWidget *parent = nullptr);
+        -:  205:    bool event(QEvent *event) override;
+        -:  206:    bool viewportEvent(QEvent *event) override;
+        -:  207:
+        -:  208:#ifndef QT_NO_CONTEXTMENU
+        -:  209:    void contextMenuEvent(QContextMenuEvent *event) override;
+        -:  210:#endif
+        -:  211:#if QT_CONFIG(draganddrop)
+        -:  212:    void dragEnterEvent(QDragEnterEvent *event) override;
+        -:  213:    void dragLeaveEvent(QDragLeaveEvent *event) override;
+        -:  214:    void dragMoveEvent(QDragMoveEvent *event) override;
+        -:  215:    void dropEvent(QDropEvent *event) override;
+        -:  216:#endif
+        -:  217:    void focusInEvent(QFocusEvent *event) override;
+        -:  218:    bool focusNextPrevChild(bool next) override;
+        -:  219:    void focusOutEvent(QFocusEvent *event) override;
+        -:  220:    void keyPressEvent(QKeyEvent *event) override;
+        -:  221:    void keyReleaseEvent(QKeyEvent *event) override;
+        -:  222:    void mouseDoubleClickEvent(QMouseEvent *event) override;
+        -:  223:    void mousePressEvent(QMouseEvent *event) override;
+        -:  224:    void mouseMoveEvent(QMouseEvent *event) override;
+        -:  225:    void mouseReleaseEvent(QMouseEvent *event) override;
+        -:  226:#if QT_CONFIG(wheelevent)
+        -:  227:    void wheelEvent(QWheelEvent *event) override;
+        -:  228:#endif
+        -:  229:    void paintEvent(QPaintEvent *event) override;
+        -:  230:    void resizeEvent(QResizeEvent *event) override;
+        -:  231:    void scrollContentsBy(int dx, int dy) override;
+        -:  232:    void showEvent(QShowEvent *event) override;
+        -:  233:    void inputMethodEvent(QInputMethodEvent *event) override;
+        -:  234:
+        -:  235:    virtual void drawBackground(QPainter *painter, const QRectF &rect);
+        -:  236:    virtual void drawForeground(QPainter *painter, const QRectF &rect);
+        -:  237:    virtual void drawItems(QPainter *painter, int numItems,
+        -:  238:                           QGraphicsItem *items[],
+        -:  239:                           const QStyleOptionGraphicsItem options[]);
+        -:  240:
+        -:  241:private:
+        -:  242:    Q_DECLARE_PRIVATE(QGraphicsView)
+        -:  243:    Q_DISABLE_COPY(QGraphicsView)
+        -:  244:#ifndef QT_NO_CURSOR
+        -:  245:    Q_PRIVATE_SLOT(d_func(), void _q_setViewportCursor(const QCursor &))
+        -:  246:    Q_PRIVATE_SLOT(d_func(), void _q_unsetViewportCursor())
+        -:  247:#endif
+        -:  248:    friend class QGraphicsSceneWidget;
+        -:  249:    friend class QGraphicsScene;
+        -:  250:    friend class QGraphicsScenePrivate;
+        -:  251:    friend class QGraphicsItemPrivate;
+        -:  252:};
+        -:  253:
+        -:  254:Q_DECLARE_OPERATORS_FOR_FLAGS(QGraphicsView::CacheMode)
+        -:  255:Q_DECLARE_OPERATORS_FOR_FLAGS(QGraphicsView::OptimizationFlags)
+        -:  256:
+        -:  257:inline void QGraphicsView::setSceneRect(qreal ax, qreal ay, qreal aw, qreal ah)
+        -:  258:{ setSceneRect(QRectF(ax, ay, aw, ah)); }
+        1:  259:inline void QGraphicsView::centerOn(qreal ax, qreal ay)
+        1:  260:{ centerOn(QPointF(ax, ay)); }
+        -:  261:inline void QGraphicsView::ensureVisible(qreal ax, qreal ay, qreal aw, qreal ah, int xmargin, int ymargin)
+        -:  262:{ ensureVisible(QRectF(ax, ay, aw, ah), xmargin, ymargin); }
+        -:  263:inline void QGraphicsView::fitInView(qreal ax, qreal ay, qreal w, qreal h, Qt::AspectRatioMode mode)
+        -:  264:{ fitInView(QRectF(ax, ay, w, h), mode); }
+        -:  265:inline QList<QGraphicsItem *> QGraphicsView::items(int ax, int ay) const
+        -:  266:{ return items(QPoint(ax, ay)); }
+        -:  267:inline QList<QGraphicsItem *> QGraphicsView::items(int ax, int ay, int w, int h, Qt::ItemSelectionMode mode) const
+        -:  268:{ return items(QRect(ax, ay, w, h), mode); }
+        -:  269:inline QGraphicsItem *QGraphicsView::itemAt(int ax, int ay) const
+        -:  270:{ return itemAt(QPoint(ax, ay)); }
+        -:  271:inline QPointF QGraphicsView::mapToScene(int ax, int ay) const
+        -:  272:{ return mapToScene(QPoint(ax, ay)); }
+        -:  273:inline QPolygonF QGraphicsView::mapToScene(int ax, int ay, int w, int h) const
+        -:  274:{ return mapToScene(QRect(ax, ay, w, h)); }
+        -:  275:inline QPoint QGraphicsView::mapFromScene(qreal ax, qreal ay) const
+        -:  276:{ return mapFromScene(QPointF(ax, ay)); }
+        -:  277:inline QPolygon QGraphicsView::mapFromScene(qreal ax, qreal ay, qreal w, qreal h) const
+        -:  278:{ return mapFromScene(QRectF(ax, ay, w, h)); }
+        -:  279:
+        -:  280:QT_END_NAMESPACE
+        -:  281:
+        -:  282:#endif // QGRAPHICSVIEW_H

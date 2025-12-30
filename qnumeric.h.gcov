@@ -1,0 +1,632 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qnumeric.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/moc_mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2021 The Qt Company Ltd.
+        -:    2:// Copyright (C) 2025 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+        -:    3:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    4:// Qt-Security score:critical reason:data-parser
+        -:    5:
+        -:    6:#ifndef QNUMERIC_H
+        -:    7:#define QNUMERIC_H
+        -:    8:
+        -:    9:#if 0
+        -:   10:#pragma qt_class(QtNumeric)
+        -:   11:#endif
+        -:   12:
+        -:   13:#include <QtCore/qassert.h>
+        -:   14:#include <QtCore/qminmax.h>
+        -:   15:#include <QtCore/qtconfigmacros.h>
+        -:   16:#include <QtCore/qtcoreexports.h>
+        -:   17:#include <QtCore/qtypes.h>
+        -:   18:
+        -:   19:#include <cmath>
+        -:   20:#include <limits>
+        -:   21:#include <QtCore/q20type_traits.h>
+        -:   22:
+        -:   23:// min() and max() may be #defined by windows.h if that is included before, but we need them
+        -:   24:// for std::numeric_limits below. You should not use the min() and max() macros, so we just #undef.
+        -:   25:#ifdef min
+        -:   26:#  undef min
+        -:   27:#  undef max
+        -:   28:#endif
+        -:   29:
+        -:   30://
+        -:   31:// SIMDe (SIMD Everywhere) can't be used if intrin.h has been included as many definitions
+        -:   32:// conflict.   Defining Q_NUMERIC_NO_INTRINSICS allows SIMDe users to use Qt, at the cost of
+        -:   33:// falling back to the prior implementations of qMulOverflow and qAddOverflow.
+        -:   34://
+        -:   35:#if defined(Q_CC_MSVC) && !defined(Q_NUMERIC_NO_INTRINSICS)
+        -:   36:#  include <intrin.h>
+        -:   37:#  include <float.h>
+        -:   38:#  if defined(Q_PROCESSOR_X86) || defined(Q_PROCESSOR_X86_64)
+        -:   39:#    define Q_HAVE_ADDCARRY
+        -:   40:#  endif
+        -:   41:#  if defined(Q_PROCESSOR_X86_64) || defined(Q_PROCESSOR_ARM_64)
+        -:   42:#    define Q_INTRINSIC_MUL_OVERFLOW64
+        -:   43:#    define Q_UMULH(v1, v2) __umulh(v1, v2)
+        -:   44:#    define Q_SMULH(v1, v2) __mulh(v1, v2)
+        -:   45:#    pragma intrinsic(__umulh)
+        -:   46:#    pragma intrinsic(__mulh)
+        -:   47:#  endif
+        -:   48:#endif
+        -:   49:
+        -:   50:QT_BEGIN_NAMESPACE
+        -:   51:
+        -:   52:// To match std::is{inf,nan,finite} functions:
+        -:   53:template <typename T>
+        -:   54:constexpr typename std::enable_if<std::is_integral<T>::value, bool>::type
+        -:   55:qIsInf(T) { return false; }
+        -:   56:template <typename T>
+        -:   57:constexpr typename std::enable_if<std::is_integral<T>::value, bool>::type
+        -:   58:qIsNaN(T) { return false; }
+        -:   59:template <typename T>
+        -:   60:constexpr typename std::enable_if<std::is_integral<T>::value, bool>::type
+        -:   61:qIsFinite(T) { return true; }
+        -:   62:
+        -:   63:// Floating-point types (see qfloat16.h for its overloads).
+        -:   64:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION bool qIsInf(double d);
+        -:   65:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION bool qIsNaN(double d);
+        -:   66:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION bool qIsFinite(double d);
+        -:   67:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION int qFpClassify(double val);
+        -:   68:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION bool qIsInf(float f);
+        -:   69:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION bool qIsNaN(float f);
+        -:   70:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION bool qIsFinite(float f);
+        -:   71:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION int qFpClassify(float val);
+        -:   72:
+        -:   73:#if QT_CONFIG(signaling_nan)
+        -:   74:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION double qSNaN();
+        -:   75:#endif
+        -:   76:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION double qQNaN();
+        -:   77:Q_CORE_EXPORT Q_DECL_CONST_FUNCTION double qInf();
+        -:   78:
+        -:   79:Q_CORE_EXPORT quint32 qFloatDistance(float a, float b);
+        -:   80:Q_CORE_EXPORT quint64 qFloatDistance(double a, double b);
+        -:   81:
+        -:   82:#define Q_INFINITY (QT_PREPEND_NAMESPACE(qInf)())
+        -:   83:#if QT_CONFIG(signaling_nan)
+        -:   84:#  define Q_SNAN (QT_PREPEND_NAMESPACE(qSNaN)())
+        -:   85:#endif
+        -:   86:#define Q_QNAN (QT_PREPEND_NAMESPACE(qQNaN)())
+        -:   87:
+        -:   88:// Overflow math.
+        -:   89:// This provides efficient implementations for int, unsigned, qsizetype and
+        -:   90:// size_t. Implementations for 8- and 16-bit types will work but may not be as
+        -:   91:// efficient. Implementations for 64-bit may be missing on 32-bit platforms.
+        -:   92:
+        -:   93:// All the GCC and Clang versions we support have constexpr
+        -:   94:// builtins for overflowing arithmetic.
+        -:   95:#if defined(Q_CC_GNU_ONLY) \
+        -:   96:    || defined(Q_CC_CLANG_ONLY) \
+        -:   97:    || __has_builtin(__builtin_add_overflow)
+        -:   98:# define Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS
+        -:   99:// On 32-bit, Clang < 14 will fail to link if multiplying 64-bit
+        -:  100:// quantities (emits an unresolved call to __mulodi4), so we can't use
+        -:  101:// the builtin in that case.
+        -:  102:# if !(QT_POINTER_SIZE == 4 && defined(Q_CC_CLANG_ONLY) && Q_CC_CLANG_ONLY < 1400)
+        -:  103:#  define Q_INTRINSIC_MUL_OVERFLOW64
+        -:  104:# endif
+        -:  105:#endif
+        -:  106:
+        -:  107:namespace QtPrivate {
+        -:  108:// Generic versions of (some) overflowing math functions, private API.
+        -:  109:template <typename T>
+        -:  110:constexpr inline
+        -:  111:typename std::enable_if_t<std::is_unsigned_v<T>, bool>
+        -:  112:qAddOverflowGeneric(T v1, T v2, T *r)
+        -:  113:{
+        -:  114:    // unsigned additions are well-defined
+        -:  115:    *r = v1 + v2;
+        -:  116:    return v1 > T(v1 + v2);
+        -:  117:}
+        -:  118:
+        -:  119:// Wide multiplication.
+        -:  120:// It has been isolated in its own function so that it can be tested.
+        -:  121:// Note that this implementation requires a T that doesn't undergo
+        -:  122:// promotions.
+        -:  123:template <typename T>
+        -:  124:constexpr inline
+        -:  125:typename std::enable_if_t<std::is_same_v<T, decltype(+T{})>, bool>
+        -:  126:qMulOverflowWideMultiplication(T v1, T v2, T *r)
+        -:  127:{
+        -:  128:    // This is a glorified long/school-grade multiplication,
+        -:  129:    // that considers each input of N bits as two halves of N/2 bits:
+        -:  130:    //
+        -:  131:    // v1 = 2^(N/2) * v1_hi + v1_lo
+        -:  132:    // v2 = 2^(N/2) * v2_hi + v2_lo
+        -:  133:    //
+        -:  134:    // Therefore, v1*v2 = 2^N     * v1_hi * v2_hi +
+        -:  135:    //                    2^(N/2) * v1_hi * v2_lo +
+        -:  136:    //                    2^(N/2) * v1_lo * v2_hi +
+        -:  137:    //                            * v1_lo * v2_lo
+        -:  138:    //
+        -:  139:    // Using the N bits of precision we have we can perform the hi*lo
+        -:  140:    // multiplications safely; that is never going to overflow.
+        -:  141:    //
+        -:  142:    // Then we can sum together these partial results:
+        -:  143:    //
+        -:  144:    //                 [ v1_hi | v1_lo ] *
+        -:  145:    //                 [ v2_hi | v2_lo ] =
+        -:  146:    //                 -------------------
+        -:  147:    //                 [ v1_lo * v2_lo ] +
+        -:  148:    //         [ v1_hi * v2_lo ]         +  // shifted because it's * 2^(N/2)
+        -:  149:    //         [ v2_hi * v1_lo ]         +  // shifted because it's * 2^(N/2)
+        -:  150:    // [ v1_hi * v2_hi ]                 =  // shifted because it's * 2^N
+        -:  151:    // -------------------------------
+        -:  152:    // [     high     ][     low       ]    // exact result (in 2^(2N) bits)
+        -:  153:    //
+        -:  154:    // ... except that this way we'll need to bring some carries, so
+        -:  155:    // we'll do a slightly smarter sum.
+        -:  156:    //
+        -:  157:    // We need high for detecting overflows, even if we are not returning it.
+        -:  158:
+        -:  159:    // Get multiplication by zero out of the way
+        -:  160:    if (v1 == 0 || v2 == 0) {
+        -:  161:        *r = T(0);
+        -:  162:        return false;
+        -:  163:    }
+        -:  164:
+        -:  165:    // Extract the absolute values as unsigned
+        -:  166:    // (will fix the sign later)
+        -:  167:    using U = std::make_unsigned_t<T>;
+        -:  168:    const U v1_abs = (v1 >= 0) ? U(v1) : (U(0) - U(v1));
+        -:  169:    const U v2_abs = (v2 >= 0) ? U(v2) : (U(0) - U(v2));
+        -:  170:
+        -:  171:    // Masks for N/2 bits
+        -:  172:    constexpr std::size_t half_width = (sizeof(U) * 8) / 2;
+        -:  173:    const U half_mask = ~U(0) >> half_width;
+        -:  174:
+        -:  175:    // Split in low and half quantities
+        -:  176:    const U v1_lo = v1_abs & half_mask;
+        -:  177:    const U v1_hi = v1_abs >> half_width;
+        -:  178:    const U v2_lo = v2_abs & half_mask;
+        -:  179:    const U v2_hi = v2_abs >> half_width;
+        -:  180:
+        -:  181:    // Cross-product; this will never overflow
+        -:  182:    const U lo_lo = v1_lo * v2_lo;
+        -:  183:    const U lo_hi = v1_lo * v2_hi;
+        -:  184:    const U hi_lo = v1_hi * v2_lo;
+        -:  185:    const U hi_hi = v1_hi * v2_hi;
+        -:  186:
+        -:  187:    // We could sum directly the cross-products, but then we'd have to
+        -:  188:    // keep track of carries. This avoids it.
+        -:  189:    const U tmp = (lo_lo >> half_width) + (hi_lo & half_mask) + lo_hi;
+        -:  190:    U result_hi = (hi_lo >> half_width) + (tmp >> half_width) + hi_hi;
+        -:  191:    U result_lo = (tmp << half_width) | (lo_lo & half_mask);
+        -:  192:
+        -:  193:    if constexpr (std::is_unsigned_v<T>) {
+        -:  194:        // If the source was unsigned, we're done; a non-zero high
+        -:  195:        // signals overflow.
+        -:  196:        *r = result_lo;
+        -:  197:        return result_hi != U(0);
+        -:  198:    } else {
+        -:  199:        // We need to set the correct sign back, and check for overflow.
+        -:  200:        const bool isNegative = (v1 < T(0)) != (v2 < T(0));
+        -:  201:        if (isNegative) {
+        -:  202:            // Result is negative; calculate two's complement of the
+        -:  203:            // [high, low] pair, by inverting the bits and adding 1,
+        -:  204:            // which is equivalent to negating it in unsigned
+        -:  205:            // arithmetic.
+        -:  206:            // This operation should be done on the pair as a whole,
+        -:  207:            // but we have the individual components, so start by
+        -:  208:            // calculating two's complement of low:
+        -:  209:            result_lo = U(0) - result_lo;
+        -:  210:
+        -:  211:            // If result_lo is 0, it means that the addition of 1 into
+        -:  212:            // it has overflown, so now we have a carry to add into the
+        -:  213:            // inverted high:
+        -:  214:            result_hi = ~result_hi;
+        -:  215:            if (result_lo == 0)
+        -:  216:                result_hi += U(1);
+        -:  217:        }
+        -:  218:
+        -:  219:        *r = result_lo;
+        -:  220:        // Overflow has happened if result_hi is not a sign extension
+        -:  221:        // of the sign bit of result_lo. Note the usage of T, not U.
+        -:  222:        return result_hi != U(*r >> std::numeric_limits<T>::digits);
+        -:  223:    }
+        -:  224:}
+        -:  225:
+        -:  226:template <typename T, typename Enable = void>
+        -:  227:constexpr inline bool HasLargerInt = false;
+        -:  228:template <typename T>
+        -:  229:constexpr inline bool HasLargerInt<T, std::void_t<typename QIntegerForSize<sizeof(T) * 2>::Unsigned>> = true;
+        -:  230:
+        -:  231:template <typename T>
+        -:  232:constexpr inline
+        -:  233:typename std::enable_if_t<(std::is_unsigned_v<T> || std::is_signed_v<T>), bool>
+        -:  234:qMulOverflowGeneric(T v1, T v2, T *r)
+        -:  235:{
+        -:  236:    // This function is a generic fallback for qMulOverflow,
+        -:  237:    // called either by constant or non-constant evaluation,
+        -:  238:    // if the compiler does not have builtins or intrinsics itself.
+        -:  239:    //
+        -:  240:    // (For instance, this is never going to be called on GCC or recent
+        -:  241:    // Clang, as their builtins will be used in all cases.)
+        -:  242:    //
+        -:  243:    // If a compiler does have builtins, please amend qMulOverflow
+        -:  244:    // directly.
+        -:  245:
+        -:  246:    if constexpr (HasLargerInt<T>) {
+        -:  247:        // Use the next biggest type if available
+        -:  248:        using LargerInt = QIntegerForSize<sizeof(T) * 2>;
+        -:  249:        using Larger = typename std::conditional_t<std::is_signed_v<T>,
+        -:  250:                typename LargerInt::Signed, typename LargerInt::Unsigned>;
+        -:  251:        Larger lr = Larger(v1) * Larger(v2);
+        -:  252:        *r = T(lr);
+        -:  253:        return lr > (std::numeric_limits<T>::max)() || lr < (std::numeric_limits<T>::min)();
+        -:  254:    } else {
+        -:  255:        // Otherwise fall back to a wide multiplication
+        -:  256:        return qMulOverflowWideMultiplication(v1, v2, r);
+        -:  257:    }
+        -:  258:}
+        -:  259:} // namespace QtPrivate
+        -:  260:
+        -:  261:template <typename T>
+        -:  262:constexpr inline
+        -:  263:typename std::enable_if_t<std::is_unsigned_v<T>, bool>
+        -:  264:qAddOverflow(T v1, T v2, T *r)
+        -:  265:{
+        -:  266:#if defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  267:    return __builtin_add_overflow(v1, v2, r);
+        -:  268:#else
+        -:  269:    if (q20::is_constant_evaluated())
+        -:  270:        return QtPrivate::qAddOverflowGeneric(v1, v2, r);
+        -:  271:# if defined(Q_HAVE_ADDCARRY)
+        -:  272:    // We can use intrinsics for the unsigned operations with MSVC
+        -:  273:    if constexpr (std::is_same_v<T, unsigned>) {
+        -:  274:        return _addcarry_u32(0, v1, v2, r);
+        -:  275:    } else if constexpr (std::is_same_v<T, quint64>) {
+        -:  276:#    if defined(Q_PROCESSOR_X86_64)
+        -:  277:        return _addcarry_u64(0, v1, v2, reinterpret_cast<unsigned __int64 *>(r));
+        -:  278:#    else
+        -:  279:        uint low, high;
+        -:  280:        uchar carry = _addcarry_u32(0, unsigned(v1), unsigned(v2), &low);
+        -:  281:        carry = _addcarry_u32(carry, v1 >> 32, v2 >> 32, &high);
+        -:  282:        *r = (quint64(high) << 32) | low;
+        -:  283:        return carry;
+        -:  284:#    endif // defined(Q_PROCESSOR_X86_64)
+        -:  285:    }
+        -:  286:# endif // defined(Q_HAVE_ADDCARRY)
+        -:  287:    return QtPrivate::qAddOverflowGeneric(v1, v2, r);
+        -:  288:#endif // defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  289:}
+        -:  290:
+        -:  291:template <typename T>
+        -:  292:constexpr inline
+        -:  293:typename std::enable_if_t<std::is_signed_v<T>, bool>
+        -:  294:qAddOverflow(T v1, T v2, T *r)
+        -:  295:{
+        -:  296:#if defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  297:    return __builtin_add_overflow(v1, v2, r);
+        -:  298:#else
+        -:  299:    // Here's how we calculate the overflow:
+        -:  300:    // 1) unsigned addition is well-defined, so we can always execute it
+        -:  301:    // 2) conversion from unsigned back to signed is implementation-
+        -:  302:    //    defined and in the implementations we use, it's a no-op.
+        -:  303:    // 3) signed integer overflow happens if the sign of the two input operands
+        -:  304:    //    is the same but the sign of the result is different. In other words,
+        -:  305:    //    the sign of the result must be the same as the sign of either
+        -:  306:    //    operand.
+        -:  307:
+        -:  308:    using U = typename std::make_unsigned_t<T>;
+        -:  309:    *r = T(U(v1) + U(v2));
+        -:  310:
+        -:  311:    // Two's complement equivalent (generates slightly shorter code):
+        -:  312:    //  x ^ y             is negative if x and y have different signs
+        -:  313:    //  x & y             is negative if x and y are negative
+        -:  314:    // (x ^ z) & (y ^ z)  is negative if x and z have different signs
+        -:  315:    //                    AND y and z have different signs
+        -:  316:    return ((v1 ^ *r) & (v2 ^ *r)) < 0;
+        -:  317:#endif // defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  318:}
+        -:  319:
+        -:  320:template <typename T>
+        -:  321:constexpr inline
+        -:  322:typename std::enable_if_t<std::is_unsigned_v<T>, bool>
+        -:  323:qSubOverflow(T v1, T v2, T *r)
+        -:  324:{
+        -:  325:#if defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  326:    return __builtin_sub_overflow(v1, v2, r);
+        -:  327:#else
+        -:  328:    // unsigned subtractions are well-defined
+        -:  329:    *r = v1 - v2;
+        -:  330:    return v1 < v2;
+        -:  331:#endif // defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  332:}
+        -:  333:
+        -:  334:template <typename T>
+        -:  335:constexpr inline
+        -:  336:typename std::enable_if_t<std::is_signed_v<T>, bool>
+        -:  337:qSubOverflow(T v1, T v2, T *r)
+        -:  338:{
+        -:  339:#if defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  340:    return __builtin_sub_overflow(v1, v2, r);
+        -:  341:#else
+        -:  342:    // See above for explanation. This is the same with some signs reversed.
+        -:  343:    // We can't use qAddOverflow(v1, -v2, r) because it would be UB if
+        -:  344:    // v2 == std::numeric_limits<T>::min().
+        -:  345:
+        -:  346:    using U = typename std::make_unsigned_t<T>;
+        -:  347:    *r = T(U(v1) - U(v2));
+        -:  348:
+        -:  349:    return ((v1 ^ *r) & (~v2 ^ *r)) < 0;
+        -:  350:#endif // defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  351:}
+        -:  352:
+        -:  353:template <typename T>
+        -:  354:constexpr inline
+        -:  355:typename std::enable_if_t<std::is_unsigned_v<T> || std::is_signed_v<T>, bool>
+        -:  356:qMulOverflow(T v1, T v2, T *r)
+        -:  357:{
+        -:  358:#if defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  359:# if defined(Q_INTRINSIC_MUL_OVERFLOW64)
+        -:  360:    return __builtin_mul_overflow(v1, v2, r);
+        -:  361:# else
+        -:  362:    if constexpr (sizeof(T) <= 4)
+        -:  363:        return __builtin_mul_overflow(v1, v2, r);
+        -:  364:    else
+        -:  365:        return QtPrivate::qMulOverflowGeneric(v1, v2, r);
+        -:  366:# endif
+        -:  367:#else
+        -:  368:    if (q20::is_constant_evaluated())
+        -:  369:        return QtPrivate::qMulOverflowGeneric(v1, v2, r);
+        -:  370:
+        -:  371:# if defined(Q_INTRINSIC_MUL_OVERFLOW64)
+        -:  372:    if constexpr (std::is_unsigned_v<T> && (sizeof(T) == sizeof(quint64))) {
+        -:  373:        // T is 64 bit; either unsigned long long,
+        -:  374:        // or unsigned long on LP64 platforms.
+        -:  375:        *r = v1 * v2;
+        -:  376:        return T(Q_UMULH(v1, v2));
+        -:  377:    } else if constexpr (std::is_signed_v<T> && (sizeof(T) == sizeof(qint64))) {
+        -:  378:        // This is slightly more complex than the unsigned case above: the sign bit
+        -:  379:        // of 'low' must be replicated as the entire 'high', so the only valid
+        -:  380:        // values for 'high' are 0 and -1. Use unsigned multiply since it's the same
+        -:  381:        // as signed for the low bits and use a signed right shift to verify that
+        -:  382:        // 'high' is nothing but sign bits that match the sign of 'low'.
+        -:  383:
+        -:  384:        qint64 high = Q_SMULH(v1, v2);
+        -:  385:        *r = qint64(quint64(v1) * quint64(v2));
+        -:  386:        return (*r >> 63) != high;
+        -:  387:    }
+        -:  388:# endif // defined(Q_INTRINSIC_MUL_OVERFLOW64)
+        -:  389:
+        -:  390:    return QtPrivate::qMulOverflowGeneric(v1, v2, r);
+        -:  391:#endif // defined(Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS)
+        -:  392:}
+        -:  393:
+        -:  394:#undef Q_HAVE_ADDCARRY
+        -:  395:#undef Q_NUMERIC_USE_GCC_OVERFLOW_BUILTINS
+        -:  396:
+        -:  397:// Implementations for addition, subtraction or multiplication by a
+        -:  398:// compile-time constant. For addition and subtraction, we simply call the code
+        -:  399:// that detects overflow at runtime. For multiplication, we compare to the
+        -:  400:// maximum possible values before multiplying to ensure no overflow happens.
+        -:  401:
+        -:  402:template <typename T, T V2> constexpr bool qAddOverflow(T v1, std::integral_constant<T, V2>, T *r)
+        -:  403:{
+        -:  404:    return qAddOverflow(v1, V2, r);
+        -:  405:}
+        -:  406:
+        -:  407:template <auto V2, typename T> constexpr bool qAddOverflow(T v1, T *r)
+        -:  408:{
+        -:  409:    return qAddOverflow(v1, std::integral_constant<T, V2>{}, r);
+        -:  410:}
+        -:  411:
+        -:  412:template <typename T, T V2> constexpr bool qSubOverflow(T v1, std::integral_constant<T, V2>, T *r)
+        -:  413:{
+        -:  414:    return qSubOverflow(v1, V2, r);
+        -:  415:}
+        -:  416:
+        -:  417:template <auto V2, typename T> constexpr bool qSubOverflow(T v1, T *r)
+        -:  418:{
+        -:  419:    return qSubOverflow(v1, std::integral_constant<T, V2>{}, r);
+        -:  420:}
+        -:  421:
+        -:  422:template <typename T, T V2> constexpr bool qMulOverflow(T v1, std::integral_constant<T, V2>, T *r)
+        -:  423:{
+        -:  424:    // Runtime detection for anything smaller than or equal to a register
+        -:  425:    // width, as most architectures' multiplication instructions actually
+        -:  426:    // produce a result twice as wide as the input registers, allowing us to
+        -:  427:    // efficiently detect the overflow.
+        -:  428:    if constexpr (sizeof(T) <= sizeof(qregisteruint)) {
+        -:  429:        return qMulOverflow(v1, V2, r);
+        -:  430:
+        -:  431:#ifdef Q_INTRINSIC_MUL_OVERFLOW64
+        -:  432:    } else if constexpr (sizeof(T) <= sizeof(quint64)) {
+        -:  433:        // If we have intrinsics detecting overflow of 64-bit multiplications,
+        -:  434:        // then detect overflows through them up to 64 bits.
+        -:  435:        return qMulOverflow(v1, V2, r);
+        -:  436:#endif
+        -:  437:
+        -:  438:    } else if constexpr (V2 == 0 || V2 == 1) {
+        -:  439:        // trivial cases (and simplify logic below due to division by zero)
+        -:  440:        *r = v1 * V2;
+        -:  441:        return false;
+        -:  442:    } else if constexpr (V2 == -1) {
+        -:  443:        // multiplication by -1 is valid *except* for signed minimum values
+        -:  444:        // (necessary to avoid diving min() by -1, which is an overflow)
+        -:  445:        if (v1 < 0 && v1 == (std::numeric_limits<T>::min)())
+        -:  446:            return true;
+        -:  447:        *r = -v1;
+        -:  448:        return false;
+        -:  449:    } else {
+        -:  450:        // For 64-bit multiplications on 32-bit platforms, let's instead compare v1
+        -:  451:        // against the bounds that would overflow.
+        -:  452:        constexpr T Highest = (std::numeric_limits<T>::max)() / V2;
+        -:  453:        constexpr T Lowest = (std::numeric_limits<T>::min)() / V2;
+        -:  454:        if constexpr (Highest > Lowest) {
+        -:  455:            if (v1 > Highest || v1 < Lowest)
+        -:  456:                return true;
+        -:  457:        } else {
+        -:  458:            // this can only happen if V2 < 0
+        -:  459:            static_assert(V2 < 0);
+        -:  460:            if (v1 > Lowest || v1 < Highest)
+        -:  461:                return true;
+        -:  462:        }
+        -:  463:
+        -:  464:        *r = v1 * V2;
+        -:  465:        return false;
+        -:  466:    }
+        -:  467:}
+        -:  468:
+        -:  469:template <auto V2, typename T> constexpr bool qMulOverflow(T v1, T *r)
+        -:  470:{
+        -:  471:    if constexpr (V2 == 2)
+        -:  472:        return qAddOverflow(v1, v1, r);
+        -:  473:    return qMulOverflow(v1, std::integral_constant<T, V2>{}, r);
+        -:  474:}
+        -:  475:
+        -:  476:template <typename T>
+    #####:  477:constexpr inline T qAbs(const T &t)
+        -:  478:{
+        -:  479:    if constexpr (std::is_integral_v<T> && std::is_signed_v<T>)
+        -:  480:        Q_ASSERT(t != std::numeric_limits<T>::min());
+    #####:  481:    return t >= 0 ? t : -t;
+        -:  482:}
+        -:  483:
+        -:  484:namespace QtPrivate {
+        -:  485:template <typename T,
+        -:  486:          typename std::enable_if_t<std::is_integral_v<T>, bool> = true>
+        -:  487:constexpr inline auto qUnsignedAbs(T t)
+        -:  488:{
+        -:  489:    using U = std::make_unsigned_t<T>;
+        -:  490:    return (t >= 0) ? U(t) : U(~U(t) + U(1));
+        -:  491:}
+        -:  492:
+        -:  493:template <typename Result,
+        -:  494:          typename FP,
+        -:  495:          typename std::enable_if_t<std::is_integral_v<Result>, bool> = true,
+        -:  496:          typename std::enable_if_t<std::is_floating_point_v<FP>, bool> = true>
+        -:  497:constexpr inline Result qCheckedFPConversionToInteger(FP value)
+        -:  498:{
+        -:  499:#ifdef QT_SUPPORTS_IS_CONSTANT_EVALUATED
+        -:  500:    if (!q20::is_constant_evaluated())
+        -:  501:        Q_ASSERT(!std::isnan(value));
+        -:  502:#endif
+        -:  503:
+        -:  504:    constexpr Result minimal = (std::numeric_limits<Result>::min)();
+        -:  505:    constexpr Result maximal = (std::numeric_limits<Result>::max)();
+        -:  506:
+        -:  507:    // We want to check that `value > minimal-1`. `minimal` is
+        -:  508:    // precisely representable as FP (it's -2^N), but `minimal-1`
+        -:  509:    // may not be. Just rearrange the terms:
+        -:  510:    Q_ASSERT(value - FP(minimal) > FP(-1));
+        -:  511:
+        -:  512:    // Symmetrically, `maximal` may not have a precise
+        -:  513:    // representation, but `maximal+1` has, so calculate that:
+        -:  514:    constexpr FP maximalPlusOne = FP(2) * (maximal / 2 + 1);
+        -:  515:    // And check that we're below that:
+        -:  516:    Q_ASSERT(value < maximalPlusOne);
+        -:  517:
+        -:  518:    // If both checks passed, the result of truncation is representable
+        -:  519:    // as `Result`:
+        -:  520:    return Result(value);
+        -:  521:}
+        -:  522:
+        -:  523:namespace QRoundImpl {
+        -:  524:// gcc < 10 doesn't have __has_builtin
+        -:  525:#if defined(Q_PROCESSOR_ARM_64) && (__has_builtin(__builtin_round) || defined(Q_CC_GNU)) && !defined(Q_CC_CLANG)
+        -:  526:// ARM64 has a single instruction that can do C++ rounding with conversion to integer.
+        -:  527:// Note current clang versions have non-constexpr __builtin_round, ### allow clang this path when they fix it.
+        -:  528:constexpr inline double qRound(double d)
+        -:  529:{ return __builtin_round(d); }
+        -:  530:constexpr inline float qRound(float f)
+        -:  531:{ return __builtin_roundf(f); }
+        -:  532:#elif defined(__SSE2__) && (__has_builtin(__builtin_copysign) || defined(Q_CC_GNU))
+        -:  533:// SSE has binary operations directly on floating point making copysign fast
+        -:  534:constexpr inline double qRound(double d)
+        -:  535:{ return d + __builtin_copysign(0.5, d); }
+        -:  536:constexpr inline float qRound(float f)
+        -:  537:{ return f + __builtin_copysignf(0.5f, f); }
+        -:  538:#else
+        -:  539:constexpr inline double qRound(double d)
+        -:  540:{ return d >= 0.0 ? d + 0.5 : d - 0.5; }
+        -:  541:constexpr inline float qRound(float d)
+        -:  542:{ return d >= 0.0f ? d + 0.5f : d - 0.5f; }
+        -:  543:#endif
+        -:  544:} // namespace QRoundImpl
+        -:  545:
+        -:  546:// Like qRound, but have well-defined saturating behavior.
+        -:  547:// NaN is not handled.
+        -:  548:template <typename FP,
+        -:  549:          typename std::enable_if_t<std::is_floating_point_v<FP>, bool> = true>
+        -:  550:constexpr inline int qSaturateRound(FP value)
+        -:  551:{
+        -:  552:#ifdef QT_SUPPORTS_IS_CONSTANT_EVALUATED
+        -:  553:    if (!q20::is_constant_evaluated())
+        -:  554:        Q_ASSERT(!qIsNaN(value));
+        -:  555:#endif
+        -:  556:    constexpr FP MinBound = FP((std::numeric_limits<int>::min)());
+        -:  557:    constexpr FP MaxBound = FP((std::numeric_limits<int>::max)());
+        -:  558:    const FP beforeTruncation = QRoundImpl::qRound(value);
+        -:  559:    return int(qBound(MinBound, beforeTruncation, MaxBound));
+        -:  560:}
+        -:  561:} // namespace QtPrivate
+        -:  562:
+        -:  563:constexpr inline int qRound(double d)
+        -:  564:{
+        -:  565:    return QtPrivate::qCheckedFPConversionToInteger<int>(QtPrivate::QRoundImpl::qRound(d));
+        -:  566:}
+        -:  567:
+        -:  568:constexpr inline int qRound(float f)
+        -:  569:{
+        -:  570:    return QtPrivate::qCheckedFPConversionToInteger<int>(QtPrivate::QRoundImpl::qRound(f));
+        -:  571:}
+        -:  572:
+        -:  573:constexpr inline qint64 qRound64(double d)
+        -:  574:{
+        -:  575:    return QtPrivate::qCheckedFPConversionToInteger<qint64>(QtPrivate::QRoundImpl::qRound(d));
+        -:  576:}
+        -:  577:
+        -:  578:constexpr inline qint64 qRound64(float f)
+        -:  579:{
+        -:  580:    return QtPrivate::qCheckedFPConversionToInteger<qint64>(QtPrivate::QRoundImpl::qRound(f));
+        -:  581:}
+        -:  582:
+        -:  583:namespace QtPrivate {
+        -:  584:template <typename T>
+    #####:  585:constexpr inline const T &min(const T &a, const T &b) { return (a < b) ? a : b; }
+        -:  586:}
+        -:  587:
+    #####:  588:[[nodiscard]] constexpr bool qFuzzyCompare(double p1, double p2) noexcept
+        -:  589:{
+    #####:  590:    return (qAbs(p1 - p2) * 1000000000000. <= QtPrivate::min(qAbs(p1), qAbs(p2)));
+        -:  591:}
+        -:  592:
+        -:  593:[[nodiscard]] constexpr bool qFuzzyCompare(float p1, float p2) noexcept
+        -:  594:{
+        -:  595:    return (qAbs(p1 - p2) * 100000.f <= QtPrivate::min(qAbs(p1), qAbs(p2)));
+        -:  596:}
+        -:  597:
+    #####:  598:[[nodiscard]] constexpr bool qFuzzyIsNull(double d) noexcept
+        -:  599:{
+    #####:  600:    return qAbs(d) <= 0.000000000001;
+        -:  601:}
+        -:  602:
+        -:  603:[[nodiscard]] constexpr bool qFuzzyIsNull(float f) noexcept
+        -:  604:{
+        -:  605:    return qAbs(f) <= 0.00001f;
+        -:  606:}
+        -:  607:
+        -:  608:QT_WARNING_PUSH
+        -:  609:QT_WARNING_DISABLE_FLOAT_COMPARE
+        -:  610:
+        -:  611:[[nodiscard]] constexpr bool qIsNull(double d) noexcept
+        -:  612:{
+        -:  613:    return d == 0.0;
+        -:  614:}
+        -:  615:
+        -:  616:[[nodiscard]] constexpr bool qIsNull(float f) noexcept
+        -:  617:{
+        -:  618:    return f == 0.0f;
+        -:  619:}
+        -:  620:
+        -:  621:QT_WARNING_POP
+        -:  622:
+        -:  623:inline int qIntCast(double f) { return int(f); }
+        -:  624:inline int qIntCast(float f) { return int(f); }
+        -:  625:
+        -:  626:QT_END_NAMESPACE
+        -:  627:
+        -:  628:#endif // QNUMERIC_H

@@ -1,0 +1,163 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qiodevice.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QIODEVICE_H
+        -:    5:#define QIODEVICE_H
+        -:    6:
+        -:    7:#include <QtCore/qglobal.h>
+        -:    8:#include <QtCore/qiodevicebase.h>
+        -:    9:#ifndef QT_NO_QOBJECT
+        -:   10:#include <QtCore/qobject.h>
+        -:   11:#else
+        -:   12:#include <QtCore/qobjectdefs.h>
+        -:   13:#include <QtCore/qscopedpointer.h>
+        -:   14:#endif
+        -:   15:#include <QtCore/qspan.h>
+        -:   16:#include <QtCore/qstring.h>
+        -:   17:
+        -:   18:#ifdef open
+        -:   19:#error qiodevice.h must be included before any header file that defines open
+        -:   20:#endif
+        -:   21:
+        -:   22:#include <memory>
+        -:   23:
+        -:   24:QT_BEGIN_NAMESPACE
+        -:   25:
+        -:   26:
+        -:   27:class QByteArray;
+        -:   28:class QIODevicePrivate;
+        -:   29:
+        -:   30:class Q_CORE_EXPORT QIODevice
+        -:   31:#ifndef QT_NO_QOBJECT
+        -:   32:    : public QObject,
+        -:   33:#else
+        -:   34:    :
+        -:   35:#endif
+        -:   36:      public QIODeviceBase
+        -:   37:{
+        -:   38:#ifndef QT_NO_QOBJECT
+        -:   39:    Q_OBJECT
+        -:   40:#endif
+        -:   41:public:
+        -:   42:    QIODevice();
+        -:   43:#ifndef QT_NO_QOBJECT
+        -:   44:    explicit QIODevice(QObject *parent);
+        -:   45:#endif
+        -:   46:    virtual ~QIODevice();
+        -:   47:
+        -:   48:    QIODeviceBase::OpenMode openMode() const;
+        -:   49:
+        -:   50:    void setTextModeEnabled(bool enabled);
+        -:   51:    bool isTextModeEnabled() const;
+        -:   52:
+        -:   53:    bool isOpen() const;
+        -:   54:    bool isReadable() const;
+        -:   55:    bool isWritable() const;
+        -:   56:    virtual bool isSequential() const;
+        -:   57:
+        -:   58:    int readChannelCount() const;
+        -:   59:    int writeChannelCount() const;
+        -:   60:    int currentReadChannel() const;
+        -:   61:    void setCurrentReadChannel(int channel);
+        -:   62:    int currentWriteChannel() const;
+        -:   63:    void setCurrentWriteChannel(int channel);
+        -:   64:
+        -:   65:    virtual bool open(QIODeviceBase::OpenMode mode);
+        -:   66:    virtual void close();
+        -:   67:
+        -:   68:    // ### Qt 7 - QTBUG-76492: pos() and seek() should not be virtual, and
+        -:   69:    // ### seek() should call a virtual seekData() function.
+        -:   70:    virtual qint64 pos() const;
+        -:   71:    virtual qint64 size() const;
+        -:   72:    virtual bool seek(qint64 pos);
+        -:   73:    virtual bool atEnd() const;
+        -:   74:    virtual bool reset();
+        -:   75:
+        -:   76:    virtual qint64 bytesAvailable() const;
+        -:   77:    virtual qint64 bytesToWrite() const;
+        -:   78:
+        -:   79:    qint64 read(char *data, qint64 maxlen);
+        -:   80:    QByteArray read(qint64 maxlen);
+        -:   81:    QByteArray readAll();
+        -:   82:    qint64 readLine(char *data, qint64 maxlen);
+        -:   83:    QByteArray readLine(qint64 maxlen = 0);
+        -:   84:    bool readLineInto(QByteArray *result, qint64 maxlen = 0);
+        -:   85:
+        -:   86:    QByteArrayView readLineInto(QSpan<char> buffer)
+        -:   87:    { return readLineInto(as_writable_bytes(buffer)); }
+        -:   88:    QByteArrayView readLineInto(QSpan<uchar> buffer)
+        -:   89:    { return readLineInto(as_writable_bytes(buffer)); }
+        -:   90:    QByteArrayView readLineInto(QSpan<std::byte> buffer);
+        -:   91:
+        -:   92:    virtual bool canReadLine() const;
+        -:   93:
+        -:   94:    void startTransaction();
+        -:   95:    void commitTransaction();
+        -:   96:    void rollbackTransaction();
+        -:   97:    bool isTransactionStarted() const;
+        -:   98:
+        -:   99:    qint64 write(const char *data, qint64 len);
+        -:  100:    qint64 write(const char *data);
+        -:  101:    qint64 write(const QByteArray &data);
+        -:  102:
+        -:  103:    qint64 peek(char *data, qint64 maxlen);
+        -:  104:    QByteArray peek(qint64 maxlen);
+        -:  105:    qint64 skip(qint64 maxSize);
+        -:  106:
+        -:  107:    virtual bool waitForReadyRead(int msecs);
+        -:  108:    virtual bool waitForBytesWritten(int msecs);
+        -:  109:
+        -:  110:    void ungetChar(char c);
+        -:  111:    bool putChar(char c);
+        -:  112:    bool getChar(char *c);
+        -:  113:
+        -:  114:    QString errorString() const;
+        -:  115:
+        -:  116:#ifndef QT_NO_QOBJECT
+        -:  117:Q_SIGNALS:
+        -:  118:    void readyRead();
+        -:  119:    void channelReadyRead(int channel);
+        -:  120:    void bytesWritten(qint64 bytes);
+        -:  121:    void channelBytesWritten(int channel, qint64 bytes);
+        -:  122:    void aboutToClose();
+        -:  123:    void readChannelFinished();
+        -:  124:#endif
+        -:  125:
+        -:  126:protected:
+        -:  127:#ifdef QT_NO_QOBJECT
+        -:  128:    QIODevice(QIODevicePrivate &dd);
+        -:  129:#else
+        -:  130:    QIODevice(QIODevicePrivate &dd, QObject *parent = nullptr);
+        -:  131:#endif
+        -:  132:    virtual qint64 readData(char *data, qint64 maxlen) = 0;
+        -:  133:    virtual qint64 readLineData(char *data, qint64 maxlen);
+        -:  134:    virtual qint64 skipData(qint64 maxSize);
+        -:  135:    virtual qint64 writeData(const char *data, qint64 len) = 0;
+        -:  136:
+        -:  137:    void setOpenMode(QIODeviceBase::OpenMode openMode);
+        -:  138:
+        -:  139:    void setErrorString(const QString &errorString);
+        -:  140:
+        -:  141:#ifdef QT_NO_QOBJECT
+        -:  142:    std::unique_ptr<QIODevicePrivate> d_ptr;
+        -:  143:#endif
+        -:  144:
+        -:  145:private:
+        -:  146:    Q_DECLARE_PRIVATE(QIODevice)
+        -:  147:    Q_DISABLE_COPY(QIODevice)
+        -:  148:};
+        -:  149:
+    #####:  150:Q_DECLARE_OPERATORS_FOR_FLAGS(QIODevice::OpenMode)
+        -:  151:
+        -:  152:#if !defined(QT_NO_DEBUG_STREAM)
+        -:  153:class QDebug;
+        -:  154:Q_CORE_EXPORT QDebug operator<<(QDebug debug, QIODevice::OpenMode modes);
+        -:  155:#endif
+        -:  156:
+        -:  157:QT_END_NAMESPACE
+        -:  158:
+        -:  159:#endif // QIODEVICE_H

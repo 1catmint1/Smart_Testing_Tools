@@ -1,0 +1,183 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtWidgets/qsizepolicy.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2016 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:// Qt-Security score:significant reason:default
+        -:    4:
+        -:    5:#ifndef QSIZEPOLICY_H
+        -:    6:#define QSIZEPOLICY_H
+        -:    7:
+        -:    8:#include <QtWidgets/qtwidgetsglobal.h>
+        -:    9:#include <QtCore/qobject.h>
+        -:   10:#include <QtCore/qalgorithms.h>
+        -:   11:#include <QtCore/qhashfunctions.h>
+        -:   12:
+        -:   13:QT_BEGIN_NAMESPACE
+        -:   14:
+        -:   15:class QVariant;
+        -:   16:class QSizePolicy;
+        -:   17:
+        -:   18:class Q_WIDGETS_EXPORT QSizePolicy
+        -:   19:{
+        -:   20:    Q_GADGET
+        -:   21:
+        -:   22:public:
+        -:   23:    enum PolicyFlag {
+        -:   24:        GrowFlag = 1,
+        -:   25:        ExpandFlag = 2,
+        -:   26:        ShrinkFlag = 4,
+        -:   27:        IgnoreFlag = 8
+        -:   28:    };
+        -:   29:
+        -:   30:    enum Policy {
+        -:   31:        Fixed = 0,
+        -:   32:        Minimum = GrowFlag,
+        -:   33:        Maximum = ShrinkFlag,
+        -:   34:        Preferred = GrowFlag | ShrinkFlag,
+        -:   35:        MinimumExpanding = GrowFlag | ExpandFlag,
+        -:   36:        Expanding = GrowFlag | ShrinkFlag | ExpandFlag,
+        -:   37:        Ignored = ShrinkFlag | GrowFlag | IgnoreFlag
+        -:   38:    };
+        -:   39:    Q_ENUM(Policy)
+        -:   40:
+        -:   41:    enum ControlType {
+        -:   42:        DefaultType      = 0x00000001,
+        -:   43:        ButtonBox        = 0x00000002,
+        -:   44:        CheckBox         = 0x00000004,
+        -:   45:        ComboBox         = 0x00000008,
+        -:   46:        Frame            = 0x00000010,
+        -:   47:        GroupBox         = 0x00000020,
+        -:   48:        Label            = 0x00000040,
+        -:   49:        Line             = 0x00000080,
+        -:   50:        LineEdit         = 0x00000100,
+        -:   51:        PushButton       = 0x00000200,
+        -:   52:        RadioButton      = 0x00000400,
+        -:   53:        Slider           = 0x00000800,
+        -:   54:        SpinBox          = 0x00001000,
+        -:   55:        TabWidget        = 0x00002000,
+        -:   56:        ToolButton       = 0x00004000
+        -:   57:    };
+        -:   58:    Q_DECLARE_FLAGS(ControlTypes, ControlType)
+        -:   59:    Q_FLAG(ControlTypes)
+        -:   60:
+        -:   61:    constexpr QSizePolicy() noexcept : data(0) { }
+        -:   62:
+        1:   63:    constexpr QSizePolicy(Policy horizontal, Policy vertical, ControlType type = DefaultType) noexcept
+        2:   64:        : bits{0, 0, quint32(horizontal), quint32(vertical),
+       1*:   65:               type == DefaultType ? 0 : toControlTypeFieldValue(type), 0, 0, 0}
+        1:   66:    {}
+        -:   67:    constexpr Policy horizontalPolicy() const noexcept { return static_cast<Policy>(bits.horPolicy); }
+        -:   68:    constexpr Policy verticalPolicy() const noexcept { return static_cast<Policy>(bits.verPolicy); }
+        -:   69:    ControlType controlType() const noexcept;
+        -:   70:
+        -:   71:    constexpr void setHorizontalPolicy(Policy d) noexcept { bits.horPolicy = d; }
+        -:   72:    constexpr void setVerticalPolicy(Policy d) noexcept { bits.verPolicy = d; }
+        -:   73:    void setControlType(ControlType type) noexcept;
+        -:   74:
+        -:   75:    // ### Qt 7: consider making Policy a QFlags and removing these casts
+        -:   76:    constexpr Qt::Orientations expandingDirections() const noexcept {
+        -:   77:        return ( (verticalPolicy()   & static_cast<Policy>(ExpandFlag)) ? Qt::Vertical   : Qt::Orientations() )
+        -:   78:             | ( (horizontalPolicy() & static_cast<Policy>(ExpandFlag)) ? Qt::Horizontal : Qt::Orientations() ) ;
+        -:   79:    }
+        -:   80:
+        -:   81:    constexpr void setHeightForWidth(bool b) noexcept { bits.hfw = b;  }
+        -:   82:    constexpr bool hasHeightForWidth() const noexcept { return bits.hfw; }
+        -:   83:    constexpr void setWidthForHeight(bool b) noexcept { bits.wfh = b;  }
+        -:   84:    constexpr bool hasWidthForHeight() const noexcept { return bits.wfh; }
+        -:   85:
+        -:   86:    constexpr bool operator==(const QSizePolicy& s) const noexcept { return data == s.data; }
+        -:   87:    constexpr bool operator!=(const QSizePolicy& s) const noexcept { return data != s.data; }
+        -:   88:
+        -:   89:    friend Q_DECL_CONST_FUNCTION size_t qHash(QSizePolicy key, size_t seed = 0) noexcept { return qHash(key.data, seed); }
+        -:   90:
+        -:   91:    operator QVariant() const;
+        -:   92:
+        -:   93:    constexpr int horizontalStretch() const noexcept { return static_cast<int>(bits.horStretch); }
+        -:   94:    constexpr int verticalStretch() const noexcept { return static_cast<int>(bits.verStretch); }
+        -:   95:    constexpr void setHorizontalStretch(int stretchFactor) { bits.horStretch = static_cast<quint32>(qBound(0, stretchFactor, 255)); }
+        -:   96:    constexpr void setVerticalStretch(int stretchFactor) { bits.verStretch = static_cast<quint32>(qBound(0, stretchFactor, 255)); }
+        -:   97:
+        -:   98:    constexpr bool retainSizeWhenHidden() const noexcept { return bits.retainSizeWhenHidden; }
+        -:   99:    constexpr void setRetainSizeWhenHidden(bool retainSize) noexcept { bits.retainSizeWhenHidden = retainSize; }
+        -:  100:
+        -:  101:    constexpr void transpose() noexcept { *this = transposed(); }
+        -:  102:    [[nodiscard]] constexpr QSizePolicy transposed() const noexcept
+        -:  103:    {
+        -:  104:        return QSizePolicy(bits.transposed());
+        -:  105:    }
+        -:  106:
+        -:  107:private:
+        -:  108:#ifndef QT_NO_DATASTREAM
+        -:  109:    friend Q_WIDGETS_EXPORT QDataStream &operator<<(QDataStream &, const QSizePolicy &);
+        -:  110:    friend Q_WIDGETS_EXPORT QDataStream &operator>>(QDataStream &, QSizePolicy &);
+        -:  111:#endif
+        -:  112:    constexpr QSizePolicy(int i) noexcept : data(i) { }
+        -:  113:    struct Bits;
+        -:  114:    constexpr explicit QSizePolicy(Bits b) noexcept : bits(b) { }
+        -:  115:
+    #####:  116:    static constexpr quint32 toControlTypeFieldValue(ControlType type) noexcept
+        -:  117:    {
+        -:  118:        /*
+        -:  119:          The control type is a flag type, with values 0x1, 0x2, 0x4, 0x8, 0x10,
+        -:  120:          etc. In memory, we pack it onto the available bits (CTSize) in
+        -:  121:          setControlType(), and unpack it here.
+        -:  122:
+        -:  123:          Example:
+        -:  124:
+        -:  125:          0x00000001 maps to 0
+        -:  126:          0x00000002 maps to 1
+        -:  127:          0x00000004 maps to 2
+        -:  128:          0x00000008 maps to 3
+        -:  129:          etc.
+        -:  130:        */
+        -:  131:
+    #####:  132:        return qCountTrailingZeroBits(static_cast<quint32>(type));
+        -:  133:    }
+        -:  134:
+        -:  135:    struct Bits {
+        -:  136:        quint32 horStretch : 8;
+        -:  137:        quint32 verStretch : 8;
+        -:  138:        quint32 horPolicy : 4;
+        -:  139:        quint32 verPolicy : 4;
+        -:  140:        quint32 ctype : 5;
+        -:  141:        quint32 hfw : 1;
+        -:  142:        quint32 wfh : 1;
+        -:  143:        quint32 retainSizeWhenHidden : 1;
+        -:  144:
+        -:  145:        constexpr Bits transposed() const noexcept
+        -:  146:        {
+        -:  147:            return {verStretch, // \ swap
+        -:  148:                    horStretch, // /
+        -:  149:                    verPolicy, // \ swap
+        -:  150:                    horPolicy, // /
+        -:  151:                    ctype,
+        -:  152:                    hfw, // \ don't swap (historic behavior)
+        -:  153:                    wfh, // /
+        -:  154:                    retainSizeWhenHidden};
+        -:  155:        }
+        -:  156:    };
+        -:  157:    union {
+        -:  158:        Bits bits;
+        -:  159:        quint32 data;
+        -:  160:    };
+        -:  161:};
+        -:  162:
+        -:  163:Q_DECLARE_TYPEINFO(QSizePolicy, Q_PRIMITIVE_TYPE);
+        -:  164:
+        -:  165:Q_DECLARE_OPERATORS_FOR_FLAGS(QSizePolicy::ControlTypes)
+        -:  166:Q_DECLARE_MIXED_ENUM_OPERATORS(int, QSizePolicy::Policy, QSizePolicy::PolicyFlag)
+        -:  167:
+        -:  168:#ifndef QT_NO_DATASTREAM
+        -:  169:Q_WIDGETS_EXPORT QDataStream &operator<<(QDataStream &, const QSizePolicy &);
+        -:  170:Q_WIDGETS_EXPORT QDataStream &operator>>(QDataStream &, QSizePolicy &);
+        -:  171:#endif
+        -:  172:
+        -:  173:#ifndef QT_NO_DEBUG_STREAM
+        -:  174:Q_WIDGETS_EXPORT QDebug operator<<(QDebug dbg, const QSizePolicy &);
+        -:  175:#endif
+        -:  176:
+        -:  177:QT_END_NAMESPACE
+        -:  178:
+        -:  179:#endif // QSIZEPOLICY_H

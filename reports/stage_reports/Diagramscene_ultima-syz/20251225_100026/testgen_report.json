@@ -1,0 +1,51 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251225_100026",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [],
+      "patches": [],
+      "stats": {
+        "files_generated": 0,
+        "cases_approx": 0
+      }
+    },
+    "applied": [],
+    "total_cases_count": 0
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: ```json\n{\n  \"schema\": \"QtTest project with 50 test files\",\n  \"files\": [\n    {\n      \"name\": \"tests/generated/tests.pro\",\n      \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow \\\\\\n    test_diagramitem_geometry \\\\\\n    test_diagramitem_selection \\\\\\n    test_diagramitem_paint \\\\\\n    test_diagramitemgroup_creation \\\\\\n    test_diagramitemgroup_manipulation \\\\\\n    test_diagrampath_construction \\\\\\n    test_diagrampath_editing \\\\\\n    test_diagramtextitem_text \\\\\\n    test_diagramtextitem_formatting \\\\\\n    test_diagramscene_items \\\\\\n    test_diagramscene_selection \\\\\\n    test_diagramscene_zorder \\\\\\n    test_arrow_geometry \\\\\\n    test_arrow_connection \\\\\\n    test_deletecommand_basic \\\\\\n    test_deletecommand_undo \\\\\\n    test_findreplacedialog_ui \\\\\\n    test_findreplacedialog_logic \\\\\\n    test_mainwindow_actions \\\\\\n    test_mainwindow_scene \\\\\\n    test_diagramitem_types \\\\\\n    test_diagramitem_flags \\\\\\n    test_diagramitemgroup_bounding \\\\\\n    test_diagramitemgroup_transform \\\\\\n    test_diagrampath_bezier \\\\\\n    test_diagrampath_serialization \\\\\\n    test_diagramtextitem_focus \\\\\\n    test_diagramtextitem_document \\\\\\n    test_diagramscene_events \\\\\\n    test_diagramscene_clipboard \\\\\\n    test_arrow_styles \\\\\\n    test_arrow_painting \\\\\\n    test_deletecommand_redo \\\\\\n    test_deletecommand_multiple \\\\\\n    test_findreplacedialog_strings \\\\\\n    test_findreplacedialog_options \\\\\\n    test_mainwindow_toolbars \\\\\\n    test_mainwindow_menus \\\\\\n    test_integration_scene_items \\\\\\n    test_integration_commands\\n\\nCONFIG += ordered\\n\"\n    },\n    {\n      \"name\": \"tests/generated/test_diagramitem.cpp\",\n      \"content\": \"#include <QtTest>\\n#include \\\"diagramitem.h\\\"\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\npriva",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "error",
+      "title": "批量生成失败",
+      "details": "Failed to obtain valid JSON after 3 attempts: JSON parse failed: Expecting value: line 1 column 1 (char 0). Extracted string: ''\nLast response preview: {\n  \"schema\": \"QtTest project with .pro file and test .cpp files\",\n  \"files\": [\n    {\n      \"name\": \"tests/generated/tests.pro\",\n      \"content\": \"TEMPLATE = subdirs\\nSUBDIRS += \\\\\\n    test_diagramitem \\\\\\n    test_diagramitemgroup \\\\\\n    test_diagrampath \\\\\\n    test_diagramtextitem \\\\\\n    test_diagramscene \\\\\\n    test_arrow \\\\\\n    test_deletecommand \\\\\\n    test_findreplacedialog \\\\\\n    test_mainwindow\\n\\nCONFIG += ordered\\n\"\n    },\n    {\n      \"name\": \"tests/generated/test_diagramitem.cpp\",\n      \"content\": \"#include <QtTest>\\n#include \\\"../diagramitem.h\\\"\\n#include <QGraphicsScene>\\n#include <QMenu>\\n\\nclass TestDiagramItem : public QObject\\n{\\n    Q_OBJECT\\n\\nprivate slots:\\n    void initTestCase();\\n    void cleanupTestCase();\\n    void testConstructor();\\n    void testBoundingRect();\\n    void testSetBrush();\\n    void testSetFixedSize();\\n    void testRotationAngle();\\n    void testDiagramTypes();\\n    void testFlags();\\n    void testTextItem();\\n\\nprivate:\\n    QGraphicsScene *scene;\\n    QMenu *menu;\\n};\\n\\nvoid TestDiagramItem::initTestCase()\\n{\\n    scene = new QGraphicsScene();\\n    menu = new QMenu();\\n}\\n\\nvoid TestDiagramItem::cleanupTestCase()\\n{\\n    delete scene;\\n    delete menu;\\n}\\n\\nvoid TestDiagramItem::testConstructor()\\n{\\n    DiagramItem item(DiagramItem::Step, menu);\\n    QVERIFY(item.boundingRect().isValid());\\n    QVERIFY(true);\\n}\\n\\nvoid TestDiagramItem::testBoundingRect()\\n{\\n    DiagramItem item(DiagramItem::Step, menu);\\n    QRectF rect = item.boundingRect();\\n    QVERIFY(rect.width() > 0);\\n    QVERIFY(rect.height() > 0);\\n}\\n\\nvoid TestDiagramItem::testSetBrush()\\n{\\n    DiagramItem item(DiagramItem::Step, menu);\\n    QColor color(Qt::red);\\n    item.setBrush(color);\\n    QVERIFY(true);\\n}\\n\\nvoid TestDiagramItem::testSetFixedSize()\\n{\\n    DiagramItem item(DiagramItem::Step, menu);\\n    QSizeF newSize(200, 150);\\n    item.setFixedSize(newSize);\\n    QVERIFY(item.boundingRect().size().width() >= newSize.width());\\n}\\n\\nvoid",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    },
+    {
+      "category": "testgen",
+      "severity": "warning",
+      "title": "未写入任何 QtTest 文件（LLM 输出为空或不合法）",
+      "details": "",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

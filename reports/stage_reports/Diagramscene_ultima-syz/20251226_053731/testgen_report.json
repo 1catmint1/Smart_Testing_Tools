@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_053731",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\arrow.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_arrow.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_arrow.cpp",
+          "content": "#include <QtTest>\n#include <QStyleOptionGraphicsItem>\n#include \"../../arrow.h\"\n#include \"../../diagramitem.h\"\n\nclass TestArrow : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void initTestCase();\n    void cleanupTestCase();\n    void testConstructor();\n    void testUpdatePosition();\n    void testBoundingRect();\n    void testShape();\n    void testPaint_data();\n    void testPaint();\n\nprivate:\n    DiagramItem *startItem = nullptr;\n    DiagramItem *endItem = nullptr;\n    Arrow *arrow = nullptr;\n};\n\nvoid TestArrow::initTestCase()\n{\n    // 创建两个 DiagramItem 作为箭头的起点和终点。\n    // 假设 DiagramItem 有一个默认构造函数，创建一个简单的矩形。\n    // 如果 DiagramItem 需要参数，这里需要调整。\n    startItem = new DiagramItem(DiagramItem::Box); // 假设 Box 是一个有效的类型\n    endItem = new DiagramItem(DiagramItem::Box);\n    startItem->setPos(0, 0);\n    endItem->setPos(100, 100);\n    arrow = new Arrow(startItem, endItem);\n}\n\nvoid TestArrow::cleanupTestCase()\n{\n    delete arrow;\n    delete startItem;\n    delete endItem;\n}\n\nvoid TestArrow::testConstructor()\n{\n    QVERIFY(arrow != nullptr);\n    QCOMPARE(arrow->myStartItem, startItem);\n    QCOMPARE(arrow->myEndItem, endItem);\n    QVERIFY(arrow->flags() & QGraphicsItem::ItemIsSelectable);\n    // 可以检查默认颜色，但 myColor 是私有成员。\n    // 我们只能通过外观或公共接口间接测试。\n}\n\nvoid TestArrow::testUpdatePosition()\n{\n    // 移动一个 item，然后更新箭头位置\n    QPointF newPos(50, 50);\n    endItem->setPos(newPos);\n    arrow->updatePosition();\n    // updatePosition 重新计算了内部的线。\n    // 我们可以检查线的点是否大致正确（从 startItem 的映射位置到 endItem 的映射位置）\n    // 由于涉及场景坐标和 item 坐标的映射，这里做一个简单的合理性检查。\n    QLineF line = arrow->line();\n    // 线应该从 (0,0) 附近指向 (50,50) 附近（因为 startItem 在 (0,0), endItem 在 (50,50)）\n    // 但 mapFromItem 转换可能产生非零值。我们只检查线是有效的。\n    QVERIFY(line.length() > 0);\n}\n\nvoid TestArrow::testBoundingRect()\n{\n    QRectF rect = arrow->boundingRect();\n    QVERIFY(rect.isValid());\n    // 边界矩形应该包含线\n    QLineF l = arrow->line();\n    QVERIFY(rect.contains(l.p1()));\n    QVERIFY(rect.contains(l.p2()));\n    // 并且有额外的边距（因为 pen width + 20）\n    // 我们可以检查 rect 比线的边界框大\n    QRectF lineRect(l.p1(), l.p2());\n    lineRect = lineRect.normalized();\n    QVERIFY(rect.left() <= lineRect.left());\n    QVERIFY(rect.top() <= lineRect.top());\n    QVERIFY(rect.right() >= lineRect.right());\n    QVERIFY(rect.bottom() >= lineRect.bottom());\n}\n\nvoid TestArrow::testShape()\n{\n    QPainterPath path = arrow->shape();\n    QVERIFY(!path.isEmpty());\n    // 形状应该包含线（来自基类）和箭头头部多边形\n    // 我们可以检查路径的边界矩形\n    QVERIFY(path.boundingRect().isValid());\n}\n\nvoid TestArrow::testPaint_data()\n{\n    QTest::addColumn<bool>(\"selected\");\n    QTest::newRow(\"not selected\") << false;\n    QTest::newRow(\"selected\") << true;\n}\n\nvoid TestArrow::testPaint()\n{\n    QFETCH(bool, selected);\n    arrow->setSelected(selected);\n    // paint 方法很难进行单元测试，因为它依赖于 QPainter 和绘制上下文。\n    // 我们只能调用它，确保它不崩溃（例如，通过模拟一个 QPainter）。\n    // 这里我们只做一个简单的调用，使用一个 QImage 作为绘制设备。\n    QImage image(200, 200, QImage::Format_ARGB32);\n    image.fill(Qt::transparent);\n    QPainter painter(&image);\n    QStyleOptionGraphicsItem option;\n    arrow->paint(&painter, &option, nullptr);\n    // 如果没有崩溃，测试通过\n    QVERIFY(true);\n}\n\nQTEST_MAIN(TestArrow)\n#include \"test_arrow.moc\"\n"
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = tests\nCONFIG += console testcase\nQT += testlib widgets\n\n# 假设项目根目录是上一级目录的上一级（因为 tests/generated 在 tests 下）\n# 我们需要包含被测文件的目录和头文件目录\nINCLUDEPATH += ../..\n\n# 源文件\nSOURCES += test_arrow.cpp \\\n           ../../arrow.cpp\n\n# 头文件\nHEADERS += ../../arrow.h \\\n            ../../diagramitem.h\n\n# 如果 diagramitem.cpp 存在，也需要添加\nSOURCES += ../../diagramitem.cpp\n\n# 如果还有其他依赖的源文件，请根据实际项目添加\n# 例如，如果 diagramitem.h 依赖 diagramscene.h 等，需要相应添加\n\n# 确保使用 C++11 或更高版本\nCONFIG += c++11\n\n# 输出目录\nDESTDIR = .\nOBJECTS_DIR = .obj\nMOC_DIR = .moc\nRCC_DIR = .rcc\nUI_DIR = .ui"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 6
+      }
+    },
+    "applied": [
+      "tests/generated/test_arrow.cpp (6 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 6
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 6 个用例",
+      "details": "生成文件明细：\ntests/generated/test_arrow.cpp (6 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

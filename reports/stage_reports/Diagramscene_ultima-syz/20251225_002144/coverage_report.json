@@ -1,0 +1,35 @@
+{
+  "stage": "coverage",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251225_002144",
+  "meta": {
+    "cmd": "D:\\Anaconda\\envs\\py312_env\\python.exe -m gcovr -r \"C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\"  --object-directory tests/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/debug --gcov-executable D:/Qt/Tools/mingw1310_64/bin/gcov.exe --exclude-directories .git --exclude-directories .venv --exclude-directories tools --exclude-directories generated_tests --print-summary --html-details -o coverage.html --json=coverage.json",
+    "cwd": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "timeout_s": 600.0,
+    "ensure_gcov_sources": {
+      "cmd": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\lenovo\\Desktop\\Smart_Testing_Tools-syz\\tools\\ensure_gcov_sources.ps1\" -ProjectRoot \"C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\" -ObjDir \"C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\build\\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\\debug\"",
+      "cwd": "C:\\Users\\lenovo\\Desktop\\Smart_Testing_Tools-syz",
+      "timeout_s": 300,
+      "returncode": 1,
+      "stdout": "Ensuring gcov-referenced sources exist for object dir: C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\build\\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\\debug\nObjDir not found: C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\tests\\build\\Desktop_Qt_6_10_1_MinGW_64_bit-Debug\\debug\nNo candidate object directories found. Searching project for any .gcda files...\nFound .gcda under project: C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\\arrow.gcda. Using object dir: C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\nProcessing .gcda: C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\\arrow.gcda\nMissing referenced file: arrow.h -> C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\\arrow.h\n",
+      "stderr": "方法调用失败，因为 [System.IO.Path] 不包含名为“GetRelativePath”的方法。\n所在位置 C:\\Users\\lenovo\\Desktop\\Smart_Testing_Tools-syz\\tools\\ensure_gcov_sources.ps1:123 字符: 17\n+ ...             $rel = [System.IO.Path]::GetRelativePath($ProjectRoot, $f ...\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : InvalidOperation: (:) []，ParentContainsErrorRecordException\n    + FullyQualifiedErrorId : MethodNotFound\n \n",
+      "timed_out": false
+    },
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "(ERROR) Bad --gcov-object-directory option.\n\tThe specified directory does not exist.\n",
+    "timed_out": false
+  },
+  "findings": [
+    {
+      "category": "coverage",
+      "severity": "error",
+      "title": "覆盖率命令执行失败",
+      "details": "\n(ERROR) Bad --gcov-object-directory option.\n\tThe specified directory does not exist.\n",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

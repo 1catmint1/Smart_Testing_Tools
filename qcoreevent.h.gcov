@@ -1,0 +1,422 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qcoreevent.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:
+        -:    4:#ifndef QCOREEVENT_H
+        -:    5:#define QCOREEVENT_H
+        -:    6:
+        -:    7:#include <QtCore/qbasictimer.h>
+        -:    8:#include <QtCore/qnamespace.h>
+        -:    9:#include <QtCore/qbytearray.h>
+        -:   10:#include <QtCore/qobjectdefs.h>
+        -:   11:
+        -:   12:QT_BEGIN_NAMESPACE
+        -:   13:
+        -:   14:template <typename Event> class QEventStorage;
+        -:   15:
+        -:   16:#define Q_EVENT_DISABLE_COPY(Class) \
+        -:   17:protected: \
+        -:   18:    Class(const Class &) = default; \
+        -:   19:    Class(Class &&) = delete; \
+        -:   20:    Class &operator=(const Class &other) = default; \
+        -:   21:    Class &operator=(Class &&) = delete
+        -:   22:
+        -:   23:#define Q_DECL_EVENT_COMMON(Class) \
+        -:   24:        friend class QEventStorage<Class>; \
+        -:   25:    protected: \
+        -:   26:        Class(const Class &); \
+        -:   27:        Class(Class &&) = delete; \
+        -:   28:        Class &operator=(const Class &other) = default; \
+        -:   29:        Class &operator=(Class &&) = delete; \
+        -:   30:    public: \
+        -:   31:        Class* clone() const override; \
+        -:   32:        ~Class() override; \
+        -:   33:    private:
+        -:   34:
+        -:   35:#define Q_IMPL_EVENT_COMMON(Class) \
+        -:   36:    Class::Class(const Class &) = default; \
+        -:   37:    Class::~Class() = default; \
+        -:   38:    Class* Class::clone() const \
+        -:   39:    { \
+        -:   40:        auto c = new Class(*this); \
+        -:   41:        [[maybe_unused]] QEvent *e = c; \
+        -:   42:        /* check that covariant return is safe to add */ \
+        -:   43:        Q_ASSERT(reinterpret_cast<quintptr>(c) == reinterpret_cast<quintptr>(e)); \
+        -:   44:        return c; \
+        -:   45:    }
+        -:   46:
+        -:   47:class QEventPrivate;
+        -:   48:class Q_CORE_EXPORT QEvent           // event base class
+        -:   49:{
+        -:   50:    Q_GADGET
+        -:   51:    QDOC_PROPERTY(bool accepted READ isAccepted WRITE setAccepted)
+        -:   52:
+        -:   53:    Q_EVENT_DISABLE_COPY(QEvent);
+        -:   54:public:
+        -:   55:    enum Type {
+        -:   56:        /*
+        -:   57:          If you get a strange compiler error on the line with None,
+        -:   58:          it's probably because you're also including X11 headers,
+        -:   59:          which #define the symbol None. Put the X11 includes after
+        -:   60:          the Qt includes to solve this problem.
+        -:   61:        */
+        -:   62:        None = 0,                               // invalid event
+        -:   63:        Timer = 1,                              // timer event
+        -:   64:        MouseButtonPress = 2,                   // mouse button pressed
+        -:   65:        MouseButtonRelease = 3,                 // mouse button released
+        -:   66:        MouseButtonDblClick = 4,                // mouse button double click
+        -:   67:        MouseMove = 5,                          // mouse move
+        -:   68:        KeyPress = 6,                           // key pressed
+        -:   69:        KeyRelease = 7,                         // key released
+        -:   70:        FocusIn = 8,                            // keyboard focus received
+        -:   71:        FocusOut = 9,                           // keyboard focus lost
+        -:   72:        FocusAboutToChange = 23,                // keyboard focus is about to be lost
+        -:   73:        Enter = 10,                             // mouse enters widget
+        -:   74:        Leave = 11,                             // mouse leaves widget
+        -:   75:        Paint = 12,                             // paint widget
+        -:   76:        Move = 13,                              // move widget
+        -:   77:        Resize = 14,                            // resize widget
+        -:   78:        Create = 15,                            // after widget creation
+        -:   79:        Destroy = 16,                           // during widget destruction
+        -:   80:        Show = 17,                              // widget is shown
+        -:   81:        Hide = 18,                              // widget is hidden
+        -:   82:        Close = 19,                             // request to close widget
+        -:   83:        Quit = 20,                              // request to quit application
+        -:   84:        ParentChange = 21,                      // object has been reparented
+        -:   85:        ParentAboutToChange = 131,              // sent just before the parent change is done
+        -:   86:        ThreadChange = 22,                      // object has changed threads
+        -:   87:        WindowActivate = 24,                    // window was activated
+        -:   88:        WindowDeactivate = 25,                  // window was deactivated
+        -:   89:        ShowToParent = 26,                      // widget is shown to parent
+        -:   90:        HideToParent = 27,                      // widget is hidden to parent
+        -:   91:        Wheel = 31,                             // wheel event
+        -:   92:        WindowTitleChange = 33,                 // window title changed
+        -:   93:        WindowIconChange = 34,                  // icon changed
+        -:   94:        ApplicationWindowIconChange = 35,       // application icon changed
+        -:   95:        ApplicationFontChange = 36,             // application font changed
+        -:   96:        ApplicationLayoutDirectionChange = 37,  // application layout direction changed
+        -:   97:        ApplicationPaletteChange = 38,          // application palette changed
+        -:   98:        PaletteChange = 39,                     // widget palette changed
+        -:   99:        Clipboard = 40,                         // internal clipboard event
+        -:  100:        Speech = 42,                            // reserved for speech input
+        -:  101:        MetaCall =  43,                         // meta call event
+        -:  102:        SockAct = 50,                           // socket activation
+        -:  103:        WinEventAct = 132,                      // win event activation
+        -:  104:        DeferredDelete = 52,                    // deferred delete event
+        -:  105:        DragEnter = 60,                         // drag moves into widget
+        -:  106:        DragMove = 61,                          // drag moves in widget
+        -:  107:        DragLeave = 62,                         // drag leaves or is cancelled
+        -:  108:        Drop = 63,                              // actual drop
+        -:  109:        DragResponse = 64,                      // drag accepted/rejected
+        -:  110:        ChildAdded = 68,                        // new child widget
+        -:  111:        ChildPolished = 69,                     // polished child widget
+        -:  112:        ChildRemoved = 71,                      // deleted child widget
+        -:  113:        ShowWindowRequest = 73,                 // widget's window should be mapped
+        -:  114:        PolishRequest = 74,                     // widget should be polished
+        -:  115:        Polish = 75,                            // widget is polished
+        -:  116:        LayoutRequest = 76,                     // widget should be relayouted
+        -:  117:        UpdateRequest = 77,                     // widget should be repainted
+        -:  118:        UpdateLater = 78,                       // request update() later
+        -:  119:
+        -:  120:        EmbeddingControl = 79,                  // ActiveX embedding
+        -:  121:        ActivateControl = 80,                   // ActiveX activation
+        -:  122:        DeactivateControl = 81,                 // ActiveX deactivation
+        -:  123:        ContextMenu = 82,                       // context popup menu
+        -:  124:        InputMethod = 83,                       // input method
+        -:  125:        TabletMove = 87,                        // Wacom tablet event
+        -:  126:        LocaleChange = 88,                      // the system locale changed
+        -:  127:        LanguageChange = 89,                    // the application language changed
+        -:  128:        LayoutDirectionChange = 90,             // the layout direction changed
+        -:  129:        Style = 91,                             // internal style event
+        -:  130:        TabletPress = 92,                       // tablet press
+        -:  131:        TabletRelease = 93,                     // tablet release
+        -:  132:        OkRequest = 94,                         // CE (Ok) button pressed
+        -:  133:        HelpRequest = 95,                       // CE (?)  button pressed
+        -:  134:
+        -:  135:        IconDrag = 96,                          // proxy icon dragged
+        -:  136:
+        -:  137:        FontChange = 97,                        // font has changed
+        -:  138:        EnabledChange = 98,                     // enabled state has changed
+        -:  139:        ActivationChange = 99,                  // window activation has changed
+        -:  140:        StyleChange = 100,                      // style has changed
+        -:  141:        IconTextChange = 101,                   // icon text has changed.  Deprecated.
+        -:  142:        ModifiedChange = 102,                   // modified state has changed
+        -:  143:        MouseTrackingChange = 109,              // mouse tracking state has changed
+        -:  144:
+        -:  145:        WindowBlocked = 103,                    // window is about to be blocked modally
+        -:  146:        WindowUnblocked = 104,                  // windows modal blocking has ended
+        -:  147:        WindowStateChange = 105,
+        -:  148:
+        -:  149:        ReadOnlyChange = 106,                   // readonly state has changed
+        -:  150:
+        -:  151:        ToolTip = 110,
+        -:  152:        WhatsThis = 111,
+        -:  153:        StatusTip = 112,
+        -:  154:
+        -:  155:        ActionChanged = 113,
+        -:  156:        ActionAdded = 114,
+        -:  157:        ActionRemoved = 115,
+        -:  158:
+        -:  159:        FileOpen = 116,                         // file open request
+        -:  160:
+        -:  161:        Shortcut = 117,                         // shortcut triggered
+        -:  162:        ShortcutOverride = 51,                  // shortcut override request
+        -:  163:
+        -:  164:        WhatsThisClicked = 118,
+        -:  165:
+        -:  166:        ToolBarChange = 120,                    // toolbar visibility toggled
+        -:  167:
+        -:  168:        ApplicationActivate = 121,              // deprecated. Use ApplicationStateChange instead.
+        -:  169:        ApplicationActivated = ApplicationActivate, // deprecated
+        -:  170:        ApplicationDeactivate = 122,            // deprecated. Use ApplicationStateChange instead.
+        -:  171:        ApplicationDeactivated = ApplicationDeactivate, // deprecated
+        -:  172:
+        -:  173:        QueryWhatsThis = 123,                   // query what's this widget help
+        -:  174:        EnterWhatsThisMode = 124,
+        -:  175:        LeaveWhatsThisMode = 125,
+        -:  176:
+        -:  177:        ZOrderChange = 126,                     // child widget has had its z-order changed
+        -:  178:
+        -:  179:        HoverEnter = 127,                       // mouse cursor enters a hover widget
+        -:  180:        HoverLeave = 128,                       // mouse cursor leaves a hover widget
+        -:  181:        HoverMove = 129,                        // mouse cursor move inside a hover widget
+        -:  182:
+        -:  183:        // last event id used = 132
+        -:  184:
+        -:  185:#ifdef QT_KEYPAD_NAVIGATION
+        -:  186:        EnterEditFocus = 150,                   // enter edit mode in keypad navigation
+        -:  187:        LeaveEditFocus = 151,                   // enter edit mode in keypad navigation
+        -:  188:#endif
+        -:  189:        AcceptDropsChange = 152,
+        -:  190:
+        -:  191:        ZeroTimerEvent = 154,                   // Used for Windows Zero timer events
+        -:  192:
+        -:  193:        GraphicsSceneMouseMove = 155,           // GraphicsView
+        -:  194:        GraphicsSceneMousePress = 156,
+        -:  195:        GraphicsSceneMouseRelease = 157,
+        -:  196:        GraphicsSceneMouseDoubleClick = 158,
+        -:  197:        GraphicsSceneContextMenu = 159,
+        -:  198:        GraphicsSceneHoverEnter = 160,
+        -:  199:        GraphicsSceneHoverMove = 161,
+        -:  200:        GraphicsSceneHoverLeave = 162,
+        -:  201:        GraphicsSceneHelp = 163,
+        -:  202:        GraphicsSceneDragEnter = 164,
+        -:  203:        GraphicsSceneDragMove = 165,
+        -:  204:        GraphicsSceneDragLeave = 166,
+        -:  205:        GraphicsSceneDrop = 167,
+        -:  206:        GraphicsSceneWheel = 168,
+        -:  207:        GraphicsSceneLeave = 220,
+        -:  208:
+        -:  209:        KeyboardLayoutChange = 169,             // keyboard layout changed
+        -:  210:
+        -:  211:        DynamicPropertyChange = 170,            // A dynamic property was changed through setProperty/property
+        -:  212:
+        -:  213:        TabletEnterProximity = 171,
+        -:  214:        TabletLeaveProximity = 172,
+        -:  215:
+        -:  216:        NonClientAreaMouseMove = 173,
+        -:  217:        NonClientAreaMouseButtonPress = 174,
+        -:  218:        NonClientAreaMouseButtonRelease = 175,
+        -:  219:        NonClientAreaMouseButtonDblClick = 176,
+        -:  220:
+        -:  221:        MacSizeChange = 177,                    // when the Qt::WA_Mac{Normal,Small,Mini}Size changes
+        -:  222:
+        -:  223:        ContentsRectChange = 178,               // sent by QWidget::setContentsMargins (internal)
+        -:  224:
+        -:  225:        MacGLWindowChange = 179,                // Internal! the window of the GLWidget has changed
+        -:  226:
+        -:  227:        FutureCallOut = 180,
+        -:  228:
+        -:  229:        GraphicsSceneResize  = 181,
+        -:  230:        GraphicsSceneMove  = 182,
+        -:  231:
+        -:  232:        CursorChange = 183,
+        -:  233:        ToolTipChange = 184,
+        -:  234:
+        -:  235:        NetworkReplyUpdated = 185,              // Internal for QNetworkReply
+        -:  236:
+        -:  237:        GrabMouse = 186,
+        -:  238:        UngrabMouse = 187,
+        -:  239:        GrabKeyboard = 188,
+        -:  240:        UngrabKeyboard = 189,
+        -:  241:
+        -:  242:        StateMachineSignal = 192,
+        -:  243:        StateMachineWrapped = 193,
+        -:  244:
+        -:  245:        TouchBegin = 194,
+        -:  246:        TouchUpdate = 195,
+        -:  247:        TouchEnd = 196,
+        -:  248:
+        -:  249:#ifndef QT_NO_GESTURES
+        -:  250:        NativeGesture = 197,                    // QtGui native gesture
+        -:  251:#endif
+        -:  252:        RequestSoftwareInputPanel = 199,
+        -:  253:        CloseSoftwareInputPanel = 200,
+        -:  254:
+        -:  255:        WinIdChange = 203,
+        -:  256:#ifndef QT_NO_GESTURES
+        -:  257:        Gesture = 198,
+        -:  258:        GestureOverride = 202,
+        -:  259:#endif
+        -:  260:        ScrollPrepare = 204,
+        -:  261:        Scroll = 205,
+        -:  262:
+        -:  263:        Expose = 206,
+        -:  264:
+        -:  265:        InputMethodQuery = 207,
+        -:  266:        OrientationChange = 208,                // Screen orientation has changed
+        -:  267:
+        -:  268:        TouchCancel = 209,
+        -:  269:
+        -:  270:        ThemeChange = 210,
+        -:  271:
+        -:  272:        SockClose = 211,                        // socket closed
+        -:  273:
+        -:  274:        PlatformPanel = 212,
+        -:  275:
+        -:  276:        StyleAnimationUpdate = 213,             // style animation target should be updated
+        -:  277:        ApplicationStateChange = 214,
+        -:  278:
+        -:  279:        WindowChangeInternal = 215,             // internal for QQuickWidget and texture-based widgets
+        -:  280:        ScreenChangeInternal = 216,
+        -:  281:
+        -:  282:        PlatformSurface = 217,                  // Platform surface created or about to be destroyed
+        -:  283:
+        -:  284:        Pointer = 218,                          // Qt 5: QQuickPointerEvent; Qt 6: unused so far
+        -:  285:
+        -:  286:        TabletTrackingChange = 219,             // tablet tracking state has changed
+        -:  287:
+        -:  288:        // GraphicsSceneLeave = 220,
+        -:  289:        WindowAboutToChangeInternal = 221,      // internal for QQuickWidget and texture-based widgets
+        -:  290:
+        -:  291:        DevicePixelRatioChange = 222,
+        -:  292:
+        -:  293:        ChildWindowAdded = 223,
+        -:  294:        ChildWindowRemoved = 224,
+        -:  295:        ParentWindowAboutToChange = 225,
+        -:  296:        ParentWindowChange = 226,
+        -:  297:
+        -:  298:        SafeAreaMarginsChange = 227,
+        -:  299:
+        -:  300:        // 512 reserved for Qt Jambi's MetaCall event
+        -:  301:        // 513 reserved for Qt Jambi's DeleteOnMainThread event
+        -:  302:
+        -:  303:        User = 1000,                            // first user event id
+        -:  304:        MaxUser = 65535                         // last user event id
+        -:  305:    };
+        -:  306:    Q_ENUM(Type)
+        -:  307:
+        -:  308:    explicit QEvent(Type type);
+        -:  309:    virtual ~QEvent();
+        -:  310:    inline Type type() const { return static_cast<Type>(t); }
+        -:  311:    inline bool spontaneous() const { return m_spont; }
+        -:  312:
+        -:  313:    inline virtual void setAccepted(bool accepted) { m_accept = accepted; }
+        -:  314:    inline bool isAccepted() const { return m_accept; }
+        -:  315:
+        1:  316:    inline void accept() { m_accept = true; }
+    #####:  317:    inline void ignore() { m_accept = false; }
+        -:  318:
+        -:  319:    inline bool isInputEvent() const noexcept { return m_inputEvent; }
+        -:  320:    inline bool isPointerEvent() const noexcept { return m_pointerEvent; }
+        -:  321:    inline bool isSinglePointEvent() const noexcept { return m_singlePointEvent; }
+        -:  322:
+        -:  323:    static int registerEventType(int hint = -1) noexcept;
+        -:  324:
+        -:  325:    virtual QEvent *clone() const;
+        -:  326:
+        -:  327:protected:
+        -:  328:    QT_DEFINE_TAG_STRUCT(InputEventTag);
+        -:  329:    QEvent(Type type, InputEventTag) : QEvent(type) { m_inputEvent = true; }
+        -:  330:    QT_DEFINE_TAG_STRUCT(PointerEventTag);
+        -:  331:    QEvent(Type type, PointerEventTag) : QEvent(type, InputEventTag{}) { m_pointerEvent = true; }
+        -:  332:    QT_DEFINE_TAG_STRUCT(SinglePointEventTag);
+        -:  333:    QEvent(Type type, SinglePointEventTag) : QEvent(type, PointerEventTag{}) { m_singlePointEvent = true; }
+        -:  334:    quint16 t;
+        -:  335:
+        -:  336:private:
+        -:  337:    /*
+        -:  338:        We can assume that C++ types are 8-byte aligned, and we can't assume that compilers
+        -:  339:        coalesce data members from subclasses. Use bitfields to fill up to next 8-byte
+        -:  340:        aligned size, which is 16 bytes. That way we don't waste memory, and have plenty of room
+        -:  341:        for future flags.
+        -:  342:        Don't use bitfields for the most important flags, as that would generate more code, and
+        -:  343:        access is always inline. Bytes used are:
+        -:  344:        8 vptr + 2 type + 3 bool flags => 3 bytes left, so 24 bits. However, compilers will word-
+        -:  345:        align the quint16s after the bools, so add another unused bool to fill that gap, which
+        -:  346:        leaves us with 16 bits.
+        -:  347:    */
+        -:  348:    bool m_posted = false;
+        -:  349:    bool m_spont = false;
+        -:  350:    bool m_accept = true;
+        -:  351:    bool m_unused = false;
+        -:  352:    quint16 m_reserved : 13;
+        -:  353:    quint16 m_inputEvent : 1;
+        -:  354:    quint16 m_pointerEvent : 1;
+        -:  355:    quint16 m_singlePointEvent : 1;
+        -:  356:
+        -:  357:    friend class QCoreApplication;
+        -:  358:    friend class QCoreApplicationPrivate;
+        -:  359:    friend class QThreadData;
+        -:  360:    friend class QApplication;
+        -:  361:    friend class QGraphicsScenePrivate;
+        -:  362:    // from QtTest:
+        -:  363:    // QtWebEngine event handling requires forwarding events as spontaneous.
+        -:  364:    // Impersonated QSpontaneKeyEvent in QtWebEngine to handle such cases.
+        -:  365:    friend class QSpontaneKeyEvent;
+        -:  366:    // needs this:
+        -:  367:    Q_ALWAYS_INLINE
+        -:  368:    void setSpontaneous() { m_spont = true; }
+        -:  369:};
+        -:  370:
+        -:  371:class Q_CORE_EXPORT QTimerEvent : public QEvent
+        -:  372:{
+        -:  373:    Q_DECL_EVENT_COMMON(QTimerEvent)
+        -:  374:public:
+        -:  375:    explicit QTimerEvent(int timerId);
+        -:  376:    explicit QTimerEvent(Qt::TimerId timerId);
+        -:  377:
+        -:  378:    int timerId() const { return qToUnderlying(id()); }
+        -:  379:    Qt::TimerId id() const { return m_id; }
+        -:  380:    bool matches(const QBasicTimer &timer) const noexcept
+        -:  381:    { return m_id == timer.id(); }
+        -:  382:
+        -:  383:protected:
+        -:  384:    Qt::TimerId m_id;
+        -:  385:};
+        -:  386:
+        -:  387:class QObject;
+        -:  388:
+        -:  389:class Q_CORE_EXPORT QChildEvent : public QEvent
+        -:  390:{
+        -:  391:    Q_DECL_EVENT_COMMON(QChildEvent)
+        -:  392:public:
+        -:  393:    QChildEvent(Type type, QObject *child);
+        -:  394:
+        -:  395:    QObject *child() const { return c; }
+        -:  396:    bool added() const { return type() == ChildAdded; }
+        -:  397:    bool polished() const { return type() == ChildPolished; }
+        -:  398:    bool removed() const { return type() == ChildRemoved; }
+        -:  399:
+        -:  400:protected:
+        -:  401:    QObject *c;
+        -:  402:};
+        -:  403:
+        -:  404:class Q_CORE_EXPORT QDynamicPropertyChangeEvent : public QEvent
+        -:  405:{
+        -:  406:    Q_DECL_EVENT_COMMON(QDynamicPropertyChangeEvent)
+        -:  407:public:
+        -:  408:    explicit QDynamicPropertyChangeEvent(const QByteArray &name);
+        -:  409:
+        -:  410:    inline QByteArray propertyName() const { return n; }
+        -:  411:
+        -:  412:private:
+        -:  413:    QByteArray n;
+        -:  414:};
+        -:  415:
+        -:  416:QT_END_NAMESPACE
+        -:  417:
+        -:  418:#endif // QCOREEVENT_H

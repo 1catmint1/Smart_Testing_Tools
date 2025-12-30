@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main2",
+  "created_at": "20251226_061722",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main2",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-main2\\arrow.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_arrow.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_arrow.cpp",
+          "content": "#include <QtTest>\n#include <QStyleOptionGraphicsItem>\n#include <QPainter>\n#include \"../../arrow.h\"\n#include \"../../diagramitem.h\"\n\nclass TestArrow : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void testConstructor();\n    void testBoundingRect();\n    void testUpdatePosition();\n    void testPaint_data();\n    void testPaint();\n};\n\nvoid TestArrow::testConstructor()\n{\n    DiagramItem startItem(DiagramItem::Step);\n    DiagramItem endItem(DiagramItem::Step);\n    Arrow arrow(&startItem, &endItem);\n    QVERIFY(arrow.myStartItem == &startItem);\n    QVERIFY(arrow.myEndItem == &endItem);\n    QVERIFY(arrow.flags() & QGraphicsItem::ItemIsSelectable);\n    QCOMPARE(arrow.pen().color(), QColor(Qt::black));\n    QCOMPARE(arrow.pen().width(), 2);\n}\n\nvoid TestArrow::testBoundingRect()\n{\n    DiagramItem startItem(DiagramItem::Step);\n    DiagramItem endItem(DiagramItem::Step);\n    startItem.setPos(0, 0);\n    endItem.setPos(100, 100);\n    Arrow arrow(&startItem, &endItem);\n    arrow.updatePosition();\n    QRectF rect = arrow.boundingRect();\n    QVERIFY(rect.isValid());\n    QVERIFY(rect.contains(arrow.line().p1()));\n    QVERIFY(rect.contains(arrow.line().p2()));\n    qreal extra = (arrow.pen().width() + 20) / 2.0;\n    QVERIFY(rect.width() >= arrow.line().length() + 2 * extra - 0.001);\n    QVERIFY(rect.height() >= arrow.line().length() + 2 * extra - 0.001);\n}\n\nvoid TestArrow::testUpdatePosition()\n{\n    DiagramItem startItem(DiagramItem::Step);\n    DiagramItem endItem(DiagramItem::Step);\n    startItem.setPos(10, 20);\n    endItem.setPos(150, 250);\n    Arrow arrow(&startItem, &endItem);\n    arrow.updatePosition();\n    QLineF line = arrow.line();\n    QCOMPARE(line.p1(), QPointF(10, 20));\n    QCOMPARE(line.p2(), QPointF(150, 250));\n}\n\nvoid TestArrow::testPaint_data()\n{\n    QTest::addColumn<bool>(\"selected\");\n    QTest::addColumn<QPointF>(\"startPos\");\n    QTest::addColumn<QPointF>(\"endPos\");\n    QTest::newRow(\"not selected, normal line\") << false << QPointF(0, 0) << QPointF(100, 0);\n    QTest::newRow(\"selected, diagonal line\") << true << QPointF(0, 0) << QPointF(100, 100);\n}\n\nvoid TestArrow::testPaint()\n{\n    QFETCH(bool, selected);\n    QFETCH(QPointF, startPos);\n    QFETCH(QPointF, endPos);\n    DiagramItem startItem(DiagramItem::Step);\n    DiagramItem endItem(DiagramItem::Step);\n    startItem.setPos(startPos);\n    endItem.setPos(endPos);\n    Arrow arrow(&startItem, &endItem);\n    arrow.setSelected(selected);\n    arrow.updatePosition();\n    QImage image(200, 200, QImage::Format_ARGB32);\n    image.fill(Qt::transparent);\n    QPainter painter(&image);\n    QStyleOptionGraphicsItem option;\n    arrow.paint(&painter, &option, nullptr);\n    QVERIFY(!image.isNull());\n    bool hasPixels = false;\n    for (int y = 0; y < image.height(); ++y) {\n        for (int x = 0; x < image.width(); ++x) {\n            if (qAlpha(image.pixel(x, y)) > 0) {\n                hasPixels = true;\n                break;\n            }\n        }\n        if (hasPixels) break;\n    }\n    QVERIFY(hasPixels);\n}\n\nQTEST_MAIN(TestArrow)\n#include \"test_arrow.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = tests\nCONFIG += testcase\nQT += testlib widgets svg\n\nINCLUDEPATH += ../..\n\nSOURCES += test_arrow.cpp \\\n           ../../arrow.cpp\n\nHEADERS += ../../arrow.h \\\n            ../../diagramitem.h\n\nDEFINES += QT_DISABLE_DEPRECATED_BEFORE=0\n\nwin32 {\n    CONFIG += console\n}\n\nunix {\n    CONFIG -= app_bundle\n}\nQMAKE_CXXFLAGS += --coverage\nQMAKE_LFLAGS += --coverage"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 5
+      }
+    },
+    "applied": [
+      "tests/generated/test_arrow.cpp (5 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 5
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 5 个用例",
+      "details": "生成文件明细：\ntests/generated/test_arrow.cpp (5 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

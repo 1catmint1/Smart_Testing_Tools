@@ -1,0 +1,48 @@
+{
+  "stage": "testgen",
+  "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+  "created_at": "20251226_122142",
+  "meta": {
+    "project_root": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz",
+    "single_file_mode": true,
+    "target_file": "C:\\Users\\lenovo\\Desktop\\Diagramscene_ultima-syz\\debug\\diagramitem.cpp",
+    "llm_output": {
+      "out_dir": "tests\\generated",
+      "files": [
+        "tests/generated/test_diagramitem.cpp",
+        "tests/generated/tests.pro"
+      ],
+      "patches": [
+        {
+          "path": "tests/generated/test_diagramitem.cpp",
+          "content": "#include <QtTest>\n// Enable access to protected members\n#define protected public\n#define private public\n#include \"../../debug/diagramitem.h\"\n\nclass TestDiagramItem : public QObject\n{\n    Q_OBJECT\n\nprivate slots:\n    void testConstructor();\n    void testBoundingRect();\n    void testSetBrush();\n    void testSetFixedSize();\n    void testDiagramTypeEnum();\n};\n\nvoid TestDiagramItem::testConstructor()\n{\n    DiagramItem item(DiagramItem::StartEnd, nullptr);\n    QVERIFY(item.boundingRect().isValid());\n    QCOMPARE(item.diagramType(), DiagramItem::StartEnd);\n}\n\nvoid TestDiagramItem::testBoundingRect()\n{\n    DiagramItem item(DiagramItem::Conditional, nullptr);\n    QRectF rect = item.boundingRect();\n    QVERIFY(rect.width() > 0);\n    QVERIFY(rect.height() > 0);\n    QVERIFY(!rect.isNull());\n}\n\nvoid TestDiagramItem::testSetBrush()\n{\n    DiagramItem item(DiagramItem::Step, nullptr);\n    QColor newColor(Qt::red);\n    item.setBrush(newColor);\n    QCOMPARE(item.brushColor(), newColor);\n}\n\nvoid TestDiagramItem::testSetFixedSize()\n{\n    DiagramItem item(DiagramItem::Io, nullptr);\n    QSizeF newSize(200, 150);\n    item.setFixedSize(newSize);\n    QCOMPARE(item.size(), newSize);\n}\n\nvoid TestDiagramItem::testDiagramTypeEnum()\n{\n    QCOMPARE(static_cast<int>(DiagramItem::StartEnd), 0);\n    QCOMPARE(static_cast<int>(DiagramItem::Conditional), 1);\n    QCOMPARE(static_cast<int>(DiagramItem::Step), 2);\n    QCOMPARE(static_cast<int>(DiagramItem::Io), 3);\n}\n\nQTEST_MAIN(TestDiagramItem)\n#include \"test_diagramitem.moc\""
+        },
+        {
+          "path": "tests/generated/tests.pro",
+          "content": "TEMPLATE = app\nTARGET = tests\nCONFIG += console testcase\nCONFIG -= app_bundle\nQT += testlib widgets svg\n\n# Include all generated test cpp/h automatically (use $$files to expand on Windows)\nSOURCES += $$files($$PWD/*.cpp)\nHEADERS += $$files($$PWD/*.h)\n\n# Project sources and headers (relative to tests/generated)\nSOURCES +=     ../../arrow.cpp     ../../diagramitem.cpp     ../../diagramitemgroup.cpp     ../../diagrampath.cpp     ../../diagramscene.cpp     ../../diagramtextitem.cpp     ../../findreplacedialog.cpp     ../../mainwindow.cpp\n\nHEADERS +=     ../../arrow.h     ../../diagramitem.h     ../../diagramitemgroup.h     ../../diagrampath.h     ../../diagramscene.h     ../../diagramtextitem.h     ../../findreplacedialog.h     ../../mainwindow.h\n\nINCLUDEPATH += $$PWD/../..\nDEPENDPATH += $$PWD/../..\nQMAKE_CXXFLAGS += --coverage\nQMAKE_LFLAGS += --coverage\n\nDESTDIR = $$PWD/debug\nOBJECTS_DIR = $$PWD/obj\nMOC_DIR = $$PWD/moc\nRCC_DIR = $$PWD/rcc\nUI_DIR = $$PWD/ui\n"
+        }
+      ],
+      "stats": {
+        "files_generated": 2,
+        "cases_approx": 5
+      }
+    },
+    "applied": [
+      "tests/generated/test_diagramitem.cpp (5 cases)",
+      "tests/generated/tests.pro (0 cases)"
+    ],
+    "total_cases_count": 5
+  },
+  "findings": [
+    {
+      "category": "testgen",
+      "severity": "info",
+      "title": "已生成 QtTest：2 个文件，共约 5 个用例",
+      "details": "生成文件明细：\ntests/generated/test_diagramitem.cpp (5 cases)\ntests/generated/tests.pro (0 cases)",
+      "file": null,
+      "line": null,
+      "rule_id": null,
+      "evidence": {}
+    }
+  ]
+}

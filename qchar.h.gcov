@@ -1,0 +1,727 @@
+        -:    0:Source:D:/Qt/6.10.1/mingw_64/include/QtCore/qchar.h
+        -:    0:Graph:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcno
+        -:    0:Data:C:\Users\lenovo\Desktop\Diagramscene_ultima-syz\debug/mainwindow.gcda
+        -:    0:Runs:1
+        -:    1:// Copyright (C) 2020 The Qt Company Ltd.
+        -:    2:// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+        -:    3:// Qt-Security score:critical reason:data-parser
+        -:    4:
+        -:    5:#ifndef QCHAR_H
+        -:    6:#define QCHAR_H
+        -:    7:
+        -:    8:#include <QtCore/qglobal.h>
+        -:    9:#include <QtCore/qcompare.h>
+        -:   10:
+        -:   11:#include <functional> // for std::hash
+        -:   12:
+        -:   13:QT_BEGIN_NAMESPACE
+        -:   14:
+        -:   15:class QString;
+        -:   16:
+        -:   17:struct QLatin1Char
+        -:   18:{
+        -:   19:public:
+        -:   20:    constexpr inline explicit QLatin1Char(char c) noexcept : ch(c) {}
+        -:   21:    constexpr inline char toLatin1() const noexcept { return ch; }
+        -:   22:    constexpr inline char16_t unicode() const noexcept { return char16_t(uchar(ch)); }
+        -:   23:
+        -:   24:    friend constexpr bool
+        -:   25:    comparesEqual(const QLatin1Char &lhs, const QLatin1Char &rhs) noexcept
+        -:   26:    { return lhs.ch == rhs.ch; }
+        -:   27:    friend constexpr Qt::strong_ordering
+        -:   28:    compareThreeWay(const QLatin1Char &lhs, const QLatin1Char &rhs) noexcept
+        -:   29:    { return Qt::compareThreeWay(uchar(lhs.ch), uchar(rhs.ch)); }
+        -:   30:    Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(QLatin1Char)
+        -:   31:
+        -:   32:    friend constexpr bool comparesEqual(const QLatin1Char &lhs, char rhs) noexcept
+        -:   33:    { return lhs.toLatin1() == rhs; }
+        -:   34:    friend constexpr Qt::strong_ordering
+        -:   35:    compareThreeWay(const QLatin1Char &lhs, char rhs) noexcept
+        -:   36:    { return Qt::compareThreeWay(uchar(lhs.toLatin1()), uchar(rhs)); }
+        -:   37:    Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(QLatin1Char, char)
+        -:   38:
+        -:   39:private:
+        -:   40:    friend class QChar;
+        -:   41:    // this is for QChar's ctor only:
+        -:   42:    explicit constexpr operator char16_t() const noexcept { return unicode(); }
+        -:   43:
+        -:   44:    char ch;
+        -:   45:};
+        -:   46:
+        -:   47:#define QT_CHAR_FASTCALL QT7_ONLY(Q_CORE_EXPORT) QT_FASTCALL
+        -:   48:class QT6_ONLY(Q_CORE_EXPORT) QChar {
+        -:   49:public:
+        -:   50:    enum SpecialCharacter {
+        -:   51:        Null = 0x0000,
+        -:   52:        Tabulation = 0x0009,
+        -:   53:        LineFeed = 0x000a,
+        -:   54:        FormFeed = 0x000c,
+        -:   55:        CarriageReturn = 0x000d,
+        -:   56:        Space = 0x0020,
+        -:   57:        Nbsp = 0x00a0,
+        -:   58:        SoftHyphen = 0x00ad,
+        -:   59:        ReplacementCharacter = 0xfffd,
+        -:   60:        ObjectReplacementCharacter = 0xfffc,
+        -:   61:        ByteOrderMark = 0xfeff,
+        -:   62:        ByteOrderSwapped = 0xfffe,
+        -:   63:        ParagraphSeparator = 0x2029,
+        -:   64:        LineSeparator = 0x2028,
+        -:   65:        VisualTabCharacter = 0x2192,
+        -:   66:        LastValidCodePoint = 0x10ffff
+        -:   67:    };
+        -:   68:
+        -:   69:#ifdef QT_IMPLICIT_QCHAR_CONSTRUCTION
+        -:   70:#error This macro has been removed in Qt 6.8.
+        -:   71:#endif
+        -:   72:private:
+        -:   73:    using is_wide_wchar_t = std::bool_constant<(sizeof(wchar_t) > 2)>;
+        -:   74:    template <typename Char>
+        -:   75:    using is_implicit_conversion_char = std::disjunction<
+        -:   76:            std::is_same<Char, ushort>,
+        -:   77:            std::is_same<Char, short>,
+        -:   78:            std::is_same<Char, SpecialCharacter>,
+        -:   79:            std::is_same<Char, QLatin1Char>,
+        -:   80:            std::conjunction<std::is_same<Char, wchar_t>, std::negation<is_wide_wchar_t>>,
+        -:   81:            std::is_same<Char, char16_t>
+        -:   82:        >;
+        -:   83:    template <typename Char>
+        -:   84:    using is_explicit_conversion_char = std::disjunction<
+        -:   85:            std::is_same<Char, char32_t>, // implicit conversion to uint(?) before 6.8
+        -:   86:            std::conjunction<std::is_same<Char, wchar_t>, is_wide_wchar_t>,
+        -:   87:            std::is_same<Char, int>,
+        -:   88:            std::is_same<Char, uint>
+        -:   89:        >;
+        -:   90:    template <typename Char>
+        -:   91:    using is_conversion_char = std::disjunction<
+        -:   92:            is_implicit_conversion_char<Char>,
+        -:   93:            is_explicit_conversion_char<Char>
+        -:   94:        >;
+        -:   95:    template <typename Char>
+        -:   96:    using is_implicit_ascii_warn_char = std::is_same<Char, char>;
+        -:   97:    template <typename Char>
+        -:   98:    using is_explicit_ascii_warn_char = std::is_same<Char, uchar>;
+        -:   99:    template <typename Char>
+        -:  100:    using if_compatible_char = std::enable_if_t<is_conversion_char<Char>::value, bool>;
+        -:  101:    template <typename Char>
+        -:  102:    using if_implicit_conversion_char = std::enable_if_t<is_implicit_conversion_char<Char>::value, bool>;
+        -:  103:    template <typename Char>
+        -:  104:    using if_explicit_conversion_char = std::enable_if_t<is_explicit_conversion_char<Char>::value, bool>;
+        -:  105:    template <typename Char>
+        -:  106:    using if_implicit_ascii_warn_char = std::enable_if_t<is_implicit_ascii_warn_char<Char>::value, bool>;
+        -:  107:    template <typename Char>
+        -:  108:    using if_explicit_ascii_warn_char = std::enable_if_t<is_explicit_ascii_warn_char<Char>::value, bool>;
+        -:  109:    template <typename Char>
+        -:  110:    [[maybe_unused]] static constexpr bool is_explicit_char_v = std::disjunction_v<
+        -:  111:            is_explicit_conversion_char<Char>,
+        -:  112:            is_explicit_ascii_warn_char<Char>
+        -:  113:        >;
+        -:  114:public:
+        -:  115:    constexpr Q_IMPLICIT QChar() noexcept : ucs(0) {}
+        -:  116:#if QT_CORE_REMOVED_SINCE(6, 9) || defined(Q_QDOC)
+        -:  117:    constexpr Q_IMPLICIT QChar(ushort rc) noexcept : ucs(rc) {}
+        -:  118:#endif
+        -:  119:    constexpr explicit QChar(uchar c, uchar r) noexcept : ucs(char16_t((r << 8) | c)) {}
+        -:  120:#if QT_CORE_REMOVED_SINCE(6, 9) || defined(Q_QDOC)
+        -:  121:    constexpr Q_IMPLICIT QChar(short rc) noexcept : ucs(char16_t(rc)) {}
+        -:  122:    constexpr explicit QChar(uint rc) noexcept : ucs((Q_ASSERT(rc <= 0xffff), char16_t(rc))) {}
+        -:  123:    constexpr explicit QChar(int rc) noexcept : QChar(uint(rc)) {}
+        -:  124:    constexpr Q_IMPLICIT QChar(SpecialCharacter s) noexcept : ucs(char16_t(s)) {}
+        -:  125:    constexpr Q_IMPLICIT QChar(QLatin1Char ch) noexcept : ucs(ch.unicode()) {}
+        -:  126:    constexpr Q_IMPLICIT QChar(char16_t ch) noexcept : ucs(ch) {}
+        -:  127:#if defined(Q_OS_WIN) || defined(Q_QDOC)
+        -:  128:    constexpr Q_IMPLICIT QChar(wchar_t ch) noexcept : ucs(char16_t(ch)) {}
+        -:  129:#endif
+        -:  130:#endif // QT_CORE_REMOVED_SINCE(6, 9)
+        -:  131:    template <typename Char, if_implicit_conversion_char<Char> = true>
+        1:  132:    constexpr Q_IMPLICIT QChar(const Char ch) noexcept : ucs(char16_t(ch)) {}
+        -:  133:    template <typename Char, if_explicit_conversion_char<Char> = true>
+        -:  134:    constexpr explicit QChar(const Char ch) noexcept
+        -:  135:        : ucs((Q_ASSERT(char32_t(ch) <= 0xffff), char16_t(ch))) {}
+        -:  136:
+        -:  137:#ifndef QT_NO_CAST_FROM_ASCII
+        -:  138:    // Always implicit -- allow for 'x' => QChar conversions
+        -:  139:#if QT_CORE_REMOVED_SINCE(6, 9) || defined(Q_QDOC)
+        -:  140:    QT_ASCII_CAST_WARN constexpr Q_IMPLICIT QChar(char c) noexcept : ucs(uchar(c)) { }
+        -:  141:#endif
+        -:  142:    template <typename Char, if_implicit_ascii_warn_char<Char> = true>
+    #####:  143:    QT_ASCII_CAST_WARN constexpr Q_IMPLICIT QChar(const Char ch) noexcept : ucs(uchar(ch)) {}
+        -:  144:#ifndef QT_RESTRICTED_CAST_FROM_ASCII
+        -:  145:#if QT_CORE_REMOVED_SINCE(6, 9) || defined(Q_QDOC)
+        -:  146:    QT_ASCII_CAST_WARN constexpr explicit QChar(uchar c) noexcept : ucs(c) { }
+        -:  147:#endif
+        -:  148:    template <typename Char, if_explicit_ascii_warn_char<Char> = true>
+        -:  149:    QT_ASCII_CAST_WARN constexpr explicit QChar(const Char c) noexcept : ucs(c) { }
+        -:  150:#endif
+        -:  151:#endif
+        -:  152:
+        -:  153:    static constexpr QChar fromUcs2(char16_t c) noexcept { return QChar{c}; }
+        -:  154:    static constexpr inline auto fromUcs4(char32_t c) noexcept;
+        -:  155:
+        -:  156:    // Unicode information
+        -:  157:
+        -:  158:    enum Category
+        -:  159:    {
+        -:  160:        Mark_NonSpacing,          //   Mn
+        -:  161:        Mark_SpacingCombining,    //   Mc
+        -:  162:        Mark_Enclosing,           //   Me
+        -:  163:
+        -:  164:        Number_DecimalDigit,      //   Nd
+        -:  165:        Number_Letter,            //   Nl
+        -:  166:        Number_Other,             //   No
+        -:  167:
+        -:  168:        Separator_Space,          //   Zs
+        -:  169:        Separator_Line,           //   Zl
+        -:  170:        Separator_Paragraph,      //   Zp
+        -:  171:
+        -:  172:        Other_Control,            //   Cc
+        -:  173:        Other_Format,             //   Cf
+        -:  174:        Other_Surrogate,          //   Cs
+        -:  175:        Other_PrivateUse,         //   Co
+        -:  176:        Other_NotAssigned,        //   Cn
+        -:  177:
+        -:  178:        Letter_Uppercase,         //   Lu
+        -:  179:        Letter_Lowercase,         //   Ll
+        -:  180:        Letter_Titlecase,         //   Lt
+        -:  181:        Letter_Modifier,          //   Lm
+        -:  182:        Letter_Other,             //   Lo
+        -:  183:
+        -:  184:        Punctuation_Connector,    //   Pc
+        -:  185:        Punctuation_Dash,         //   Pd
+        -:  186:        Punctuation_Open,         //   Ps
+        -:  187:        Punctuation_Close,        //   Pe
+        -:  188:        Punctuation_InitialQuote, //   Pi
+        -:  189:        Punctuation_FinalQuote,   //   Pf
+        -:  190:        Punctuation_Other,        //   Po
+        -:  191:
+        -:  192:        Symbol_Math,              //   Sm
+        -:  193:        Symbol_Currency,          //   Sc
+        -:  194:        Symbol_Modifier,          //   Sk
+        -:  195:        Symbol_Other              //   So
+        -:  196:    };
+        -:  197:
+        -:  198:    enum Script
+        -:  199:    {
+        -:  200:        Script_Unknown,
+        -:  201:        Script_Inherited,
+        -:  202:        Script_Common,
+        -:  203:
+        -:  204:        Script_Latin,
+        -:  205:        Script_Greek,
+        -:  206:        Script_Cyrillic,
+        -:  207:        Script_Armenian,
+        -:  208:        Script_Hebrew,
+        -:  209:        Script_Arabic,
+        -:  210:        Script_Syriac,
+        -:  211:        Script_Thaana,
+        -:  212:        Script_Devanagari,
+        -:  213:        Script_Bengali,
+        -:  214:        Script_Gurmukhi,
+        -:  215:        Script_Gujarati,
+        -:  216:        Script_Oriya,
+        -:  217:        Script_Tamil,
+        -:  218:        Script_Telugu,
+        -:  219:        Script_Kannada,
+        -:  220:        Script_Malayalam,
+        -:  221:        Script_Sinhala,
+        -:  222:        Script_Thai,
+        -:  223:        Script_Lao,
+        -:  224:        Script_Tibetan,
+        -:  225:        Script_Myanmar,
+        -:  226:        Script_Georgian,
+        -:  227:        Script_Hangul,
+        -:  228:        Script_Ethiopic,
+        -:  229:        Script_Cherokee,
+        -:  230:        Script_CanadianAboriginal,
+        -:  231:        Script_Ogham,
+        -:  232:        Script_Runic,
+        -:  233:        Script_Khmer,
+        -:  234:        Script_Mongolian,
+        -:  235:        Script_Hiragana,
+        -:  236:        Script_Katakana,
+        -:  237:        Script_Bopomofo,
+        -:  238:        Script_Han,
+        -:  239:        Script_Yi,
+        -:  240:        Script_OldItalic,
+        -:  241:        Script_Gothic,
+        -:  242:        Script_Deseret,
+        -:  243:        Script_Tagalog,
+        -:  244:        Script_Hanunoo,
+        -:  245:        Script_Buhid,
+        -:  246:        Script_Tagbanwa,
+        -:  247:        Script_Coptic,
+        -:  248:
+        -:  249:        // Unicode 4.0 additions
+        -:  250:        Script_Limbu,
+        -:  251:        Script_TaiLe,
+        -:  252:        Script_LinearB,
+        -:  253:        Script_Ugaritic,
+        -:  254:        Script_Shavian,
+        -:  255:        Script_Osmanya,
+        -:  256:        Script_Cypriot,
+        -:  257:        Script_Braille,
+        -:  258:
+        -:  259:        // Unicode 4.1 additions
+        -:  260:        Script_Buginese,
+        -:  261:        Script_NewTaiLue,
+        -:  262:        Script_Glagolitic,
+        -:  263:        Script_Tifinagh,
+        -:  264:        Script_SylotiNagri,
+        -:  265:        Script_OldPersian,
+        -:  266:        Script_Kharoshthi,
+        -:  267:
+        -:  268:        // Unicode 5.0 additions
+        -:  269:        Script_Balinese,
+        -:  270:        Script_Cuneiform,
+        -:  271:        Script_Phoenician,
+        -:  272:        Script_PhagsPa,
+        -:  273:        Script_Nko,
+        -:  274:
+        -:  275:        // Unicode 5.1 additions
+        -:  276:        Script_Sundanese,
+        -:  277:        Script_Lepcha,
+        -:  278:        Script_OlChiki,
+        -:  279:        Script_Vai,
+        -:  280:        Script_Saurashtra,
+        -:  281:        Script_KayahLi,
+        -:  282:        Script_Rejang,
+        -:  283:        Script_Lycian,
+        -:  284:        Script_Carian,
+        -:  285:        Script_Lydian,
+        -:  286:        Script_Cham,
+        -:  287:
+        -:  288:        // Unicode 5.2 additions
+        -:  289:        Script_TaiTham,
+        -:  290:        Script_TaiViet,
+        -:  291:        Script_Avestan,
+        -:  292:        Script_EgyptianHieroglyphs,
+        -:  293:        Script_Samaritan,
+        -:  294:        Script_Lisu,
+        -:  295:        Script_Bamum,
+        -:  296:        Script_Javanese,
+        -:  297:        Script_MeeteiMayek,
+        -:  298:        Script_ImperialAramaic,
+        -:  299:        Script_OldSouthArabian,
+        -:  300:        Script_InscriptionalParthian,
+        -:  301:        Script_InscriptionalPahlavi,
+        -:  302:        Script_OldTurkic,
+        -:  303:        Script_Kaithi,
+        -:  304:
+        -:  305:        // Unicode 6.0 additions
+        -:  306:        Script_Batak,
+        -:  307:        Script_Brahmi,
+        -:  308:        Script_Mandaic,
+        -:  309:
+        -:  310:        // Unicode 6.1 additions
+        -:  311:        Script_Chakma,
+        -:  312:        Script_MeroiticCursive,
+        -:  313:        Script_MeroiticHieroglyphs,
+        -:  314:        Script_Miao,
+        -:  315:        Script_Sharada,
+        -:  316:        Script_SoraSompeng,
+        -:  317:        Script_Takri,
+        -:  318:
+        -:  319:        // Unicode 7.0 additions
+        -:  320:        Script_CaucasianAlbanian,
+        -:  321:        Script_BassaVah,
+        -:  322:        Script_Duployan,
+        -:  323:        Script_Elbasan,
+        -:  324:        Script_Grantha,
+        -:  325:        Script_PahawhHmong,
+        -:  326:        Script_Khojki,
+        -:  327:        Script_LinearA,
+        -:  328:        Script_Mahajani,
+        -:  329:        Script_Manichaean,
+        -:  330:        Script_MendeKikakui,
+        -:  331:        Script_Modi,
+        -:  332:        Script_Mro,
+        -:  333:        Script_OldNorthArabian,
+        -:  334:        Script_Nabataean,
+        -:  335:        Script_Palmyrene,
+        -:  336:        Script_PauCinHau,
+        -:  337:        Script_OldPermic,
+        -:  338:        Script_PsalterPahlavi,
+        -:  339:        Script_Siddham,
+        -:  340:        Script_Khudawadi,
+        -:  341:        Script_Tirhuta,
+        -:  342:        Script_WarangCiti,
+        -:  343:
+        -:  344:        // Unicode 8.0 additions
+        -:  345:        Script_Ahom,
+        -:  346:        Script_AnatolianHieroglyphs,
+        -:  347:        Script_Hatran,
+        -:  348:        Script_Multani,
+        -:  349:        Script_OldHungarian,
+        -:  350:        Script_SignWriting,
+        -:  351:
+        -:  352:        // Unicode 9.0 additions
+        -:  353:        Script_Adlam,
+        -:  354:        Script_Bhaiksuki,
+        -:  355:        Script_Marchen,
+        -:  356:        Script_Newa,
+        -:  357:        Script_Osage,
+        -:  358:        Script_Tangut,
+        -:  359:
+        -:  360:        // Unicode 10.0 additions
+        -:  361:        Script_MasaramGondi,
+        -:  362:        Script_Nushu,
+        -:  363:        Script_Soyombo,
+        -:  364:        Script_ZanabazarSquare,
+        -:  365:
+        -:  366:        // Unicode 12.1 additions
+        -:  367:        Script_Dogra,
+        -:  368:        Script_GunjalaGondi,
+        -:  369:        Script_HanifiRohingya,
+        -:  370:        Script_Makasar,
+        -:  371:        Script_Medefaidrin,
+        -:  372:        Script_OldSogdian,
+        -:  373:        Script_Sogdian,
+        -:  374:        Script_Elymaic,
+        -:  375:        Script_Nandinagari,
+        -:  376:        Script_NyiakengPuachueHmong,
+        -:  377:        Script_Wancho,
+        -:  378:
+        -:  379:        // Unicode 13.0 additions
+        -:  380:        Script_Chorasmian,
+        -:  381:        Script_DivesAkuru,
+        -:  382:        Script_KhitanSmallScript,
+        -:  383:        Script_Yezidi,
+        -:  384:
+        -:  385:        // Unicode 14.0 additions
+        -:  386:        Script_CyproMinoan,
+        -:  387:        Script_OldUyghur,
+        -:  388:        Script_Tangsa,
+        -:  389:        Script_Toto,
+        -:  390:        Script_Vithkuqi,
+        -:  391:
+        -:  392:        // Unicode 15.0 additions
+        -:  393:        Script_Kawi,
+        -:  394:        Script_NagMundari,
+        -:  395:
+        -:  396:        // Unicode 16.0 additions
+        -:  397:        Script_Garay,
+        -:  398:        Script_GurungKhema,
+        -:  399:        Script_KiratRai,
+        -:  400:        Script_OlOnal,
+        -:  401:        Script_Sunuwar,
+        -:  402:        Script_Todhri,
+        -:  403:        Script_TuluTigalari,
+        -:  404:
+        -:  405:        ScriptCount
+        -:  406:    };
+        -:  407:
+        -:  408:    enum Direction
+        -:  409:    {
+        -:  410:        DirL, DirR, DirEN, DirES, DirET, DirAN, DirCS, DirB, DirS, DirWS, DirON,
+        -:  411:        DirLRE, DirLRO, DirAL, DirRLE, DirRLO, DirPDF, DirNSM, DirBN,
+        -:  412:        DirLRI, DirRLI, DirFSI, DirPDI
+        -:  413:    };
+        -:  414:
+        -:  415:    enum Decomposition
+        -:  416:    {
+        -:  417:        NoDecomposition,
+        -:  418:        Canonical,
+        -:  419:        Font,
+        -:  420:        NoBreak,
+        -:  421:        Initial,
+        -:  422:        Medial,
+        -:  423:        Final,
+        -:  424:        Isolated,
+        -:  425:        Circle,
+        -:  426:        Super,
+        -:  427:        Sub,
+        -:  428:        Vertical,
+        -:  429:        Wide,
+        -:  430:        Narrow,
+        -:  431:        Small,
+        -:  432:        Square,
+        -:  433:        Compat,
+        -:  434:        Fraction
+        -:  435:    };
+        -:  436:
+        -:  437:    enum JoiningType {
+        -:  438:        Joining_None,
+        -:  439:        Joining_Causing,
+        -:  440:        Joining_Dual,
+        -:  441:        Joining_Right,
+        -:  442:        Joining_Left,
+        -:  443:        Joining_Transparent
+        -:  444:    };
+        -:  445:
+        -:  446:    enum CombiningClass
+        -:  447:    {
+        -:  448:        Combining_BelowLeftAttached       = 200,
+        -:  449:        Combining_BelowAttached           = 202,
+        -:  450:        Combining_BelowRightAttached      = 204,
+        -:  451:        Combining_LeftAttached            = 208,
+        -:  452:        Combining_RightAttached           = 210,
+        -:  453:        Combining_AboveLeftAttached       = 212,
+        -:  454:        Combining_AboveAttached           = 214,
+        -:  455:        Combining_AboveRightAttached      = 216,
+        -:  456:
+        -:  457:        Combining_BelowLeft               = 218,
+        -:  458:        Combining_Below                   = 220,
+        -:  459:        Combining_BelowRight              = 222,
+        -:  460:        Combining_Left                    = 224,
+        -:  461:        Combining_Right                   = 226,
+        -:  462:        Combining_AboveLeft               = 228,
+        -:  463:        Combining_Above                   = 230,
+        -:  464:        Combining_AboveRight              = 232,
+        -:  465:
+        -:  466:        Combining_DoubleBelow             = 233,
+        -:  467:        Combining_DoubleAbove             = 234,
+        -:  468:        Combining_IotaSubscript           = 240
+        -:  469:    };
+        -:  470:
+        -:  471:    enum UnicodeVersion {
+        -:  472:        Unicode_Unassigned,
+        -:  473:        Unicode_1_1,
+        -:  474:        Unicode_2_0,
+        -:  475:        Unicode_2_1_2,
+        -:  476:        Unicode_3_0,
+        -:  477:        Unicode_3_1,
+        -:  478:        Unicode_3_2,
+        -:  479:        Unicode_4_0,
+        -:  480:        Unicode_4_1,
+        -:  481:        Unicode_5_0,
+        -:  482:        Unicode_5_1,
+        -:  483:        Unicode_5_2,
+        -:  484:        Unicode_6_0,
+        -:  485:        Unicode_6_1,
+        -:  486:        Unicode_6_2,
+        -:  487:        Unicode_6_3,
+        -:  488:        Unicode_7_0,
+        -:  489:        Unicode_8_0,
+        -:  490:        Unicode_9_0,
+        -:  491:        Unicode_10_0,
+        -:  492:        Unicode_11_0,
+        -:  493:        Unicode_12_0,
+        -:  494:        Unicode_12_1,
+        -:  495:        Unicode_13_0,
+        -:  496:        Unicode_14_0,
+        -:  497:        Unicode_15_0,
+        -:  498:        Unicode_15_1,
+        -:  499:        Unicode_16_0,
+        -:  500:    };
+        -:  501:
+        -:  502:    Category category() const noexcept { return QChar::category(char32_t(ucs)); }
+        -:  503:    Direction direction() const noexcept { return QChar::direction(char32_t(ucs)); }
+        -:  504:    JoiningType joiningType() const noexcept { return QChar::joiningType(char32_t(ucs)); }
+        -:  505:    unsigned char combiningClass() const noexcept { return QChar::combiningClass(char32_t(ucs)); }
+        -:  506:
+        -:  507:    QChar mirroredChar() const noexcept { return QChar(QChar::mirroredChar(char32_t(ucs))); }
+        -:  508:    bool hasMirrored() const noexcept { return QChar::hasMirrored(char32_t(ucs)); }
+        -:  509:
+        -:  510:    QString decomposition() const;
+        -:  511:    Decomposition decompositionTag() const noexcept { return QChar::decompositionTag(char32_t(ucs)); }
+        -:  512:
+    #####:  513:    int digitValue() const noexcept { return QChar::digitValue(char32_t(ucs)); }
+        -:  514:    QChar toLower() const noexcept { return QChar(QChar::toLower(char32_t(ucs))); }
+        -:  515:    QChar toUpper() const noexcept { return QChar(QChar::toUpper(char32_t(ucs))); }
+        -:  516:    QChar toTitleCase() const noexcept { return QChar(QChar::toTitleCase(char32_t(ucs))); }
+        -:  517:    QChar toCaseFolded() const noexcept { return QChar(QChar::toCaseFolded(char32_t(ucs))); }
+        -:  518:
+        -:  519:    Script script() const noexcept { return QChar::script(char32_t(ucs)); }
+        -:  520:
+        -:  521:    UnicodeVersion unicodeVersion() const noexcept { return QChar::unicodeVersion(char32_t(ucs)); }
+        -:  522:
+        -:  523:    constexpr inline char toLatin1() const noexcept { return ucs > 0xff ? '\0' : char(ucs); }
+        -:  524:    constexpr inline char16_t unicode() const noexcept { return ucs; }
+        -:  525:    constexpr inline char16_t &unicode() noexcept { return ucs; }
+        -:  526:
+        -:  527:    static constexpr QChar fromLatin1(char c) noexcept { return QLatin1Char(c); }
+        -:  528:
+        -:  529:    constexpr inline bool isNull() const noexcept { return ucs == 0; }
+        -:  530:
+        -:  531:    bool isPrint() const noexcept { return QChar::isPrint(char32_t(ucs)); }
+        -:  532:    constexpr bool isSpace() const noexcept { return QChar::isSpace(char32_t(ucs)); }
+        -:  533:    bool isMark() const noexcept { return QChar::isMark(char32_t(ucs)); }
+        -:  534:    bool isPunct() const noexcept { return QChar::isPunct(char32_t(ucs)); }
+        -:  535:    bool isSymbol() const noexcept { return QChar::isSymbol(char32_t(ucs)); }
+        -:  536:    constexpr bool isLetter() const noexcept { return QChar::isLetter(char32_t(ucs)); }
+        -:  537:    constexpr bool isNumber() const noexcept { return QChar::isNumber(char32_t(ucs)); }
+        -:  538:    constexpr bool isLetterOrNumber() const noexcept { return QChar::isLetterOrNumber(char32_t(ucs)); }
+        -:  539:    constexpr bool isDigit() const noexcept { return QChar::isDigit(char32_t(ucs)); }
+        -:  540:    constexpr bool isLower() const noexcept { return QChar::isLower(char32_t(ucs)); }
+        -:  541:    constexpr bool isUpper() const noexcept { return QChar::isUpper(char32_t(ucs)); }
+        -:  542:    constexpr bool isTitleCase() const noexcept { return QChar::isTitleCase(char32_t(ucs)); }
+        -:  543:
+        -:  544:    constexpr bool isNonCharacter() const noexcept { return QChar::isNonCharacter(char32_t(ucs)); }
+        -:  545:    constexpr bool isHighSurrogate() const noexcept { return QChar::isHighSurrogate(char32_t(ucs)); }
+        -:  546:    constexpr bool isLowSurrogate() const noexcept { return QChar::isLowSurrogate(char32_t(ucs)); }
+        -:  547:    constexpr bool isSurrogate() const noexcept { return QChar::isSurrogate(char32_t(ucs)); }
+        -:  548:
+        -:  549:    constexpr inline uchar cell() const noexcept { return uchar(ucs & 0xff); }
+        -:  550:    constexpr inline uchar row() const noexcept { return uchar((ucs>>8)&0xff); }
+        -:  551:    constexpr inline void setCell(uchar acell) noexcept { ucs = char16_t((ucs & 0xff00) + acell); }
+        -:  552:    constexpr inline void setRow(uchar arow) noexcept { ucs = char16_t((char16_t(arow)<<8) + (ucs&0xff)); }
+        -:  553:
+        -:  554:    static constexpr inline bool isNonCharacter(char32_t ucs4) noexcept
+        -:  555:    {
+        -:  556:        return ucs4 >= 0xfdd0 && (ucs4 <= 0xfdef || (ucs4 & 0xfffe) == 0xfffe);
+        -:  557:    }
+        -:  558:    static constexpr inline bool isHighSurrogate(char32_t ucs4) noexcept
+        -:  559:    {
+        -:  560:        return (ucs4 & 0xfffffc00) == 0xd800; // 0xd800 + up to 1023 (0x3ff)
+        -:  561:    }
+        -:  562:    static constexpr inline bool isLowSurrogate(char32_t ucs4) noexcept
+        -:  563:    {
+        -:  564:        return (ucs4 & 0xfffffc00) == 0xdc00; // 0xdc00 + up to 1023 (0x3ff)
+        -:  565:    }
+        -:  566:    static constexpr inline bool isSurrogate(char32_t ucs4) noexcept
+        -:  567:    {
+        -:  568:        return (ucs4 - 0xd800u < 2048u);
+        -:  569:    }
+        -:  570:    static constexpr inline bool requiresSurrogates(char32_t ucs4) noexcept
+        -:  571:    {
+        -:  572:        return (ucs4 >= 0x10000);
+        -:  573:    }
+        -:  574:    static constexpr inline char32_t surrogateToUcs4(char16_t high, char16_t low) noexcept
+        -:  575:    {
+        -:  576:        // 0x010000 through 0x10ffff, provided params are actual high, low surrogates.
+        -:  577:        // 0x010000 + ((high - 0xd800) << 10) + (low - 0xdc00), optimized:
+        -:  578:        return (char32_t(high)<<10) + low - 0x35fdc00;
+        -:  579:    }
+        -:  580:    static constexpr inline char32_t surrogateToUcs4(QChar high, QChar low) noexcept
+        -:  581:    {
+        -:  582:        return surrogateToUcs4(high.ucs, low.ucs);
+        -:  583:    }
+        -:  584:    static constexpr inline char16_t highSurrogate(char32_t ucs4) noexcept
+        -:  585:    {
+        -:  586:        return char16_t((ucs4>>10) + 0xd7c0);
+        -:  587:    }
+        -:  588:    static constexpr inline char16_t lowSurrogate(char32_t ucs4) noexcept
+        -:  589:    {
+        -:  590:        return char16_t(ucs4%0x400 + 0xdc00);
+        -:  591:    }
+        -:  592:
+        -:  593:    static Category QT_CHAR_FASTCALL category(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  594:    static Direction QT_CHAR_FASTCALL direction(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  595:    static JoiningType QT_CHAR_FASTCALL joiningType(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  596:    static unsigned char QT_CHAR_FASTCALL combiningClass(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  597:
+        -:  598:    static char32_t QT_CHAR_FASTCALL mirroredChar(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  599:    static bool QT_CHAR_FASTCALL hasMirrored(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  600:
+        -:  601:    static QString QT_CHAR_FASTCALL decomposition(char32_t ucs4);
+        -:  602:    static Decomposition QT_CHAR_FASTCALL decompositionTag(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  603:
+        -:  604:    static int QT_CHAR_FASTCALL digitValue(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  605:    static char32_t QT_CHAR_FASTCALL toLower(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  606:    static char32_t QT_CHAR_FASTCALL toUpper(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  607:    static char32_t QT_CHAR_FASTCALL toTitleCase(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  608:    static char32_t QT_CHAR_FASTCALL toCaseFolded(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  609:
+        -:  610:    static Script QT_CHAR_FASTCALL script(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  611:
+        -:  612:    static UnicodeVersion QT_CHAR_FASTCALL unicodeVersion(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  613:
+        -:  614:    static UnicodeVersion QT_CHAR_FASTCALL currentUnicodeVersion() noexcept Q_DECL_CONST_FUNCTION;
+        -:  615:
+        -:  616:    static bool QT_CHAR_FASTCALL isPrint(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  617:    static constexpr inline bool isSpace(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION
+        -:  618:    {
+        -:  619:        // note that [0x09..0x0d] + 0x85 are exceptional Cc-s and must be handled explicitly
+        -:  620:        return ucs4 == 0x20 || (ucs4 <= 0x0d && ucs4 >= 0x09)
+        -:  621:                || (ucs4 > 127 && (ucs4 == 0x85 || ucs4 == 0xa0 || QChar::isSpace_helper(ucs4)));
+        -:  622:    }
+        -:  623:    static bool QT_CHAR_FASTCALL isMark(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  624:    static bool QT_CHAR_FASTCALL isPunct(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  625:    static bool QT_CHAR_FASTCALL isSymbol(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  626:    static constexpr inline bool isLetter(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION
+        -:  627:    {
+        -:  628:        return (ucs4 >= 'A' && ucs4 <= 'z' && (ucs4 >= 'a' || ucs4 <= 'Z'))
+        -:  629:                || (ucs4 > 127 && QChar::isLetter_helper(ucs4));
+        -:  630:    }
+        -:  631:    static constexpr inline bool isNumber(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION
+        -:  632:    { return (ucs4 <= '9' && ucs4 >= '0') || (ucs4 > 127 && QChar::isNumber_helper(ucs4)); }
+        -:  633:    static constexpr inline bool isLetterOrNumber(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION
+        -:  634:    {
+        -:  635:        return (ucs4 >= 'A' && ucs4 <= 'z' && (ucs4 >= 'a' || ucs4 <= 'Z'))
+        -:  636:                || (ucs4 >= '0' && ucs4 <= '9')
+        -:  637:                || (ucs4 > 127 && QChar::isLetterOrNumber_helper(ucs4));
+        -:  638:    }
+        -:  639:    static constexpr inline bool isDigit(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION
+        -:  640:    { return (ucs4 <= '9' && ucs4 >= '0') || (ucs4 > 127 && QChar::category(ucs4) == Number_DecimalDigit); }
+        -:  641:    static constexpr inline bool isLower(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION
+        -:  642:    { return (ucs4 <= 'z' && ucs4 >= 'a') || (ucs4 > 127 && QChar::category(ucs4) == Letter_Lowercase); }
+        -:  643:    static constexpr inline bool isUpper(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION
+        -:  644:    { return (ucs4 <= 'Z' && ucs4 >= 'A') || (ucs4 > 127 && QChar::category(ucs4) == Letter_Uppercase); }
+        -:  645:    static constexpr inline bool isTitleCase(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION
+        -:  646:    { return ucs4 > 127 && QChar::category(ucs4) == Letter_Titlecase; }
+        -:  647:
+    #####:  648:    friend constexpr bool comparesEqual(const QChar &lhs, const QChar &rhs) noexcept
+    #####:  649:    { return lhs.ucs == rhs.ucs; }
+        -:  650:    friend constexpr Qt::strong_ordering
+        -:  651:    compareThreeWay(const QChar &lhs, const QChar &rhs) noexcept
+        -:  652:    { return Qt::compareThreeWay(lhs.ucs, rhs.ucs); }
+    #####:  653:    Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(QChar)
+        -:  654:
+        -:  655:    friend constexpr bool comparesEqual(const QChar &lhs, std::nullptr_t) noexcept
+        -:  656:    { return lhs.isNull(); }
+        -:  657:    friend constexpr Qt::strong_ordering
+        -:  658:    compareThreeWay(const QChar &lhs, std::nullptr_t) noexcept
+        -:  659:    { return lhs.isNull() ? Qt::strong_ordering::equivalent : Qt::strong_ordering::greater; }
+        -:  660:    Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(QChar, std::nullptr_t)
+        -:  661:
+        -:  662:private:
+        -:  663:    static bool QT_CHAR_FASTCALL isSpace_helper(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  664:    static bool QT_CHAR_FASTCALL isLetter_helper(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  665:    static bool QT_CHAR_FASTCALL isNumber_helper(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  666:    static bool QT_CHAR_FASTCALL isLetterOrNumber_helper(char32_t ucs4) noexcept Q_DECL_CONST_FUNCTION;
+        -:  667:
+        -:  668:    // defined in qstring.cpp, because we need to go via QUtf8StringView
+        -:  669:    static bool QT_CHAR_FASTCALL
+        -:  670:    equal_helper(QChar lhs, const char *rhs) noexcept Q_DECL_CONST_FUNCTION;
+        -:  671:    static int QT_CHAR_FASTCALL
+        -:  672:    compare_helper(QChar lhs, const char *rhs) noexcept Q_DECL_CONST_FUNCTION;
+        -:  673:
+        -:  674:#if !defined(QT_NO_CAST_FROM_ASCII) && !defined(QT_RESTRICTED_CAST_FROM_ASCII)
+        -:  675:    Q_WEAK_OVERLOAD
+        -:  676:    friend bool comparesEqual(const QChar &lhs, const char *rhs) noexcept
+        -:  677:    { return equal_helper(lhs, rhs); }
+        -:  678:    Q_WEAK_OVERLOAD
+        -:  679:    friend Qt::strong_ordering compareThreeWay(const QChar &lhs, const char *rhs) noexcept
+        -:  680:    {
+        -:  681:        const int res = compare_helper(lhs, rhs);
+        -:  682:        return Qt::compareThreeWay(res, 0);
+        -:  683:    }
+        -:  684:    Q_DECLARE_STRONGLY_ORDERED(QChar, const char *, Q_WEAK_OVERLOAD QT_ASCII_CAST_WARN)
+        -:  685:#endif // !defined(QT_NO_CAST_FROM_ASCII) && !defined(QT_RESTRICTED_CAST_FROM_ASCII)
+        -:  686:
+        -:  687:    char16_t ucs;
+        -:  688:};
+        -:  689:#undef QT_CHAR_FASTCALL
+        -:  690:
+        -:  691:Q_DECLARE_TYPEINFO(QChar, Q_PRIMITIVE_TYPE);
+        -:  692:
+        -:  693:namespace Qt {
+        -:  694:inline namespace Literals {
+        -:  695:inline namespace StringLiterals {
+        -:  696:
+        -:  697:constexpr inline QLatin1Char operator""_L1(char ch) noexcept
+        -:  698:{
+        -:  699:    return QLatin1Char(ch);
+        -:  700:}
+        -:  701:
+        -:  702:} // StringLiterals
+        -:  703:} // Literals
+        -:  704:} // Qt
+        -:  705:
+        -:  706:QT_END_NAMESPACE
+        -:  707:
+        -:  708:namespace std {
+        -:  709:template <>
+        -:  710:struct hash<QT_PREPEND_NAMESPACE(QChar)>
+        -:  711:{
+        -:  712:    template <typename = void> // for transparent constexpr tracking
+        -:  713:    constexpr size_t operator()(QT_PREPEND_NAMESPACE(QChar) c) const
+        -:  714:        noexcept(noexcept(std::hash<char16_t>{}(u' ')))
+        -:  715:    {
+        -:  716:        return std::hash<char16_t>{}(c.unicode());
+        -:  717:    }
+        -:  718:};
+        -:  719:} // namespace std
+        -:  720:
+        -:  721:#endif // QCHAR_H
+        -:  722:
+        -:  723:#include <QtCore/qstringview.h> // for QChar::fromUcs4() definition
