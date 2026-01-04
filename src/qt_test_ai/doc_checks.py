@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import zipfile
+import xml.etree.ElementTree as ET
 import re
 from pathlib import Path
 
@@ -13,7 +15,32 @@ _DOC_NAMES = (
     "README.txt",
     "使用说明.md",
     "用户手册.md",
+    "用户手册.docx",
+    "需求文档.docx",
 )
+
+def read_docx_text(path: Path) -> str:
+    """Read text from a .docx file without external dependencies."""
+    try:
+        with zipfile.ZipFile(path) as zf:
+            xml_content = zf.read('word/document.xml')
+        
+        root = ET.fromstring(xml_content)
+        # Word XML namespace
+        ns = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+        
+        text = []
+        for p in root.findall('.//w:p', ns):
+            paragraph_text = []
+            for t in p.findall('.//w:t', ns):
+                if t.text:
+                    paragraph_text.append(t.text)
+            if paragraph_text:
+                text.append(''.join(paragraph_text))
+        
+        return '\n'.join(text)
+    except Exception as e:
+        return f"[Error reading .docx: {e}]"
 
 
 def run_doc_checks(project_root: Path) -> tuple[list[Finding], dict]:

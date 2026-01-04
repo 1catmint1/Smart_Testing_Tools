@@ -383,3 +383,81 @@ A: 是的，查看 INTEGRATION_SUMMARY.md 的 API 部分
 **更新**: 2024 年
 
 **准备好了吗？** [👉 START_HERE.md](START_HERE.md)
+
+---
+
+## ✨ v1.2 新增功能 (New!)
+
+### 1. 🔍 单文件测试模式
+现在支持只针对单个 `.cpp` 文件生成测试，大大节省 token 并提高针对性。
+- 在 UI 中选择 `Run Single File` 即可
+- 自动分析该文件的依赖并生成最小化测试上下文
+
+### 2. 🛡️ 增强的稳定性与自动修复
+- **DLL 错误自动重试**: 如果检测到 `0xC0000139` (Entry Point Not Found)，工具会自动尝试搜索 `C:/Qt` 或 `D:/Qt` 并挂载 bin 目录重试。
+- **覆盖率工件清理**: 每次运行前自动清理旧的 `.gcda/.gcov` 文件，防止报告污染。
+- **智能资源监控**: 冒烟测试现在包含内存泄漏趋势预测和 CPU 异常占用警告。
+
+### 3. 💾 配置持久化
+工具会自动记住您的上一次配置：
+- EXE 路径
+- 覆盖率命令
+- 选中的功能用例
+方便反复调试同一项目。
+
+### 4. 📄 文档检查增强
+- **Word 文档支持**: 直接支持读取 `.docx` 用户手册进行一致性检查（无需安装额外依赖）。
+  > [!TIP]
+  > 工具会自动扫描项目根目录或 `docs/` 目录下的文档（支持 .md/.txt/.docx）。
+- **报告导出**: 检查结果现可导出为 HTML/JSON 格式。
+- **超大项目支持**: 可通过环境变量调整 LLM 读取的代码量上限。
+
+---
+
+## ⚙️ 技术规格与配置
+
+### 环境要求
+- **Python**: 3.10+
+- **Qt Toolkit**: Qt 6.x (推荐) 或 Qt 5.x
+- **Build System**: qmake + mingw32-make (Windows)
+
+### 依赖库
+核心依赖已包含在 `requirements.txt` 中，主要包括：
+- `PySide6`: UI 界面
+- `psutil`: 进程与性能监控
+- `pywinauto`: Windows UI 自动化探测 (可选)
+
+### 📝 环境变量速查表
+
+| 变量名 | 必填 | 默认值 | 说明 |
+| :--- | :---: | :---: | :--- |
+| `QT_TEST_AI_LLM_API_KEY` | ✅ | - | LLM API 密钥 |
+| `QT_TEST_AI_LLM_BASE_URL` | ✅ | - | LLM API Base URL |
+| `QT_TEST_AI_LLM_MODEL` | - | `gpt-3.5-turbo` | 使用的模型名称 |
+| `QT_TEST_AI_ENABLE_AUTOMATION` | - | `0` | 设为 `1` 开启 LLM 测试生成 |
+| `QT_TEST_AI_TEST_CMD` | - | (自动检测) | 测试运行命令 (如 `ctest`) |
+| `QT_TEST_AI_COVERAGE_CMD` | - | (自动检测) | 覆盖率收集命令 (如 `gcovr`) |
+| `QT_TEST_AI_COVERAGE_CLEAN_BEFORE`| - | `1` | 运行前是否清理覆盖率文件 (1/0) |
+| `QT_TEST_AI_TESTGEN_FILE_LIMIT` | - | `5` | 每次生成的测试文件上限 |
+| `QT_TEST_AI_CTX_MAX_FILES` | - | `12` | LLM 分析的代码文件数量上限 |
+| `QT_TEST_AI_CTX_MAX_CHARS` | - | `40000` | LLM 分析的代码字符总数上限 |
+
+---
+
+## 🔧 常见问题排查 (Troubleshooting)
+
+### Q: 启动被测程序失败，错误码 `0xC0000139`?
+**A:** 这通常是 DLL 版本不匹配导致的。
+- **自动修复**: 本工具 v1.2 已内置尝试修复功能。
+- **手动修复**: 确保您的 `PATH` 环境变量中包含了编译该程序所用的 Qt bin 目录 (例如 `C:\Qt\6.5.3\mingw_64\bin`)。
+
+### Q: LLM 生成的测试无法编译?
+**A:** 请检查:
+1. `.pro` 文件是否正确引用了源文件。
+2. 之前的运行是否残留了错误的文件？尝试删除 `tests/generated/` 目录重试。
+
+### Q: 覆盖率报告为空?
+**A:** 
+1. 确认已在 Debug 模式下编译。
+2. 确认 `.pro` 文件中添加了 `CONFIG += coverage` 或 `QMAKE_CXXFLAGS += --coverage`。
+3. 检查 `QT_TEST_AI_COVERAGE_CMD` 是否正确指向了 `gcovr`。

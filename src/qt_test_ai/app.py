@@ -27,7 +27,7 @@ def _load_dotenv_if_present():
 _load_dotenv_if_present()
 
 from . import db as dbmod
-from .doc_checks import run_doc_checks, run_llm_doc_checks
+from .doc_checks import run_doc_checks, run_llm_doc_checks, read_docx_text
 from .dynamic_checks import pick_exe, run_smoke_test, run_windows_ui_probe
 from .models import Finding, TestRun
 from .reporting import write_html, write_json
@@ -787,8 +787,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.doc_llm_check_btn.setProperty("kind", "primary")
         self.doc_llm_check_btn.clicked.connect(self._run_llm_doc_check)
         
+        self.doc_export_btn = QtWidgets.QPushButton("💾 导出报告")
+        self.doc_export_btn.setProperty("kind", "secondary")
+        self.doc_export_btn.clicked.connect(self._export_doc_report)
+        
         doc_btns.addWidget(self.doc_scan_btn)
         doc_btns.addWidget(self.doc_llm_check_btn)
+        doc_btns.addWidget(self.doc_export_btn)
         doc_btns.addStretch(1)
         ldoc.addLayout(doc_btns)
         
@@ -2147,9 +2152,12 @@ class MainWindow(QtWidgets.QMainWindow):
             if dp.suffix in [".md", ".txt"]:
                 doc_content += f"\n=== {dp.name} ===\n"
                 doc_content += read_text_best_effort(dp)[:3000]
+            elif dp.suffix == ".docx":
+                doc_content += f"\n=== {dp.name} ===\n"
+                doc_content += read_docx_text(dp)[:3000]
         
         if not doc_content.strip():
-            QtWidgets.QMessageBox.warning(self, "提示", "未能读取文档内容（仅支持 .md/.txt 文件）")
+            QtWidgets.QMessageBox.warning(self, "提示", "未能读取文档内容（支持 .md/.txt/.docx）")
             return
         
         # Get project context
@@ -2174,6 +2182,64 @@ class MainWindow(QtWidgets.QMainWindow):
             self._log(f"✅ LLM 文档检查完成，发现 {len(findings)} 个问题")
         else:
             self._log("✅ LLM 文档检查完成，未发现一致性问题")
+
+    def _export_doc_report(self) -> None:
+        """Export the document check results to a file."""
+        if self.doc_results_table.rowCount() == 0:
+            QtWidgets.QMessageBox.information(self, "提示", "当前没有检查结果可导出")
+            return
+            
+        default_name = f"doc_check_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "导出报告", default_name, "HTML Files (*.html);;JSON Files (*.json)")
+        if not path:
+            return
+            
+        p = Path(path)
+        
+        # Collect data
+        rows = []
+        for r in range(self.doc_results_table.rowCount()):
+            rows.append({
+                "severity": self.doc_results_table.item(r, 0).text(),
+                "title": self.doc_results_table.item(r, 1).text(),
+                "details": self.doc_results_table.item(r, 2).text(),
+            })
+            
+        if p.suffix.lower() == ".json":
+            import json
+            p.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+        else:
+            # Simple HTML
+            html = """
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: sans-serif; padding: 20px; }
+                    table { border-collapse: collapse; width: 100%; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    tr.error { background-color: #fee2e2; }
+                    tr.warning { background-color: #fef3c7; }
+                </style>
+            </head>
+            <body>
+                <h2>文档检查报告</h2>
+                <p>生成时间: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
+                <table>
+                    <tr><th>级别</th><th>标题</th><th>详情</th></tr>
+            """
+            for row in rows:
+                cls = "error" if row["severity"] == "error" else ("warning" if row["severity"] == "warning" else "")
+                html += f'<tr class="{cls}"><td>{row["severity"]}</td><td>{row["title"]}</td><td>{row["details"]}</td></tr>'
+            html += """
+                </table>
+            </body>
+            </html>
+            """
+            p.write_text(html, encoding="utf-8")
+        
+        self._log(f"文档检查报告已导出：{p}")
 
     def _restore_functional_from_run(self, run: TestRun) -> None:
         functional = (run.meta or {}).get("functional_cases") or []

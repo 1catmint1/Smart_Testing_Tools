@@ -96,6 +96,19 @@ def _parse_pro_file_list(text: str) -> dict[str, list[str]]:
 
 
 def build_project_context(project_root: Path, *, max_files: int = 12, max_chars: int = 40_000, top_level_only: bool = False) -> ProjectContext:
+    # Allow env var override
+    if "QT_TEST_AI_CTX_MAX_FILES" in os.environ:
+        try:
+            max_files = int(os.environ["QT_TEST_AI_CTX_MAX_FILES"])
+        except ValueError:
+            pass
+    
+    if "QT_TEST_AI_CTX_MAX_CHARS" in os.environ:
+        try:
+            max_chars = int(os.environ["QT_TEST_AI_CTX_MAX_CHARS"])
+        except ValueError:
+            pass
+
     pro_files = sorted(project_root.glob("*.pro"), key=lambda p: p.name.lower())
 
     # Prefer files referenced by .pro
